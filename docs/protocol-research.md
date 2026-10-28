@@ -82,6 +82,6 @@ The vendor driver writes one key per report and never reads back. Payload offset
 
 ## Next steps (Phase 1)
 
-1. Proof of concept: write one non-primary key with `hallforge keys set --experimental`, test it by hand, and restore it.
+1. Done: proof of concept on KeyQ (3.5 mm, confirmed by typing, then restored to 0.9 mm). See `hardware-compatibility.md`.
 2. Import the current per-key state from the vendor driver database as the initial backup.
 3. Keep the last applied state locally, because the device cannot report it.

@@ -21,7 +21,11 @@ Observed on 2026-10-28, Windows 11 (build 26300), with `hallforge devices probe`
   - GET_FEATURE_LIST and GET_MULTI_MAGNETISM come back as the unchanged request. See "Echo behavior" in `protocol-research.md`. The precision is **unknown**.
   - The vendor driver lists id 1778 as `yc3121_mod007b_iso_he_soc_uk_8k`, which confirms the model.
   - Model id 1778 is not in the monsgeek-akko-linux device database. That database lists PID 0x4035 for at least ten other boards, including MOD007B HE ids 847, 1637, 3160 and 3161. This is why definitions match on `firmwareModelIds`.
-- Support level: `Unverified`. Only GET_USB_VERSION and GET_FEATURE_LIST have been sent to the device.
+- Write proof of concept (2026-10-28, Windows 11, wired, vendor driver window closed):
+  - `hallforge keys set --experimental` set KeyQ (matrix 8, profile 0) to 3.5 mm actuation. The owner confirmed by typing that Q then triggered near the bottom of its travel.
+  - Q was then restored to its previous setting from the vendor driver database (0.9 / 0.9 mm, rapid trigger off, 0.2 / 0.3 mm, deadzone 3.7 mm).
+  - Per-key settings cannot be read back, so this test is the only verification available.
+- Support level: `Unverified`. Writes need `--experimental`.
 
 ### AKKO MOD007B ISO HE 2.4G receiver, VID 0x3151 PID 0x4011
 
@@ -31,4 +35,4 @@ This is the 2.4 GHz receiver of the same keyboard, as confirmed by the owner. Th
 
 - How do firmware version 0x0070 and the vendor driver version string relate?
 - What is the travel precision (0.1, 0.01 or 0.005 mm)? It must be derived by comparing a raw GET_MULTI_MAGNETISM value with the value shown in the AKKO driver.
-- Does the firmware answer the documented read-only GET commands identically?
+- What does the firmware use for keys that the vendor driver database does not list? The driver only stores keys that differ from its default.
