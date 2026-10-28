@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HallForge.App/HallForge.App.csproj" />
+    <Project Path="src/HallForge.Cli/HallForge.Cli.csproj" />
+    <Project Path="src/HallForge.Core/HallForge.Core.csproj" />
+    <Project Path="src/HallForge.Transport.Hid/HallForge.Transport.Hid.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HallForge.Core.Tests/HallForge.Core.Tests.csproj" />
+  </Folder>
+</Solution>

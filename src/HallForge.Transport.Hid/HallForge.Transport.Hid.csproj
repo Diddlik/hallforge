@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\HallForge.Core\HallForge.Core.csproj" />
+    <PackageReference Include="HidSharp" />
+  </ItemGroup>
+</Project>

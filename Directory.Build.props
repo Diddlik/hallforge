@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <!-- Single source of the application version (SemVer). -->
+    <Version>0.1.0</Version>
+    <Product>HallForge</Product>
+    <Copyright>Copyright (C) 2026 HallForge contributors</Copyright>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
