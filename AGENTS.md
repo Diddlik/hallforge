@@ -106,7 +106,7 @@ Design:
 
 ## Project facts
 
-- Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 0, which is read-only.
+- Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 1, which is read-only. OPEN: the AKKO MOD007B ISO HE (model 1778) cannot read per-key settings back (see `docs/protocol-research.md`). How HallForge handles backups and write verification for such devices is undecided.
 - Primary languages and runtimes: C# on .NET 10. The SDK is pinned in `global.json`. License: GPL-3.0-or-later.
 - Platform-specific constraints: Windows, Linux and macOS. HID access goes through HidSharp. The USB interface number can only be parsed from Windows device paths. Linux needs udev rules that use `TAG+="uaccess"` and never `MODE=0666`.
 - GUI toolkit, update mechanism, and distribution:
