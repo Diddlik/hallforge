@@ -21,7 +21,8 @@ public sealed record DeviceDefinition(
     DeviceMatch Match,
     IReadOnlyList<uint> FirmwareModelIds,
     TriggerLimits Limits,
-    IReadOnlyDictionary<string, int> Keys)
+    IReadOnlyDictionary<string, int> Keys,
+    IReadOnlyList<KeyGeometry> Layout)
 {
     public bool Matches(HidInterfaceInfo hid) =>
         Match.VendorIds.Contains(hid.VendorId)
@@ -69,6 +70,8 @@ public static class DeviceDefinitionLoader
             throw new JsonException("Definition requires an id and at least one vendor id.");
         if (definition.Keys.Values.Distinct().Count() != definition.Keys.Count)
             throw new JsonException("Two keys share a matrix position.");
+        if (definition.Layout.FirstOrDefault(g => !definition.Keys.ContainsKey(g.Key)) is { } stray)
+            throw new JsonException($"Layout key '{stray.Key}' is not in keys.");
         if (definition.Keys.Values.Any(i => i is < 0 or >= TriggerLimits.MatrixSize))
             throw new JsonException($"Matrix positions must be between 0 and {TriggerLimits.MatrixSize - 1}.");
         return definition;
@@ -114,3 +117,6 @@ internal sealed class HexIntListConverter : JsonConverter<IReadOnlyList<int>>
         writer.WriteEndArray();
     }
 }
+
+/// <summary>Physical key position in key units (1 u = width of a letter key), origin at the top left.</summary>
+public sealed record KeyGeometry(string Key, double X, double Y, double W, double H);

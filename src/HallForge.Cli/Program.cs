@@ -154,75 +154,11 @@ var keysSet = new Command("set", "Write the complete trigger setting of one key.
 };
 keysSet.SetAction(result =>
 {
-    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
-    if (target is null || target.Definition!.Protocol != "rongyuan")
-    {
-        Console.Error.WriteLine("Device not found or not a RongYuan device. Run 'hallforge devices list'.");
-        return ExitDeviceNotFound;
-    }
-    var definition = target.Definition;
-    if (!definition.Verified && !result.GetValue(experimentalOption))
-    {
-        Console.Error.WriteLine($"'{definition.Name}' is not verified for writing. Use --experimental only for hardware research.");
-        return ExitUnsupported;
-    }
     var keyId = result.GetValue(keyOption)!;
-    if (!definition.Keys.TryGetValue(keyId, out var matrixIndex))
-    {
-        Console.Error.WriteLine($"Unknown key '{keyId}'. Run 'hallforge keys list --device <id>'.");
-        return ExitInvalidInput;
-    }
     var trigger = new KeyTrigger(
         result.GetValue(actuationOption), result.GetValue(releaseOption), result.GetValue(rapidTriggerOption),
         result.GetValue(rtPressOption), result.GetValue(rtReleaseOption), result.GetValue(deadzoneOption));
-    if (definition.Limits.Validate(trigger) is { Count: > 0 } errors)
-    {
-        foreach (var error in errors)
-            Console.Error.WriteLine(error);
-        return ExitInvalidInput;
-    }
-
-    try
-    {
-        using var connection = transport.Open(target.Interface);
-        var client = new RongYuanClient(connection);
-        var identity = client.Identify();
-        if (!definition.FirmwareModelIds.Contains(identity.DeviceId))
-        {
-            Console.Error.WriteLine($"Firmware model id {identity.DeviceId} is not listed in '{definition.Id}'; refusing to write.");
-            return ExitUnsupported;
-        }
-        var profile = client.ReadActiveProfile();
-        var report = RongYuanClient.Encode(trigger, profile, matrixIndex);
-        Console.WriteLine($"Device:  {definition.Name} (firmware model {identity.DeviceId}), profile {profile}");
-        Console.WriteLine($"Key:     {keyId} (matrix {matrixIndex})");
-        Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
-            $"Values:  actuation {trigger.ActuationMm} mm, release {trigger.ReleaseMm} mm, rapid trigger {(trigger.RapidTrigger ? "on" : "off")} ({trigger.RapidTriggerPressMm}/{trigger.RapidTriggerReleaseMm} mm), deadzone {trigger.DeadzoneMm} mm"));
-        Console.WriteLine($"Report:  {Convert.ToHexString(report.AsSpan(1, Array.FindLastIndex(report, b => b != 0)))}");
-        if (result.GetValue(dryRunOption))
-        {
-            Console.WriteLine("Dry run: nothing was sent.");
-            return 0;
-        }
-        if (!result.GetValue(yesOption))
-        {
-            Console.Write("Send this setting to the keyboard? [y/N] ");
-            if (!string.Equals(Console.ReadLine()?.Trim(), "y", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine("Cancelled.");
-                return ExitCancelled;
-            }
-        }
-        client.WriteKeyTrigger(trigger, profile, matrixIndex);
-        stateStore.RecordWrite(definition, identity.DeviceId, profile, keyId, trigger);
-        Console.WriteLine("Sent. This firmware cannot report settings back, so the result is not verified. Test the key to confirm.");
-        return 0;
-    }
-    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
-    {
-        Console.Error.WriteLine($"Write failed: {ex.Message}");
-        return ExitDeviceError;
-    }
+    return ApplyPatches(result, new Dictionary<string, TriggerPatch> { [keyId] = TriggerPatch.From(trigger) }, $"key {keyId}", (_, _, _) => null);
 });
 
 var keysList = new Command("list", "List configurable keys of a device definition.") { deviceOption };
@@ -254,17 +190,8 @@ importAkko.SetAction(result =>
     {
         uint modelId;
         byte profile;
-        using (var connection = transport.Open(target.Interface))
-        {
-            var client = new RongYuanClient(connection);
-            modelId = client.Identify().DeviceId;
-            if (!definition.FirmwareModelIds.Contains(modelId))
-            {
-                Console.Error.WriteLine($"Firmware model id {modelId} is not listed in '{definition.Id}'.");
-                return ExitUnsupported;
-            }
-            profile = client.ReadActiveProfile();
-        }
+        using (var session = RongYuanSession.Open(transport, target))
+            (modelId, profile) = (session.ModelId, session.Profile);
 
         if (stateStore.Load(definition.Id, profile) is not null && !result.GetValue(replaceOption))
         {
@@ -289,6 +216,11 @@ importAkko.SetAction(result =>
         Console.WriteLine($"Backup: {backup}");
         Console.WriteLine($"{import.Keys.Count} keys imported. Keys not listed keep the driver's defaults and are unknown to HallForge.");
         return 0;
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitUnsupported;
     }
     catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or ProtocolException)
     {
@@ -382,15 +314,8 @@ int ApplyPatches(ParseResult result, IReadOnlyDictionary<string, TriggerPatch> p
     var sent = new List<string>();
     try
     {
-        using var connection = transport.Open(target.Interface);
-        var client = new RongYuanClient(connection);
-        var modelId = client.Identify().DeviceId;
-        if (!definition.FirmwareModelIds.Contains(modelId))
-        {
-            Console.Error.WriteLine($"Firmware model id {modelId} is not listed in '{definition.Id}'; refusing to write.");
-            return ExitUnsupported;
-        }
-        var profile = client.ReadActiveProfile();
+        using var session = RongYuanSession.Open(transport, target);
+        var (modelId, profile) = (session.ModelId, session.Profile);
         if (precondition(definition, modelId, profile) is { } problem)
         {
             Console.Error.WriteLine(problem);
@@ -429,15 +354,14 @@ int ApplyPatches(ParseResult result, IReadOnlyDictionary<string, TriggerPatch> p
             }
         }
 
-        plan.Execute(
-            change => client.WriteKeyTrigger(change.After, profile, change.MatrixIndex),
-            change =>
-            {
-                stateStore.RecordWrite(definition, modelId, profile, change.KeyId, change.After);
-                sent.Add(change.KeyId);
-            });
+        session.Apply(plan, stateStore, change => sent.Add(change.KeyId));
         Console.WriteLine($"Sent {sent.Count} key setting(s). This firmware cannot report settings back, so the result is not verified.");
         return 0;
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine($"{ex.Message} Refusing to write.");
+        return ExitUnsupported;
     }
     catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException or UnauthorizedAccessException or InvalidDataException)
     {

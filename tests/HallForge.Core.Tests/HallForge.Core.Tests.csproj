@@ -6,6 +6,7 @@
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\devices\*.json" Link="devices\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\..\profiles\*.json" Link="profiles\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\layouts\*.json" Link="layouts\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <Using Include="Xunit" />
     <ProjectReference Include="..\..\src\HallForge.Core\HallForge.Core.csproj" />
     <PackageReference Include="xunit.v3.mtp-v2" />

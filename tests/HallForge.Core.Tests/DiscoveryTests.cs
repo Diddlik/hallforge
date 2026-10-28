@@ -17,7 +17,8 @@ public class DiscoveryTests
             "rapidTrigger": { "minMm": 0.1, "maxMm": 2.5, "stepMm": 0.1 },
             "deadzone": { "minMm": 0.1, "maxMm": 4.0, "stepMm": 0.1 }
           },
-          "keys": { "KeyW": 14, "AltLeft": 23 }
+          "keys": { "KeyW": 14, "AltLeft": 23 },
+          "layout": [ { "key": "KeyW", "x": 1.5, "y": 2.25, "w": 1, "h": 1 } ]
         }
         """;
 
@@ -141,5 +142,10 @@ public class DiscoveryTests
 
         Assert.NotEmpty(definitions);
         Assert.Equal(definitions.Count, definitions.Select(d => d.Id).Distinct().Count());
+        Assert.All(definitions, d => Assert.Equal(d.Keys.Keys.Order(), d.Layout.Select(g => g.Key).Order()));
     }
+
+    [Fact]
+    public void Parse_RejectsLayoutKeyThatIsNotConfigurable() =>
+        Assert.ThrowsAny<System.Text.Json.JsonException>(() => DeviceDefinitionLoader.Parse(Definition.Replace("\"key\": \"KeyW\"", "\"key\": \"KeyX\"", StringComparison.Ordinal)));
 }

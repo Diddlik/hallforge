@@ -11,7 +11,8 @@ public class AkkoDriverDatabaseTests
         "test", "Test Board", "rongyuan", false,
         new DeviceMatch([0x3151], [0x4035], 0xFFFF, 0x02), [1778],
         new TriggerLimits(Range, Range, Range),
-        new Dictionary<string, int> { ["KeyW"] = 14, ["AltLeft"] = 23 });
+        new Dictionary<string, int> { ["KeyW"] = 14, ["AltLeft"] = 23 },
+        []);
 
     private static string Mode(int usage, int travel, bool fire = false, string option = "normal") =>
         $$"""{"mode":"normal","option":"{{option}}","travel":{{travel}},"liftTravel":{{travel}},"firePressTravel":2,"fireLiftTravel":3,"all":false,"original":{{usage}},"fire":{{(fire ? "true" : "false")}},"deadZoneTravel":3.7}""";

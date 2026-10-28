@@ -10,7 +10,8 @@ public sealed class StateStoreTests : IDisposable
         "test", "Test Board", "rongyuan", false,
         new DeviceMatch([0x3151], [0x4035], 0xFFFF, 0x02), [1778],
         new TriggerLimits(Range, Range, Range),
-        new Dictionary<string, int> { ["KeyW"] = 14, ["AltLeft"] = 23 });
+        new Dictionary<string, int> { ["KeyW"] = 14, ["AltLeft"] = 23 },
+        []);
 
     private readonly string _root = Path.Combine(Path.GetTempPath(), "hallforge-tests", Guid.NewGuid().ToString("N"));
 
@@ -68,4 +69,14 @@ public sealed class StateStoreTests : IDisposable
     [InlineData(0xE2, "AltLeft")]
     public void KeyCodes_MapHidUsageToW3cCode(int usage, string code) =>
         Assert.Equal(code, KeyCodes.FromHidUsage(usage));
+
+    [Theory]
+    [InlineData("KeyZ", "Y")]
+    [InlineData("KeyY", "Z")]
+    [InlineData("KeyA", "A")]
+    [InlineData("Digit1", "1")]
+    [InlineData("F5", "F5")]
+    [InlineData("IntlBackslash", "<")]
+    public void KeyLegends_IsoGermanShowsPrintedLabels(string keyId, string legend) =>
+        Assert.Equal(legend, KeyLegends.Load(Path.Combine(AppContext.BaseDirectory, "layouts", "iso-de.json")).For(keyId));
 }

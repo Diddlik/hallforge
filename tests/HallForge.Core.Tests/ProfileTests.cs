@@ -12,7 +12,8 @@ public class ProfileTests
         "test", "Test Board", "rongyuan", false,
         new DeviceMatch([0x3151], [0x4035], 0xFFFF, 0x02), [1778],
         new TriggerLimits(Travel, Rapid, Travel),
-        new Dictionary<string, int> { ["KeyW"] = 14, ["KeyQ"] = 8, ["Digit1"] = 7 });
+        new Dictionary<string, int> { ["KeyW"] = 14, ["KeyQ"] = 8, ["Digit1"] = 7 },
+        []);
 
     private static KeyboardState State(params (string Key, KeyTrigger Trigger)[] keys) =>
         new(1, "test", 1778, 0, "test", DateTime.UtcNow, keys.ToDictionary(k => k.Key, k => k.Trigger));
