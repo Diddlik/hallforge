@@ -3,6 +3,16 @@ using HallForge.Core;
 
 namespace HallForge.App;
 
+/// <summary>The setting printed on every keycap.</summary>
+public enum KeyValueField
+{
+    Actuation,
+    Release,
+    RapidTriggerPress,
+    RapidTriggerRelease,
+    Deadzone,
+}
+
 /// <summary>One key on the keyboard view: position, label, known setting and pending change.</summary>
 public sealed partial class KeyViewModel(KeyGeometry geometry, string legend) : ObservableObject
 {
@@ -22,12 +32,16 @@ public sealed partial class KeyViewModel(KeyGeometry geometry, string legend) : 
 
     /// <summary>Last applied or imported setting; null when unknown because the device cannot report it.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Effective), nameof(ValueText), nameof(IsUnknown), nameof(AccessibleName))]
+    [NotifyPropertyChangedFor(nameof(Effective), nameof(ValueText), nameof(IsRapidTrigger), nameof(IsUnknown), nameof(AccessibleName))]
     public partial KeyTrigger? Known { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Effective), nameof(ValueText), nameof(IsPending), nameof(IsUnknown), nameof(AccessibleName))]
+    [NotifyPropertyChangedFor(nameof(Effective), nameof(ValueText), nameof(IsRapidTrigger), nameof(IsPending), nameof(IsUnknown), nameof(AccessibleName))]
     public partial TriggerPatch? Pending { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ValueText))]
+    public partial KeyValueField ShownField { get; set; }
 
     public bool IsPending => Pending is not null;
 
@@ -37,7 +51,17 @@ public sealed partial class KeyViewModel(KeyGeometry geometry, string legend) : 
     /// <summary>The setting after applying the pending change, or null while it is incomplete or unknown.</summary>
     public KeyTrigger? Effective => Pending is null ? Known : Pending.ApplyTo(Known);
 
-    public string ValueText => (Pending?.ActuationMm ?? Effective?.ActuationMm) is { } mm ? Mm.Format(mm) : "?";
+    public bool IsRapidTrigger => Effective?.RapidTrigger == true;
+
+    /// <summary>The shown setting; a drafted value is shown even while other fields of the key are unknown.</summary>
+    public string ValueText => (ShownField switch
+    {
+        KeyValueField.Release => Pending?.ReleaseMm ?? Effective?.ReleaseMm,
+        KeyValueField.RapidTriggerPress => Pending?.RapidTriggerPressMm ?? Effective?.RapidTriggerPressMm,
+        KeyValueField.RapidTriggerRelease => Pending?.RapidTriggerReleaseMm ?? Effective?.RapidTriggerReleaseMm,
+        KeyValueField.Deadzone => Pending?.DeadzoneMm ?? Effective?.DeadzoneMm,
+        _ => Pending?.ActuationMm ?? Effective?.ActuationMm,
+    }) is { } mm ? Mm.Format(mm) : "?";
 
     public string AccessibleName
     {

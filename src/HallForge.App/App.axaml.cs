@@ -26,6 +26,8 @@ public partial class App : Application
             var legends = KeyLegends.Load(Path.Combine(AppContext.BaseDirectory, "layouts", "iso-de.json"));
             var viewModel = new MainViewModel(discovery, transport, new StateStore(StateStore.DefaultRoot), legends, settings);
             var window = new MainWindow(settings) { DataContext = viewModel };
+            if (desktop.Args?.Contains(Autostart.MinimizedArgument) == true)
+                window.WindowState = Avalonia.Controls.WindowState.Minimized;
             window.Opened += async (_, _) => await viewModel.StartAsync();
             desktop.MainWindow = window;
         }

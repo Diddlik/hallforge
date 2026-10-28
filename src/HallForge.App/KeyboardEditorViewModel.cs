@@ -20,6 +20,8 @@ public sealed record ValueChange(string Old, string? New)
     public bool IsChanged => New is not null;
 }
 
+public sealed record ValueFieldItem(KeyValueField Field, string Name);
+
 public sealed partial class PresetItem(string id, string label) : ObservableObject
 {
     public string Id { get; } = id;
@@ -99,15 +101,15 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
         CanvasHeight = _definition.Layout.Max(g => g.Y + g.H) * KeyViewModel.Pitch;
         var limits = _definition.Limits;
         Actuation = new TriggerFieldViewModel(Strings.Actuation, Strings.ActuationHelp, limits.Travel,
-            t => t.ActuationMm, mm => new TriggerPatch(ActuationMm: mm), Edit);
+            t => t.ActuationMm, mm => new TriggerPatch(ActuationMm: mm), Edit, Step);
         Release = new TriggerFieldViewModel(Strings.Release, Strings.ReleaseHelp, limits.Travel,
-            t => t.ReleaseMm, mm => new TriggerPatch(ReleaseMm: mm), Edit);
+            t => t.ReleaseMm, mm => new TriggerPatch(ReleaseMm: mm), Edit, Step);
         RapidTriggerPress = new TriggerFieldViewModel(Strings.RapidTriggerPress, Strings.RapidTriggerPressHelp, limits.RapidTrigger,
-            t => t.RapidTriggerPressMm, mm => new TriggerPatch(RapidTriggerPressMm: mm), Edit);
+            t => t.RapidTriggerPressMm, mm => new TriggerPatch(RapidTriggerPressMm: mm), Edit, Step);
         RapidTriggerRelease = new TriggerFieldViewModel(Strings.RapidTriggerRelease, Strings.RapidTriggerReleaseHelp, limits.RapidTrigger,
-            t => t.RapidTriggerReleaseMm, mm => new TriggerPatch(RapidTriggerReleaseMm: mm), Edit);
+            t => t.RapidTriggerReleaseMm, mm => new TriggerPatch(RapidTriggerReleaseMm: mm), Edit, Step);
         Deadzone = new TriggerFieldViewModel(Strings.Deadzone, Strings.DeadzoneHelp, limits.Deadzone,
-            t => t.DeadzoneMm, mm => new TriggerPatch(DeadzoneMm: mm), Edit);
+            t => t.DeadzoneMm, mm => new TriggerPatch(DeadzoneMm: mm), Edit, Step);
         foreach (var field in Fields)
             field.PropertyChanged += (_, e) =>
             {
@@ -115,6 +117,7 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
                     HasInputError = Fields.Any(f => f.HasError);
             };
         Lighting = new LightingViewModel(target, transport, review);
+        ShownValue = ValueFields[0];
         RefreshEditor(keepInput: false);
     }
 
@@ -156,7 +159,23 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
     public partial bool NeedsBackup { get; set; }
 
     [ObservableProperty]
-    public partial bool ShowValues { get; set; }
+    public partial bool ShowValues { get; set; } = true;
+
+    public IReadOnlyList<ValueFieldItem> ValueFields { get; } =
+    [
+        new(KeyValueField.Actuation, Strings.Actuation), new(KeyValueField.Release, Strings.Release),
+        new(KeyValueField.RapidTriggerPress, Strings.RapidTriggerPress), new(KeyValueField.RapidTriggerRelease, Strings.RapidTriggerRelease),
+        new(KeyValueField.Deadzone, Strings.Deadzone),
+    ];
+
+    [ObservableProperty]
+    public partial ValueFieldItem? ShownValue { get; set; }
+
+    partial void OnShownValueChanged(ValueFieldItem? value)
+    {
+        foreach (var key in Keys)
+            key.ShownField = value?.Field ?? KeyValueField.Actuation;
+    }
 
     // Draft summary for the pending-changes bar.
     [ObservableProperty]
@@ -254,6 +273,15 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
             SetSelection(k => k == key);
     }
 
+    /// <summary>Selects the keys that overlap a dragged rectangle, in keyboard canvas coordinates.</summary>
+    /// <param name="add">Keep the current selection and add the keys, instead of replacing it.</param>
+    public void SelectArea(double x, double y, double width, double height, bool add)
+    {
+        bool Overlaps(KeyViewModel k) => k.Left < x + width && k.Left + k.Width > x && k.Top < y + height && k.Top + k.Height > y;
+        _anchor = Keys.FirstOrDefault(Overlaps) ?? _anchor;
+        SetSelection(k => (add && k.IsSelected) || Overlaps(k));
+    }
+
     [RelayCommand]
     private void Select(string preset)
     {
@@ -298,6 +326,24 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
         foreach (var key in selected)
             key.Pending = Trim((key.Pending ?? new TriggerPatch()).Then(patch), key.Known);
         RefreshEditor(keepInput: true);
+    }
+
+    /// <summary>Moves every selected key with a known value one step, each from its own value; unknown keys are left alone.</summary>
+    private void Step(TriggerFieldViewModel field, int direction)
+    {
+        var known = Selected.Where(k => k.Effective is not null).ToList();
+        if (known.Count == 0)
+            return;
+        var undoKey = field.Label + "±";
+        if (undoKey != _lastEdit)
+            Remember();
+        _lastEdit = undoKey;
+        foreach (var key in known)
+        {
+            var value = field.Snap(field.Read(key.Effective!) + direction * field.Range.StepMm);
+            key.Pending = Trim((key.Pending ?? new TriggerPatch()).Then(field.Patch(value)), key.Known);
+        }
+        RefreshEditor(keepInput: false);
     }
 
     /// <summary>Drops fields that equal the known setting, so a draft only holds real changes.</summary>

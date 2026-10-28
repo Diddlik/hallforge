@@ -80,6 +80,25 @@ public sealed partial class MainViewModel(
         }
     }
 
+    public static bool CanStartWithWindows => Autostart.IsSupported;
+
+    public bool StartWithWindows
+    {
+        get => Autostart.IsEnabled;
+        set
+        {
+            try
+            {
+                Autostart.IsEnabled = value;
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+            {
+                UpdateMessage = Format(Strings.AutostartFailed, ex.Message);
+            }
+            OnPropertyChanged();
+        }
+    }
+
     [RelayCommand]
     private void ToggleNavigation() => IsNavigationCollapsed = !IsNavigationCollapsed;
 

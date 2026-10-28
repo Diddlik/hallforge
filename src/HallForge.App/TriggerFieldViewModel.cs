@@ -6,10 +6,12 @@ namespace HallForge.App;
 
 /// <summary>
 /// One millimeter setting of the selected keys: typed value, slider and step buttons. It shows the common value,
-/// or explains a mixed or unknown selection; any edit is applied to every selected key through the editor.
+/// or explains a mixed or unknown selection. A typed value or slider position is applied to every selected key;
+/// the step buttons move each key from its own value, so mixed selections can be shifted together.
 /// </summary>
 public sealed partial class TriggerFieldViewModel(
-    string label, string help, TravelRange range, Func<KeyTrigger, decimal> read, Func<decimal, TriggerPatch> patch, Action<TriggerPatch, string> edit)
+    string label, string help, TravelRange range, Func<KeyTrigger, decimal> read, Func<decimal, TriggerPatch> patch,
+    Action<TriggerPatch, string> edit, Action<TriggerFieldViewModel, int> step)
     : ObservableObject
 {
     private bool _refreshing;
@@ -20,14 +22,21 @@ public sealed partial class TriggerFieldViewModel(
     public double Minimum => (double)Range.MinMm;
     public double Maximum => (double)Range.MaxMm;
     public double Step => (double)Range.StepMm;
+    public decimal Read(KeyTrigger trigger) => read(trigger);
+    public TriggerPatch Patch(decimal mm) => patch(mm);
+
     public string RangeText => $"{Mm.Format(Range.MinMm)}–{Mm.Format(Range.MaxMm)}";
     public string DecreaseName => Text.Format(Strings.DecreaseField, Label, Mm.Format(Range.StepMm));
     public string IncreaseName => Text.Format(Strings.IncreaseField, Label, Mm.Format(Range.StepMm));
 
     /// <summary>The value shared by all selected keys; null when nothing is selected, values differ or are unknown.</summary>
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(IncreaseCommand), nameof(DecreaseCommand))]
     public partial decimal? Value { get; set; }
+
+    /// <summary>At least one selected key has a known value, so the step buttons have something to move.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(IncreaseCommand), nameof(DecreaseCommand))]
+    public partial bool CanStep { get; set; }
 
     [ObservableProperty]
     public partial string Input { get; set; } = "";
@@ -63,6 +72,7 @@ public sealed partial class TriggerFieldViewModel(
         var unknown = selected.Count - known.Count;
         var distinct = known.Distinct().ToList();
         Value = distinct.Count == 1 && unknown == 0 ? distinct[0] : null;
+        CanStep = known.Count > 0;
         IsEnabled = selected.Count > 0;
         IsInactive = inactive && Value is not null;
         IsWarning = false;
@@ -122,14 +132,12 @@ public sealed partial class TriggerFieldViewModel(
             edit(patch(mm), Label);
     }
 
-    private bool HasValue() => Value is not null;
+    [RelayCommand(CanExecute = nameof(CanStep))]
+    private void Increase() => step(this, 1);
 
-    [RelayCommand(CanExecute = nameof(HasValue))]
-    private void Increase() => edit(patch(Snap(Value!.Value + Range.StepMm)), Label);
+    [RelayCommand(CanExecute = nameof(CanStep))]
+    private void Decrease() => step(this, -1);
 
-    [RelayCommand(CanExecute = nameof(HasValue))]
-    private void Decrease() => edit(patch(Snap(Value!.Value - Range.StepMm)), Label);
-
-    private decimal Snap(decimal mm) =>
+    public decimal Snap(decimal mm) =>
         Math.Clamp(Range.MinMm + Math.Round((mm - Range.MinMm) / Range.StepMm) * Range.StepMm, Range.MinMm, Range.MaxMm);
 }

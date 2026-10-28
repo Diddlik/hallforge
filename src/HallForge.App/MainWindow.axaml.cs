@@ -67,7 +67,9 @@ public partial class MainWindow : Window
         var maximized = WindowState == WindowState.Maximized;
         // A maximized window reports the screen size; keep the last normal size instead.
         var (width, height) = maximized && _settings.Window is { } previous ? (previous.Width, previous.Height) : (Width, Height);
-        _settings.Window = new WindowPlacement(width, height, Position.X, Position.Y, maximized);
+        // A minimized window, e.g. after autostart, reports an off-screen position.
+        if (WindowState != WindowState.Minimized)
+            _settings.Window = new WindowPlacement(width, height, Position.X, Position.Y, maximized);
         try
         {
             _settings.Save();

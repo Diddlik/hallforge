@@ -448,7 +448,7 @@
     <value>Kept in draft · inactive while Rapid Trigger is off</value>
   </data>
   <data name="FieldMixed" xml:space="preserve">
-    <value>Mixed: {0} mm. A new value applies to all.</value>
+    <value>Mixed: {0} mm. A typed value applies to all; − and + shift each key from its own value.</value>
   </data>
   <data name="FieldMixedUnknown" xml:space="preserve">
     <value>Mixed: {0} mm + {1} unknown. A new value applies to all.</value>
@@ -685,7 +685,7 @@
     <value>{0} unknown</value>
   </data>
   <data name="SelectionHint" xml:space="preserve">
-    <value>Click selects · Ctrl-click toggles · Shift-click extends</value>
+    <value>Click selects · Ctrl-click toggles · Shift-click extends · drag to select an area</value>
   </data>
   <data name="SelectionScope" xml:space="preserve">
     <value>Applies to {0} selected keys · only changed fields are patched</value>
@@ -746,5 +746,26 @@
   </data>
   <data name="UndoHelp" xml:space="preserve">
     <value>Undo last draft change</value>
+  </data>
+  <data name="AutostartFailed" xml:space="preserve">
+    <value>Could not change autostart: {0}</value>
+  </data>
+  <data name="StartWithWindows" xml:space="preserve">
+    <value>Start with Windows (minimized)</value>
+  </data>
+  <data name="LightingLive" xml:space="preserve">
+    <value>Apply changes immediately</value>
+  </data>
+  <data name="LightingLiveHelp" xml:space="preserve">
+    <value>Every change is sent without review and read back from the keyboard.</value>
+  </data>
+  <data name="LightingLiveExperimental" xml:space="preserve">
+    <value>This keyboard model is not verified for writing. Turning this on confirms that you accept that.</value>
+  </data>
+  <data name="LightingLiveApplied" xml:space="preserve">
+    <value>Lighting applied and verified.</value>
+  </data>
+  <data name="ShownValue" xml:space="preserve">
+    <value>Value shown on keys</value>
   </data>
 </root>

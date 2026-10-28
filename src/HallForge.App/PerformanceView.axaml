@@ -118,7 +118,7 @@
     <ScrollViewer>
         <StackPanel Margin="24,20" Spacing="16">
             <!-- Title -->
-            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="16">
                 <StackPanel Spacing="2">
                     <TextBlock Classes="h1" Text="{x:Static app:Strings.NavPerformance}" />
                     <TextBlock Classes="secondary" Text="{x:Static app:Strings.PerformanceIntro}" TextWrapping="Wrap" />
@@ -128,6 +128,14 @@
                 </Border>
                 <ToggleSwitch Grid.Column="2" IsChecked="{Binding ShowValues}" VerticalAlignment="Center"
                               OnContent="{x:Static app:Strings.ShowValues}" OffContent="{x:Static app:Strings.ShowValues}" />
+                <ComboBox Grid.Column="3" ItemsSource="{Binding ValueFields}" SelectedItem="{Binding ShownValue}" VerticalAlignment="Center"
+                          MinWidth="200" IsEnabled="{Binding ShowValues}" AutomationProperties.Name="{x:Static app:Strings.ShownValue}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="app:ValueFieldItem">
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </Grid>
 
             <!-- Status of the last action -->
@@ -167,6 +175,7 @@
                             </StackPanel>
 
                             <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+                                <Panel x:Name="KeyboardArea" Background="Transparent">
                                 <ItemsControl x:Name="KeyboardView" ItemsSource="{Binding Keys}" Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
                                               AutomationProperties.Name="{x:Static app:Strings.KeyboardViewName}">
                                     <ItemsControl.ItemsPanel>
@@ -191,19 +200,27 @@
                                                                    Classes="secondary" Classes.draft="{Binding IsPending}"
                                                                    IsVisible="{Binding $parent[UserControl].((app:KeyboardEditorViewModel)DataContext).ShowValues}" />
                                                     </StackPanel>
+                                                    <TextBlock Text="RT" FontSize="8" FontWeight="Black" Foreground="{DynamicResource HfCyan}" Margin="5,3"
+                                                               HorizontalAlignment="Left" VerticalAlignment="Top" IsVisible="{Binding IsRapidTrigger}" />
                                                     <Border IsVisible="{Binding IsUnknown}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="3"
                                                             Width="14" Height="14" CornerRadius="7" BorderThickness="1"
                                                             Background="{DynamicResource HfWarnSoft}" BorderBrush="{DynamicResource HfWarn}">
                                                         <TextBlock Text="?" FontSize="9" FontWeight="Black" Foreground="{DynamicResource HfWarn}"
                                                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     </Border>
-                                                    <Border IsVisible="{Binding IsPending}" Width="16" Height="3" CornerRadius="2" Margin="0,0,0,5"
+                                                    <Border IsVisible="{Binding IsPending}" Width="16" Height="3" CornerRadius="2" Margin="0,0,0,3"
                                                             HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="{DynamicResource HfCyan}" />
                                                 </Panel>
                                             </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                                <!-- Drag selection rectangle, in the same coordinates as the keys -->
+                                <Canvas IsHitTestVisible="False">
+                                    <Border x:Name="Band" IsVisible="False" CornerRadius="4" BorderThickness="1.5"
+                                            BorderBrush="{DynamicResource HfCyan}" Background="{DynamicResource HfCyanSoft}" />
+                                </Canvas>
+                                </Panel>
                             </Viewbox>
 
                             <WrapPanel ItemSpacing="20" LineSpacing="8" AutomationProperties.Name="{x:Static app:Strings.KeyLegend}">

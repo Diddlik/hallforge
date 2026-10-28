@@ -134,6 +134,48 @@ public sealed class KeyboardEditorViewModelTests : IDisposable
     }
 
     [Fact]
+    public void StepButtons_ShiftMixedKeysFromTheirOwnValues()
+    {
+        var editor = Editor();
+        Key(editor, "KeyA").Known = Fast with { ActuationMm = 1.0m };
+        editor.SelectCommand.Execute("All");
+
+        editor.Actuation.IncreaseCommand.Execute(null);
+        editor.Actuation.IncreaseCommand.Execute(null);
+
+        Assert.Equal(0.6m, Key(editor, "KeyW").Pending?.ActuationMm);
+        Assert.Equal(1.2m, Key(editor, "KeyA").Pending?.ActuationMm);
+        Assert.Null(Key(editor, "KeyQ").Pending); // unknown keys are not guessed
+        editor.UndoCommand.Execute(null);
+        Assert.Equal(0, editor.PendingCount);
+    }
+
+    [Fact]
+    public void SelectArea_SelectsOverlappingKeysAndCanAdd()
+    {
+        var editor = Editor();
+        var pitch = KeyViewModel.Pitch;
+
+        editor.SelectArea(1.5 * pitch, 2 * pitch, 1.2 * pitch, 0.5 * pitch, add: false); // Q and W row
+        Assert.Equal(["KeyQ", "KeyW"], editor.Keys.Where(k => k.IsSelected).Select(k => k.KeyId));
+
+        editor.SelectArea(1.8 * pitch, 3.2 * pitch, 0.2 * pitch, 0.2 * pitch, add: true);
+        Assert.All(editor.Keys, k => Assert.True(k.IsSelected));
+    }
+
+    [Fact]
+    public void ShownValue_ChangesTheValuePrintedOnKeys()
+    {
+        var editor = Editor();
+
+        editor.ShownValue = editor.ValueFields.Single(f => f.Field == KeyValueField.RapidTriggerPress);
+
+        Assert.Equal("0.50", Key(editor, "KeyW").ValueText);
+        Assert.True(Key(editor, "KeyW").IsRapidTrigger);
+        Assert.Equal("?", Key(editor, "KeyQ").ValueText);
+    }
+
+    [Fact]
     public void Pick_SelectsTogglesAndExtends()
     {
         var editor = Editor();

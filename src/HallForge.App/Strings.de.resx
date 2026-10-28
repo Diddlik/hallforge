@@ -436,7 +436,7 @@
     <value>Im Entwurf behalten · ohne Wirkung, solange Rapid Trigger aus ist</value>
   </data>
   <data name="FieldMixed" xml:space="preserve">
-    <value>Gemischt: {0} mm. Ein neuer Wert gilt für alle.</value>
+    <value>Gemischt: {0} mm. Ein eingegebener Wert gilt für alle; − und + verschieben jede Taste von ihrem eigenen Wert.</value>
   </data>
   <data name="FieldMixedUnknown" xml:space="preserve">
     <value>Gemischt: {0} mm + {1} unbekannt. Ein neuer Wert gilt für alle.</value>
@@ -673,7 +673,7 @@
     <value>{0} unbekannt</value>
   </data>
   <data name="SelectionHint" xml:space="preserve">
-    <value>Klick wählt · Strg-Klick schaltet um · Umschalt-Klick erweitert</value>
+    <value>Klick wählt · Strg-Klick schaltet um · Umschalt-Klick erweitert · Ziehen wählt einen Bereich</value>
   </data>
   <data name="SelectionScope" xml:space="preserve">
     <value>Gilt für {0} ausgewählte Tasten · nur geänderte Werte werden gesetzt</value>
@@ -737,5 +737,26 @@
   </data>
   <data name="PresetActions" xml:space="preserve">
     <value>Aktionen</value>
+  </data>
+  <data name="AutostartFailed" xml:space="preserve">
+    <value>Autostart konnte nicht geändert werden: {0}</value>
+  </data>
+  <data name="StartWithWindows" xml:space="preserve">
+    <value>Mit Windows starten (minimiert)</value>
+  </data>
+  <data name="LightingLive" xml:space="preserve">
+    <value>Änderungen sofort anwenden</value>
+  </data>
+  <data name="LightingLiveHelp" xml:space="preserve">
+    <value>Jede Änderung wird ohne Prüfdialog gesendet und von der Tastatur zurückgelesen.</value>
+  </data>
+  <data name="LightingLiveExperimental" xml:space="preserve">
+    <value>Dieses Tastaturmodell ist nicht für Schreibzugriffe verifiziert. Mit dem Einschalten bestätigst du das.</value>
+  </data>
+  <data name="LightingLiveApplied" xml:space="preserve">
+    <value>Beleuchtung angewendet und geprüft.</value>
+  </data>
+  <data name="ShownValue" xml:space="preserve">
+    <value>Auf Tasten angezeigter Wert</value>
   </data>
 </root>

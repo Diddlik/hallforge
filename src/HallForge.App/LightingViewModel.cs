@@ -14,7 +14,25 @@ public sealed record LightingVariantItem(int Option, string Name);
 public sealed partial class LightingViewModel(
     KeyboardCandidate target, IHidTransport transport, Func<ReviewViewModel, Task> review) : ObservableObject
 {
+    // Slider drags produce several values in a row; only the last one within this window is written.
+    private static readonly TimeSpan LiveDelay = TimeSpan.FromMilliseconds(250);
     private LightingState? _current;
+    private bool _showing;
+    private bool _writing;
+    private bool _changedWhileWriting;
+
+    public bool RequiresExperimentalConsent => !target.Definition!.Verified;
+
+    /// <summary>Writes every change right away, without the review dialog. Each write is still read back and verified.</summary>
+    [ObservableProperty]
+    public partial bool ApplyImmediately { get; set; }
+
+    partial void OnApplyImmediatelyChanged(bool value) => _ = ApplyLiveAsync();
+    partial void OnBrightnessChanged(double value) => _ = ApplyLiveAsync();
+    partial void OnSpeedChanged(double value) => _ = ApplyLiveAsync();
+    partial void OnOptionChanged(int value) => _ = ApplyLiveAsync();
+    partial void OnRainbowChanged(bool value) => _ = ApplyLiveAsync();
+    partial void OnColorHexChanged(string value) => _ = ApplyLiveAsync();
 
     public IReadOnlyList<LightingModeItem> Modes { get; } = Enum.GetValues<LightingMode>()
         .Where(LightingState.IsWritable)
@@ -67,6 +85,7 @@ public sealed partial class LightingViewModel(
     {
         if (oldValue is not null && newValue is not null && oldValue.Mode != newValue.Mode)
             Option = 0;
+        _ = ApplyLiveAsync();
     }
 
     [ObservableProperty]
@@ -110,16 +129,13 @@ public sealed partial class LightingViewModel(
     [RelayCommand(CanExecute = nameof(CanApply))]
     private async Task ApplyAsync()
     {
-        if (Mode is null || _current is null)
+        if (_current is null)
             return;
-        if (!TryParseColor(ColorHex, out var rgb) && !Rainbow)
+        if (Wanted() is not { } wanted)
         {
             Status = Strings.InvalidColor;
             return;
         }
-        // Rainbow ignores the color, so keep the stored color instead of overwriting it.
-        var wanted = new LightingState(Mode.Mode, (int)Brightness, (int)Speed, Option, Rainbow,
-            Rainbow ? _current.Red : rgb[0], Rainbow ? _current.Green : rgb[1], Rainbow ? _current.Blue : rgb[2]);
         if (wanted == _current)
         {
             Status = Strings.LightingUnchanged;
@@ -156,8 +172,69 @@ public sealed partial class LightingViewModel(
         }
     }
 
+    /// <returns>The edited setting, or null while the color is not a valid RRGGBB value.</returns>
+    private LightingState? Wanted()
+    {
+        if (Mode is null || _current is null || (!TryParseColor(ColorHex, out var rgb) && !Rainbow))
+            return null;
+        // Rainbow ignores the color, so keep the stored color instead of overwriting it.
+        return Rainbow
+            ? new LightingState(Mode.Mode, (int)Brightness, (int)Speed, Option, true, _current.Red, _current.Green, _current.Blue)
+            : new LightingState(Mode.Mode, (int)Brightness, (int)Speed, Option, false, rgb[0], rgb[1], rgb[2]);
+    }
+
+    private async Task ApplyLiveAsync()
+    {
+        if (!ApplyImmediately || !IsLoaded || _showing)
+            return;
+        if (_writing)
+        {
+            _changedWhileWriting = true;
+            return;
+        }
+        _writing = true;
+        try
+        {
+            do
+            {
+                _changedWhileWriting = false;
+                await Task.Delay(LiveDelay);
+                if (Wanted() is not { } wanted || wanted == _current)
+                    continue;
+                IsBusy = true;
+                try
+                {
+                    var actual = await Task.Run(() =>
+                    {
+                        using var session = RongYuanSession.Open(transport, target);
+                        return session.Client.WriteLighting(wanted);
+                    });
+                    _current = actual;
+                    // Edits made during the write win; showing the written state would undo them.
+                    if (!_changedWhileWriting)
+                        Show(actual);
+                    Status = Strings.LightingLiveApplied;
+                }
+                catch (Exception ex) when (ex is IOException or ProtocolException or DeviceNotSupportedException or UnauthorizedAccessException)
+                {
+                    Status = Text.Format(Strings.LightingFailed, ex.Message);
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
+            }
+            while (_changedWhileWriting);
+        }
+        finally
+        {
+            _writing = false;
+        }
+    }
+
     private void Show(LightingState state)
     {
+        _showing = true;
         _current = state;
         Mode = Modes.FirstOrDefault(m => m.Mode == state.Mode);
         Brightness = state.Brightness;
@@ -165,6 +242,7 @@ public sealed partial class LightingViewModel(
         Option = state.Option;
         Rainbow = state.Rainbow;
         ColorHex = $"{state.Red:X2}{state.Green:X2}{state.Blue:X2}";
+        _showing = false;
     }
 
     private string Describe(LightingState state) => Text.Format(Strings.LightingSummary,

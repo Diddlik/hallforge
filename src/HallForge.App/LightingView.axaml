@@ -69,8 +69,17 @@
                         </StackPanel>
                     </StackPanel>
                     <Border Classes="divider" />
-                    <Button Classes="accent" Content="{x:Static app:Strings.ApplyLighting}" Command="{Binding ApplyCommand}"
-                            HorizontalAlignment="Right" FontWeight="Bold" Padding="18,6" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                        <StackPanel Spacing="4" VerticalAlignment="Center">
+                            <ToggleSwitch IsChecked="{Binding ApplyImmediately}" IsEnabled="{Binding IsLoaded}"
+                                          OnContent="{x:Static app:Strings.LightingLive}" OffContent="{x:Static app:Strings.LightingLive}" />
+                            <TextBlock Classes="caption" Text="{x:Static app:Strings.LightingLiveHelp}" TextWrapping="Wrap" />
+                            <TextBlock Classes="caption warn" Text="{x:Static app:Strings.LightingLiveExperimental}" TextWrapping="Wrap"
+                                       IsVisible="{Binding RequiresExperimentalConsent}" />
+                        </StackPanel>
+                        <Button Grid.Column="1" Classes="accent" Content="{x:Static app:Strings.ApplyLighting}" Command="{Binding ApplyCommand}"
+                                IsVisible="{Binding !ApplyImmediately}" VerticalAlignment="Top" FontWeight="Bold" Padding="18,6" />
+                    </Grid>
                 </StackPanel>
             </Border>
         </StackPanel>
