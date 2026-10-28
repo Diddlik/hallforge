@@ -135,6 +135,7 @@ Design:
   - Millimeter input is parsed with `Millimeters.TryParse` (invariant '.', ',' rejected), never with the current culture.
   - The GUI and the CLI share the same services. Version numbers come only from `Directory.Build.props`, and package versions come only from `Directory.Packages.props`.
 - Generated files: `bin/` and `obj/`.
+- The app icon source is `assets/icon.svg`; `hallforge.ico`, `hallforge.icns` and the PNGs are rendered from it (ImageMagick). README images live in `docs/images` (`infographic.svg` is the source of `infographic.png`).
 - Local USB captures go to `ws/` (git-ignored; they may contain keystrokes).
 - Files or directories not to edit manually: `LICENSE` (verbatim GPL-3.0 text).
 

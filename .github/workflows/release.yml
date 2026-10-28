@@ -16,12 +16,15 @@ jobs:
           - os: windows-latest
             rid: win-x64
             exe: HallForge.App.exe
+            icon: assets/hallforge.ico
           - os: ubuntu-latest
             rid: linux-x64
             exe: HallForge.App
+            icon: assets/icon-512.png
           - os: macos-latest
             rid: osx-arm64
             exe: HallForge.App
+            icon: assets/hallforge.icns
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -40,7 +43,7 @@ jobs:
       - run: dotnet publish src/HallForge.App -c Release -r ${{ matrix.rid }} --self-contained -o publish
       - run: dotnet tool install -g vpk --version 1.2.161
       - name: Package
-        run: vpk pack --packId HallForge --packTitle HallForge --packVersion ${{ steps.version.outputs.value }} --packDir publish --mainExe ${{ matrix.exe }}
+        run: vpk pack --packId HallForge --packTitle HallForge --packVersion ${{ steps.version.outputs.value }} --packDir publish --mainExe ${{ matrix.exe }} --icon ${{ matrix.icon }}
       - name: Upload
         run: vpk upload github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "HallForge ${{ steps.version.outputs.value }}" --merge --publish
       - name: Upload CLI
