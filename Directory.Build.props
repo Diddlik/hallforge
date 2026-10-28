@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <!-- Single source of the application version (SemVer). -->
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Product>HallForge</Product>
     <NeutralLanguage>en</NeutralLanguage>
     <Copyright>Copyright (C) 2026 HallForge contributors</Copyright>
