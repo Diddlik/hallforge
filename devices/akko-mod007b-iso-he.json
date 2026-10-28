@@ -1,0 +1,12 @@
+{
+  "id": "akko-mod007b-iso-he",
+  "name": "AKKO MOD007B ISO HE",
+  "protocol": "rongyuan",
+  "verified": false,
+  "match": {
+    "vendorIds": ["0x3151"],
+    "productIds": ["0x4035"],
+    "usagePage": "0xFFFF",
+    "usage": "0x0002"
+  }
+}

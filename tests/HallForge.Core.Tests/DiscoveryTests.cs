@@ -58,6 +58,16 @@ public class DiscoveryTests
     }
 
     [Fact]
+    public void Discover_PrefersModelDefinitionOverFamily()
+    {
+        var family = DeviceDefinitionLoader.Parse(Definition);
+        var model = DeviceDefinitionLoader.Parse(Definition.Replace("\"test-board\"", "\"model\"", StringComparison.Ordinal).Replace("[]", "[\"0x5030\"]", StringComparison.Ordinal));
+        var service = new KeyboardDiscoveryService(new FakeEnumerator(Hid("config")), [family, model]);
+
+        Assert.Same(model, Assert.Single(service.Discover()).Definition);
+    }
+
+    [Fact]
     public void Discover_WithUnmatched_ReportsUnknownDevices()
     {
         var service = new KeyboardDiscoveryService(new FakeEnumerator(Hid("config"), Hid("other", vid: 0x1234)), [DeviceDefinitionLoader.Parse(Definition)]);

@@ -20,7 +20,7 @@ list.SetAction(result =>
         Console.WriteLine(
             $"{hid.Id}  {DiagnosticReport.Hex(hid.VendorId)}:{DiagnosticReport.Hex(hid.ProductId)}  " +
             $"usage {Format(hid.UsagePage)}/{Format(hid.Usage)}  if {hid.InterfaceNumber?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "?"}  " +
-            $"{c.Support,-10}  {hid.ProductName ?? "(no name)"}");
+            $"{c.Support,-10}  {c.Definition?.Name ?? hid.ProductName ?? "(no name)"}");
     }
 });
 
