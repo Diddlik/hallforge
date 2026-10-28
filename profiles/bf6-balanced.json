@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "name": "BF6 REDSEC Balanced",
+  "groups": [
+    {
+      "keyIds": [
+        "KeyW",
+        "KeyA",
+        "KeyS",
+        "KeyD"
+      ],
+      "settings": {
+        "actuationMm": 0.5,
+        "releaseMm": 0.5,
+        "rapidTriggerEnabled": true,
+        "rapidTriggerPressMm": 0.2,
+        "rapidTriggerReleaseMm": 0.3,
+        "deadzoneMm": 3.7
+      }
+    },
+    {
+      "keyIds": [
+        "ShiftLeft"
+      ],
+      "settings": {
+        "actuationMm": 0.8,
+        "releaseMm": 0.8,
+        "rapidTriggerEnabled": false,
+        "rapidTriggerPressMm": 0.2,
+        "rapidTriggerReleaseMm": 0.3,
+        "deadzoneMm": 3.7
+      }
+    },
+    {
+      "keyIds": [
+        "ControlLeft"
+      ],
+      "settings": {
+        "actuationMm": 0.6,
+        "releaseMm": 0.6,
+        "rapidTriggerEnabled": false,
+        "rapidTriggerPressMm": 0.2,
+        "rapidTriggerReleaseMm": 0.3,
+        "deadzoneMm": 3.7
+      }
+    },
+    {
+      "keyIds": [
+        "Space"
+      ],
+      "settings": {
+        "actuationMm": 0.8,
+        "releaseMm": 0.8,
+        "rapidTriggerEnabled": false,
+        "rapidTriggerPressMm": 0.2,
+        "rapidTriggerReleaseMm": 0.3,
+        "deadzoneMm": 3.7
+      }
+    },
+    {
+      "keyIds": [
+        "KeyQ",
+        "KeyE",
+        "KeyF",
+        "KeyR"
+      ],
+      "settings": {
+        "actuationMm": 1.0,
+        "releaseMm": 1.0,
+        "rapidTriggerEnabled": false,
+        "rapidTriggerPressMm": 0.2,
+        "rapidTriggerReleaseMm": 0.3,
+        "deadzoneMm": 3.7
+      }
+    },
+    {
+      "keyIds": [
+        "Digit1",
+        "Digit2",
+        "Digit3",
+        "Digit4",
+        "Digit5"
+      ],
+      "settings": {
+        "actuationMm": 1.5,
+        "releaseMm": 1.5,
+        "rapidTriggerEnabled": false,
+        "rapidTriggerPressMm": 0.2,
+        "rapidTriggerReleaseMm": 0.3,
+        "deadzoneMm": 3.7
+      }
+    }
+  ]
+}

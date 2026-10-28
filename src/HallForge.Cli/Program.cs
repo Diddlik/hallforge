@@ -317,14 +317,151 @@ stateShow.SetAction(result =>
     return 0;
 });
 
+var profileFileArgument = new Argument<FileInfo>("profile") { Description = "Profile JSON file." };
+var profilesApply = new Command("apply", "Apply a profile: validate, preview per-key changes, confirm, write.")
+{
+    profileFileArgument, deviceOption, dryRunOption, yesOption, experimentalOption,
+};
+profilesApply.SetAction(result =>
+{
+    KeyboardProfile profile;
+    try
+    {
+        profile = KeyboardProfile.Load(result.GetValue(profileFileArgument)!.FullName);
+    }
+    catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitInvalidInput;
+    }
+    return ApplyPatches(result, profile.Resolve(), $"profile '{profile.Name}'", (_, _, _) => null);
+});
+
+var backupFileArgument = new Argument<FileInfo>("backup") { Description = "Backup JSON file (see 'backup import-akko')." };
+var backupRestore = new Command("restore", "Write the settings of a backup back to the keyboard.")
+{
+    backupFileArgument, deviceOption, dryRunOption, yesOption, experimentalOption,
+};
+backupRestore.SetAction(result =>
+{
+    KeyboardState backup;
+    try
+    {
+        backup = StateStore.Read(result.GetValue(backupFileArgument)!.FullName);
+    }
+    catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitInvalidInput;
+    }
+    var patches = backup.Keys.ToDictionary(k => k.Key, k => TriggerPatch.From(k.Value));
+    return ApplyPatches(result, patches, $"backup from {backup.UpdatedAtUtc:u}", (definition, modelId, profile) =>
+        backup.DefinitionId != definition.Id ? $"The backup belongs to '{backup.DefinitionId}', not '{definition.Id}'."
+        : backup.FirmwareModelId != modelId ? $"The backup was made for firmware model {backup.FirmwareModelId}, the device reports {modelId}."
+        : backup.Profile != profile ? $"The backup is for onboard profile {backup.Profile}, but profile {profile} is active."
+        : null);
+});
+
+// Shared by profile apply and backup restore so both follow the same validation, preview and write path.
+int ApplyPatches(ParseResult result, IReadOnlyDictionary<string, TriggerPatch> patches, string title, Func<DeviceDefinition, uint, int, string?> precondition)
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null || target.Definition!.Protocol != "rongyuan")
+    {
+        Console.Error.WriteLine("Device not found or not a RongYuan device. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    var definition = target.Definition;
+    var dryRun = result.GetValue(dryRunOption);
+    if (!dryRun && !definition.Verified && !result.GetValue(experimentalOption))
+    {
+        Console.Error.WriteLine($"'{definition.Name}' is not verified for writing. Use --dry-run to preview, or --experimental only for hardware research.");
+        return ExitUnsupported;
+    }
+
+    var sent = new List<string>();
+    try
+    {
+        using var connection = transport.Open(target.Interface);
+        var client = new RongYuanClient(connection);
+        var modelId = client.Identify().DeviceId;
+        if (!definition.FirmwareModelIds.Contains(modelId))
+        {
+            Console.Error.WriteLine($"Firmware model id {modelId} is not listed in '{definition.Id}'; refusing to write.");
+            return ExitUnsupported;
+        }
+        var profile = client.ReadActiveProfile();
+        if (precondition(definition, modelId, profile) is { } problem)
+        {
+            Console.Error.WriteLine(problem);
+            return ExitInvalidInput;
+        }
+
+        var plan = ApplyPlan.Create(patches, definition, stateStore.Load(definition.Id, profile));
+        Console.WriteLine($"Applying {title} to {definition.Name}, onboard profile {profile}");
+        foreach (var change in plan.Changes)
+            Console.WriteLine($"  {change.KeyId,-14} {Describe(change.Before)}  ->  {Describe(change.After)}");
+        Console.WriteLine($"{plan.Changes.Count} key(s) change, {plan.UnchangedKeys} already match.");
+        if (!plan.CanApply)
+        {
+            foreach (var error in plan.Errors)
+                Console.Error.WriteLine($"Error: {error}");
+            Console.Error.WriteLine("Nothing was sent.");
+            return ExitInvalidInput;
+        }
+        if (dryRun || plan.Changes.Count == 0)
+        {
+            Console.WriteLine(dryRun ? "Dry run: nothing was sent." : "Nothing to send.");
+            return 0;
+        }
+        if (!stateStore.HasBackup(definition.Id, profile))
+        {
+            Console.Error.WriteLine("No backup exists for this profile yet. Run 'hallforge backup import-akko' first.");
+            return ExitInvalidInput;
+        }
+        if (!result.GetValue(yesOption))
+        {
+            Console.Write($"Send {plan.Changes.Count} key setting(s) to the keyboard? [y/N] ");
+            if (!string.Equals(Console.ReadLine()?.Trim(), "y", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Cancelled.");
+                return ExitCancelled;
+            }
+        }
+
+        plan.Execute(
+            change => client.WriteKeyTrigger(change.After, profile, change.MatrixIndex),
+            change =>
+            {
+                stateStore.RecordWrite(definition, modelId, profile, change.KeyId, change.After);
+                sent.Add(change.KeyId);
+            });
+        Console.WriteLine($"Sent {sent.Count} key setting(s). This firmware cannot report settings back, so the result is not verified.");
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException or UnauthorizedAccessException or InvalidDataException)
+    {
+        Console.Error.WriteLine($"Apply failed: {ex.Message}");
+        if (sent.Count > 0)
+            Console.Error.WriteLine($"Already sent: {string.Join(", ", sent)}. Restore with 'hallforge backup restore <backup> --device <id>'.");
+        return ExitDeviceError;
+    }
+}
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
     new Command("keys", "Inspect and configure key trigger settings.") { keysList, keysSet },
-    new Command("backup", "Create backups of key settings.") { importAkko },
+    new Command("backup", "Create and restore backups of key settings.") { importAkko, backupRestore },
+    new Command("profiles", "Apply portable key setting profiles.") { profilesApply },
     new Command("state", "Key settings known to HallForge (the device cannot report them).") { stateShow },
 };
 return root.Parse(args).Invoke();
+
+static string Describe(KeyTrigger? t) => t is null
+    ? "unknown"
+    : string.Create(System.Globalization.CultureInfo.InvariantCulture,
+        $"{t.ActuationMm}/{t.ReleaseMm} mm, RT {(t.RapidTrigger ? "on" : "off")} {t.RapidTriggerPressMm}/{t.RapidTriggerReleaseMm}, dz {t.DeadzoneMm}");
 
 static void PrintState(KeyboardState state, DeviceDefinition definition)
 {

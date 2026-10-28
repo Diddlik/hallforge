@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "name": "FPS Conservative",
+  "groups": [
+    {
+      "keyIds": [
+        "KeyW",
+        "KeyA",
+        "KeyS",
+        "KeyD"
+      ],
+      "settings": {
+        "actuationMm": 0.8,
+        "releaseMm": 0.8,
+        "rapidTriggerEnabled": true,
+        "rapidTriggerPressMm": 0.3,
+        "rapidTriggerReleaseMm": 0.4,
+        "deadzoneMm": 3.7
+      }
+    }
+  ]
+}

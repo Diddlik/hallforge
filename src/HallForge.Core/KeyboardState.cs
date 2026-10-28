@@ -37,8 +37,15 @@ public sealed class StateStore(string root)
     public KeyboardState? Load(string definitionId, int profile)
     {
         var path = StatePath(definitionId, profile);
-        if (!File.Exists(path))
-            return null;
+        return File.Exists(path) ? Read(path) : null;
+    }
+
+    public bool HasBackup(string definitionId, int profile) =>
+        Directory.Exists(Path.Combine(root, "backups"))
+        && Directory.EnumerateFiles(Path.Combine(root, "backups"), $"*-{definitionId}-profile{profile}.json").Any();
+
+    public static KeyboardState Read(string path)
+    {
         try
         {
             var state = JsonSerializer.Deserialize<KeyboardState>(File.ReadAllText(path), Options);

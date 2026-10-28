@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "name": "FPS Fast (very sensitive, may cause accidental presses)",
+  "groups": [
+    {
+      "keyIds": [
+        "KeyW",
+        "KeyA",
+        "KeyS",
+        "KeyD"
+      ],
+      "settings": {
+        "actuationMm": 0.2,
+        "releaseMm": 0.2,
+        "rapidTriggerEnabled": true,
+        "rapidTriggerPressMm": 0.1,
+        "rapidTriggerReleaseMm": 0.2,
+        "deadzoneMm": 3.7
+      }
+    }
+  ]
+}
