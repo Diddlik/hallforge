@@ -19,7 +19,7 @@ public partial class App : Application
         {
             var settings = AppSettings.Load();
             var discovery = new KeyboardDiscoveryService(
-                new HidSharpEnumerator(),
+                new HidSharpTransport(),
                 DeviceDefinitionLoader.LoadDirectory(Path.Combine(AppContext.BaseDirectory, "devices")));
             var viewModel = new MainViewModel(discovery, settings);
             var window = new MainWindow(settings) { DataContext = viewModel };

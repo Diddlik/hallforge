@@ -1,13 +1,17 @@
 ﻿using System.CommandLine;
 using System.Reflection;
 using HallForge.Core;
+using HallForge.Protocol.RongYuan;
 using HallForge.Transport.Hid;
 
 const int ExitDeviceNotFound = 2;
+const int ExitUnsupported = 3;
+const int ExitDeviceError = 4;
 
 var version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+var transport = new HidSharpTransport();
 var discovery = new KeyboardDiscoveryService(
-    new HidSharpEnumerator(),
+    transport,
     DeviceDefinitionLoader.LoadDirectory(Path.Combine(AppContext.BaseDirectory, "devices")));
 
 var allOption = new Option<bool>("--all") { Description = "Include HID interfaces without a matching device definition." };
@@ -45,9 +49,48 @@ probe.SetAction(result =>
     return 0;
 });
 
+var identify = new Command("identify", "Send read-only identification commands and show firmware model id and version.") { deviceOption, outputOption };
+identify.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    if (target.Definition!.Protocol != "rongyuan")
+    {
+        Console.Error.WriteLine($"Protocol '{target.Definition.Protocol}' is not implemented.");
+        return ExitUnsupported;
+    }
+
+    try
+    {
+        using var connection = transport.Open(target.Interface);
+        var identity = new RongYuanClient(connection).Identify();
+        var text = string.Join(Environment.NewLine,
+            $"Firmware device id: {identity.DeviceId}",
+            $"Firmware version:   {identity.FirmwareText} (0x{identity.FirmwareVersion:X4})",
+            $"Precision code:     {identity.PrecisionCode?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "unknown"}",
+            $"GET_USB_VERSION:    {Convert.ToHexString(identity.UsbVersionResponse)}",
+            $"GET_FEATURE_LIST:   {Convert.ToHexString(identity.FeatureListResponse)}");
+        Console.WriteLine(text);
+        if (!target.Definition.FirmwareModelIds.Contains(identity.DeviceId))
+            Console.WriteLine($"Warning: firmware model id {identity.DeviceId} is not listed in '{target.Definition.Id}'. The device is not the expected model and stays unsupported.");
+        if (result.GetValue(outputOption) is { } output)
+            File.WriteAllText(output.FullName, text + Environment.NewLine);
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Identification failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
-    new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe },
+    new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify },
 };
 return root.Parse(args).Invoke();
 

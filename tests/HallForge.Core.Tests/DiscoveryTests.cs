@@ -10,16 +10,18 @@ public class DiscoveryTests
           "name": "Test Board",
           "protocol": "rongyuan",
           "verified": false,
-          "match": { "vendorIds": ["0x3151"], "productIds": [], "usagePage": "0xFFFF", "usage": "0x0002" }
+          "match": { "vendorIds": ["0x3151"], "productIds": [], "usagePage": "0xFFFF", "usage": "0x0002" },
+          "firmwareModelIds": [1778]
         }
         """;
 
     private static HidInterfaceInfo Hid(string path, int vid = 0x3151, int pid = 0x5030, int? usagePage = 0xFFFF, int? usage = 0x02) =>
         new(path, vid, pid, 0x0100, "Vendor", "Board", usagePage, usage, 2, 0, 0, 65);
 
-    private sealed class FakeEnumerator(params HidInterfaceInfo[] interfaces) : IHidEnumerator
+    private sealed class FakeTransport(params HidInterfaceInfo[] interfaces) : IHidTransport
     {
         public IReadOnlyList<HidInterfaceInfo> Enumerate() => interfaces;
+        public IHidConnection Open(HidInterfaceInfo hid) => throw new NotSupportedException();
     }
 
     [Fact]
@@ -49,7 +51,7 @@ public class DiscoveryTests
         var config = Hid("config");
         var keyboardInput = Hid("input", usagePage: 0x01, usage: 0x06);
         var otherVendor = Hid("other", vid: 0x1234);
-        var service = new KeyboardDiscoveryService(new FakeEnumerator(config, keyboardInput, otherVendor), [DeviceDefinitionLoader.Parse(Definition)]);
+        var service = new KeyboardDiscoveryService(new FakeTransport(config, keyboardInput, otherVendor), [DeviceDefinitionLoader.Parse(Definition)]);
 
         var candidate = Assert.Single(service.Discover());
 
@@ -62,7 +64,7 @@ public class DiscoveryTests
     {
         var family = DeviceDefinitionLoader.Parse(Definition);
         var model = DeviceDefinitionLoader.Parse(Definition.Replace("\"test-board\"", "\"model\"", StringComparison.Ordinal).Replace("[]", "[\"0x5030\"]", StringComparison.Ordinal));
-        var service = new KeyboardDiscoveryService(new FakeEnumerator(Hid("config")), [family, model]);
+        var service = new KeyboardDiscoveryService(new FakeTransport(Hid("config")), [family, model]);
 
         Assert.Same(model, Assert.Single(service.Discover()).Definition);
     }
@@ -70,7 +72,7 @@ public class DiscoveryTests
     [Fact]
     public void Discover_WithUnmatched_ReportsUnknownDevices()
     {
-        var service = new KeyboardDiscoveryService(new FakeEnumerator(Hid("config"), Hid("other", vid: 0x1234)), [DeviceDefinitionLoader.Parse(Definition)]);
+        var service = new KeyboardDiscoveryService(new FakeTransport(Hid("config"), Hid("other", vid: 0x1234)), [DeviceDefinitionLoader.Parse(Definition)]);
 
         var candidates = service.Discover(includeUnmatched: true);
 

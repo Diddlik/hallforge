@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\HallForge.Transport.Hid\HallForge.Transport.Hid.csproj" />
+    <ProjectReference Include="..\HallForge.Protocol.RongYuan\HallForge.Protocol.RongYuan.csproj" />
     <PackageReference Include="System.CommandLine" />
     <None Include="..\..\devices\*.json" Link="devices\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

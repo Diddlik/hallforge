@@ -5,11 +5,29 @@ using HidSharp;
 
 namespace HallForge.Transport.Hid;
 
-/// <summary>Enumerates HID interfaces via HidSharp without opening a read/write stream.</summary>
-public sealed partial class HidSharpEnumerator : IHidEnumerator
+/// <summary>HID access via HidSharp. Enumeration reads metadata only; streams are opened explicitly via <see cref="Open"/>.</summary>
+public sealed partial class HidSharpTransport : IHidTransport
 {
     public IReadOnlyList<HidInterfaceInfo> Enumerate() =>
         DeviceList.Local.GetHidDevices().Select(ToInfo).ToList();
+
+    public IHidConnection Open(HidInterfaceInfo hid)
+    {
+        var device = DeviceList.Local.GetHidDevices().FirstOrDefault(d => d.DevicePath == hid.Path)
+            ?? throw new IOException("The device is no longer connected.");
+        if (!device.TryOpen(out var stream))
+            throw new IOException("The device could not be opened. Another program, such as the vendor driver, may be using it.");
+        stream.ReadTimeout = 1000;
+        stream.WriteTimeout = 1000;
+        return new Connection(stream);
+    }
+
+    private sealed class Connection(HidStream stream) : IHidConnection
+    {
+        public void SetFeature(byte[] report) => stream.SetFeature(report);
+        public void GetFeature(byte[] report) => stream.GetFeature(report);
+        public void Dispose() => stream.Dispose();
+    }
 
     private static HidInterfaceInfo ToInfo(HidDevice device)
     {

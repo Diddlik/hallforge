@@ -22,7 +22,17 @@ public sealed record HidInterfaceInfo(
     public string Id { get; } = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(Path)))[..10];
 }
 
-public interface IHidEnumerator
+public interface IHidTransport
 {
     IReadOnlyList<HidInterfaceInfo> Enumerate();
+
+    /// <exception cref="IOException">The interface is gone or held exclusively by another program.</exception>
+    IHidConnection Open(HidInterfaceInfo hid);
+}
+
+/// <summary>Feature report I/O on one interface. Buffers include the report id at index 0.</summary>
+public interface IHidConnection : IDisposable
+{
+    void SetFeature(byte[] report);
+    void GetFeature(byte[] report);
 }

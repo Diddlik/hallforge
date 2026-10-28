@@ -14,7 +14,14 @@ Documented facts, not yet verified on our hardware unless noted:
 - Per-key magnetism: 0xE5 GET / 0x65 SET_MULTI_MAGNETISM.
 - Blocked for the MVP: SET_KEYMATRIX, SET_MACRO, SET_FN, every firmware or bootloader command, and every chunked SET command.
 
+## Verified framing (wired, MOD007B ISO HE)
+
+- Request: a 65-byte feature report laid out as `[0x00 report id][cmd][p1..p6][checksum][zeros]`. The checksum is `255 - (sum(cmd, p1..p6) & 0xFF)`.
+- Response: GET_FEATURE with report id 0. Byte 1 echoes the command. If the echo does not match, the client retries up to 5 times with a 10 ms gap between send and read.
+- GET_USB_VERSION layout: bytes 1-4 hold the model id (u32 LE), and bytes 7-8 hold the firmware version (u16 LE). Verified against model id 1778.
+- Implemented in `HallForge.Protocol.RongYuan.RongYuanClient`. The allowlist is the `ReadCommand` enum, which is also checked at runtime.
+
 ## Next steps (Phase 1)
 
-1. Encode GET_REV / GET_USB_VERSION, send them to PID 0x4035 only, and record the raw responses as golden fixtures.
-2. Confirm the checksum and the response format before adding any further command.
+1. Read one GET_MULTI_MAGNETISM page (press travel) and compare the raw values with the AKKO driver to derive the precision factor.
+2. Map the matrix index to key ids for the ISO-DE layout.

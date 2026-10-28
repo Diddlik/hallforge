@@ -16,7 +16,11 @@ Observed on 2026-10-28, Windows 11 (build 26300), with `hallforge devices probe`
 
 - Release number (bcdDevice): 0x0103.
 - This matches the RongYuan interface layout in the monsgeek-akko-linux protocol reference: config on interface 2, usage 0xFFFF / 0x02, 64-byte feature report, report ID 0.
-- Support level: `Unverified`. No command has been sent to the device.
+- Firmware identification (`hallforge devices identify`, 2026-10-28):
+  - GET_USB_VERSION gives firmware model id **1778** and version **0x0070**. The raw response is `8F F2 06 00 00 00 00 70 00`, followed by zeros.
+  - GET_FEATURE_LIST gives `E6 00 00 00 00 00 00 19`, followed by zeros. The 0xAA validity marker is missing, so the precision is **unknown**.
+  - Model id 1778 is not in the monsgeek-akko-linux device database. That database lists PID 0x4035 for at least ten other boards, including MOD007B HE ids 847, 1637, 3160 and 3161. This is why definitions match on `firmwareModelIds`.
+- Support level: `Unverified`. Only GET_USB_VERSION and GET_FEATURE_LIST have been sent to the device.
 
 ### AKKO MOD007B ISO HE 2.4G receiver, VID 0x3151 PID 0x4011
 
@@ -24,5 +28,6 @@ This is the 2.4 GHz receiver of the same keyboard, as confirmed by the owner. Th
 
 ## Open questions
 
-- Which firmware version does the MOD007B ISO HE run?
+- How do firmware version 0x0070 and the vendor driver version string relate?
+- What is the travel precision (0.1, 0.01 or 0.005 mm)? It must be derived by comparing a raw GET_MULTI_MAGNETISM value with the value shown in the AKKO driver.
 - Does the firmware answer the documented read-only GET commands identically?

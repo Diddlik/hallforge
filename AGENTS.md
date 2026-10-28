@@ -121,10 +121,10 @@ Design:
 - Lint and format command: analyzers run during the build (`AnalysisLevel` latest-recommended, `TreatWarningsAsErrors`). Format with `dotnet format`.
 - Local run command: `dotnet run --project src/HallForge.Cli -- devices list --all` and `dotnet run --project src/HallForge.App`.
 - Required environment: .NET 10 SDK. Hardware tests need a keyboard connected by USB cable. The first device is AKKO VID `0x3151` PID `0x4035`.
-- Important entry points: `src/HallForge.Cli/Program.cs` (CLI `hallforge`), `src/HallForge.App` (GUI, `MainViewModel`), `src/HallForge.Core/KeyboardDiscoveryService.cs`, `src/HallForge.Transport.Hid/HidSharpEnumerator.cs`.
+- Important entry points: `src/HallForge.Cli/Program.cs` (CLI `hallforge`), `src/HallForge.App` (GUI, `MainViewModel`), `src/HallForge.Core/KeyboardDiscoveryService.cs`, `src/HallForge.Transport.Hid/HidSharpTransport.cs`, `src/HallForge.Protocol.RongYuan/RongYuanClient.cs` (read-only command allowlist).
 - Architecture constraints:
   - `Core` is vendor-neutral and has no HidSharp, UI or protocol specifics.
-  - Keyboards are described as data in `devices/*.json`, one file per model or family. Each file names a `protocol` id, the USB match and a `verified` flag.
+  - Keyboards are described as data in `devices/*.json`, one file per model. Each file names a `protocol` id, the USB match, the `firmwareModelIds` and a `verified` flag. Vendors reuse USB product ids across models, so only the firmware model id confirms the model.
   - A new keyboard on a known protocol needs only a JSON file. A new protocol gets its own `HallForge.Protocol.<Name>` project.
   - Unknown or unverified devices are never written to.
   - Firmware, bootloader, keymatrix, macro and FN commands are never exposed.

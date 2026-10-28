@@ -8,12 +8,17 @@ namespace HallForge.Core;
 /// Data-driven description of a keyboard model. Adding a keyboard that speaks an already
 /// implemented protocol only requires a new JSON file in the devices directory.
 /// </summary>
+/// <param name="FirmwareModelIds">
+/// Model ids the firmware reports. Vendors reuse one USB product id for many boards, so only this id
+/// confirms the model; a device whose firmware reports another id must not be configured with this definition.
+/// </param>
 public sealed record DeviceDefinition(
     string Id,
     string Name,
     string Protocol,
     bool Verified,
-    DeviceMatch Match)
+    DeviceMatch Match,
+    IReadOnlyList<uint> FirmwareModelIds)
 {
     public bool Matches(HidInterfaceInfo hid) =>
         Match.VendorIds.Contains(hid.VendorId)

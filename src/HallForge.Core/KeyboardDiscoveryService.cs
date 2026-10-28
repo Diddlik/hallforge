@@ -19,14 +19,14 @@ public sealed record KeyboardCandidate(HidInterfaceInfo Interface, DeviceDefinit
     };
 }
 
-public sealed class KeyboardDiscoveryService(IHidEnumerator enumerator, IReadOnlyList<DeviceDefinition> definitions)
+public sealed class KeyboardDiscoveryService(IHidTransport transport, IReadOnlyList<DeviceDefinition> definitions)
 {
     // A model definition with explicit product ids wins over a vendor-wide family definition.
     private readonly IReadOnlyList<DeviceDefinition> _definitions = definitions.OrderBy(d => d.Match.ProductIds.Count == 0).ToList();
 
     /// <param name="includeUnmatched">Also return interfaces without a definition, needed to research new keyboards.</param>
     public IReadOnlyList<KeyboardCandidate> Discover(bool includeUnmatched = false) =>
-        enumerator.Enumerate()
+        transport.Enumerate()
             .Select(hid => new KeyboardCandidate(hid, _definitions.FirstOrDefault(d => d.Matches(hid))))
             .Where(c => includeUnmatched || c.Definition is not null)
             .ToList();

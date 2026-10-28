@@ -8,5 +8,6 @@
     "productIds": ["0x4035"],
     "usagePage": "0xFFFF",
     "usage": "0x0002"
-  }
+  },
+  "firmwareModelIds": [1778]
 }
