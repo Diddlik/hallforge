@@ -80,6 +80,12 @@ The vendor driver writes one key per report and never reads back. Payload offset
 - Default limits in the vendor driver: travel 0.1-4.0 mm, rapid trigger 0.1-2.5 mm, deadzone 0.1-4.0 mm (default 3.7), all in 0.1 mm steps. They are stored in the device definition.
 - The default key matrix of the model's driver class maps matrix index to HID usage. It is stored as `keys` (W3C `KeyboardEvent.code` names) in `devices/akko-mod007b-iso-he.json`. Fn (59), index 71 and the encoder (90, 91, 96, 97) are excluded.
 
+## Lighting (GET_LEDPARAM 0x87, verified read)
+
+Response bytes (byte 0 = echo): 1 mode (0 off ... 24 fireworks, see `LightingMode`), 2 = 4 - speed, 3 brightness, 4 = option << 4 | color mode (7 = rainbow), 5-7 RGB. Model 1778 answers it (recorded `87 13 02 02 07 B4 B4 B4`: press-action-off, brightness 2, speed 2, rainbow).
+
+Writing (SET_LEDPARAM 0x07) is not implemented. The vendor driver class for this model passes checksum type "1" and a 500 ms delay, and the documented reference uses a Bit8 checksum for LED commands. Which one this firmware expects must be confirmed with a capture first.
+
 ## Next steps (Phase 1)
 
 1. Done: proof of concept on KeyQ (3.5 mm, confirmed by typing, then restored to 0.9 mm). See `hardware-compatibility.md`.

@@ -358,12 +358,45 @@ int ApplyPatches(ParseResult result, IReadOnlyDictionary<string, TriggerPatch> p
     }
 }
 
+var ledShow = new Command("show", "Read the current lighting effect (read-only).") { deviceOption };
+ledShow.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    try
+    {
+        using var session = RongYuanSession.Open(transport, target);
+        var light = session.Client.ReadLighting();
+        Console.WriteLine($"Mode:       {light.Mode}");
+        Console.WriteLine($"Brightness: {light.Brightness}");
+        Console.WriteLine($"Speed:      {light.Speed} (0-4)");
+        Console.WriteLine($"Option:     {light.Option}");
+        Console.WriteLine($"Color:      {(light.Rainbow ? "rainbow" : $"#{light.Red:X2}{light.Green:X2}{light.Blue:X2}")}");
+        return 0;
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitUnsupported;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Read failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
     new Command("keys", "Inspect and configure key trigger settings.") { keysList, keysSet },
     new Command("backup", "Create and restore backups of key settings.") { importAkko, backupRestore },
     new Command("profiles", "Apply portable key setting profiles.") { profilesApply },
+    new Command("led", "Keyboard lighting.") { ledShow },
     new Command("state", "Key settings known to HallForge (the device cannot report them).") { stateShow },
 };
 return root.Parse(args).Invoke();

@@ -10,6 +10,7 @@ namespace HallForge.Protocol.RongYuan;
 public enum ReadCommand : byte
 {
     GetProfile = 0x84,
+    GetLedParam = 0x87,
     GetUsbVersion = 0x8F,
     GetFeatureList = 0xE6,
 }
@@ -174,6 +175,8 @@ public sealed class RongYuanClient(IHidConnection connection)
         connection.SetFeature(Encode(trigger, profile, matrixIndex));
         Thread.Sleep(WriteSpacing);
     }
+
+    public LightingState ReadLighting() => LightingState.Parse(Query(ReadCommand.GetLedParam));
 
     public RongYuanIdentity Identify()
     {
