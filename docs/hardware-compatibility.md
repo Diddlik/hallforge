@@ -25,6 +25,7 @@ Observed on 2026-10-28, Windows 11 (build 26300), with `hallforge devices probe`
   - `hallforge keys set --experimental` set KeyQ (matrix 8, profile 0) to 3.5 mm actuation. The owner confirmed by typing that Q then triggered near the bottom of its travel.
   - Q was then restored to its previous setting from the vendor driver database (0.9 / 0.9 mm, rapid trigger off, 0.2 / 0.3 mm, deadzone 3.7 mm).
   - Per-key settings cannot be read back, so this test is the only verification available.
+- Lighting write (2026-10-28): `hallforge led set --experimental` changed RainDown/brightness 4 to PressActionOff/brightness 2/speed 2/rainbow. The read-back matched. The vendor driver window was open at the time; it did not interfere.
 - Support level: `Unverified`. Writes need `--experimental`.
 
 ### AKKO MOD007B ISO HE 2.4G receiver, VID 0x3151 PID 0x4011
