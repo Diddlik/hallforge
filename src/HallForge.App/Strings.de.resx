@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Refresh" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>Über</value>
+  </data>
+  <data name="LoadProfile" xml:space="preserve">
+    <value>Profil laden…</value>
+  </data>
+  <data name="ProfileFileType" xml:space="preserve">
+    <value>HallForge-Profil</value>
+  </data>
+  <data name="Searching" xml:space="preserve">
+    <value>Suche nach Tastaturen…</value>
+  </data>
+  <data name="NoKeyboardFound" xml:space="preserve">
+    <value>Keine unterstützte Tastatur gefunden. Schließe die Tastatur per USB-Kabel an und wähle Aktualisieren.</value>
+  </data>
+  <data name="ListFailed" xml:space="preserve">
+    <value>HID-Geräte konnten nicht aufgelistet werden: {0} Prüfe die Geräteberechtigungen und wähle Aktualisieren.</value>
+  </data>
+  <data name="KeyboardsHeading" xml:space="preserve">
+    <value>Tastatur</value>
+  </data>
+  <data name="ExperimentalBadge" xml:space="preserve">
+    <value>Experimentell: Diese Tastatur kann ihre Einstellungen nicht zurückmelden, Schreibvorgänge sind daher nicht überprüfbar.</value>
+  </data>
+  <data name="KeyboardViewName" xml:space="preserve">
+    <value>Tastaturlayout. Wähle Tasten aus, um sie zu bearbeiten.</value>
+  </data>
+  <data name="KeyAccessibleValue" xml:space="preserve">
+    <value>Auslösepunkt {0} mm, Rapid Trigger {1}</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>an</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>aus</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>unbekannt</value>
+  </data>
+  <data name="Mixed" xml:space="preserve">
+    <value>gemischt</value>
+  </data>
+  <data name="PresetMovement" xml:space="preserve">
+    <value>Bewegung</value>
+  </data>
+  <data name="PresetAll" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="PresetNone" xml:space="preserve">
+    <value>Keine</value>
+  </data>
+  <data name="SelectKeysHint" xml:space="preserve">
+    <value>Wähle Tasten auf der Tastatur aus, um sie zu bearbeiten.</value>
+  </data>
+  <data name="Actuation" xml:space="preserve">
+    <value>Auslösepunkt (mm)</value>
+  </data>
+  <data name="Release" xml:space="preserve">
+    <value>Rückstellpunkt (mm)</value>
+  </data>
+  <data name="RapidTrigger" xml:space="preserve">
+    <value>Rapid Trigger</value>
+  </data>
+  <data name="RapidTriggerPress" xml:space="preserve">
+    <value>RT Drücken (mm)</value>
+  </data>
+  <data name="RapidTriggerRelease" xml:space="preserve">
+    <value>RT Loslassen (mm)</value>
+  </data>
+  <data name="Deadzone" xml:space="preserve">
+    <value>Totzone (mm)</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Verwerfen</value>
+  </data>
+  <data name="ApplyCount" xml:space="preserve">
+    <value>Anwenden ({0})</value>
+  </data>
+  <data name="ImportBackup" xml:space="preserve">
+    <value>Backup aus AKKO-Treiber erstellen</value>
+  </data>
+  <data name="Connecting" xml:space="preserve">
+    <value>Verbinde mit der Tastatur…</value>
+  </data>
+  <data name="StateLoaded" xml:space="preserve">
+    <value>Onboard-Profil {0}: {1} Tasteneinstellungen bekannt. Mit ? markierte Tasten sind unbekannt, weil die Tastatur sie nicht melden kann.</value>
+  </data>
+  <data name="NoBackupYet" xml:space="preserve">
+    <value>Onboard-Profil {0}: noch kein Backup. Erstelle ein Backup aus dem AKKO-Treiber, bevor du Änderungen anwendest.</value>
+  </data>
+  <data name="ConnectFailed" xml:space="preserve">
+    <value>Verbindung zur Tastatur fehlgeschlagen: {0} Schließe den AKKO-Treiber und wähle Aktualisieren.</value>
+  </data>
+  <data name="BackupImported" xml:space="preserve">
+    <value>Backup mit {0} Tasteneinstellungen erstellt: {1}</value>
+  </data>
+  <data name="BackupImportFailed" xml:space="preserve">
+    <value>Backup konnte nicht erstellt werden: {0}</value>
+  </data>
+  <data name="BackupRequired" xml:space="preserve">
+    <value>Erstelle ein Backup, bevor du Änderungen anwendest.</value>
+  </data>
+  <data name="ProfileLoaded" xml:space="preserve">
+    <value>Profil {0} zu den offenen Änderungen hinzugefügt. Geschrieben wird erst mit Anwenden.</value>
+  </data>
+  <data name="ProfileKeysIgnored" xml:space="preserve">
+    <value>Profil hinzugefügt. Diese Tasten gibt es auf dieser Tastatur nicht, sie wurden ignoriert: {0}</value>
+  </data>
+  <data name="ProfileLoadFailed" xml:space="preserve">
+    <value>Profil konnte nicht geladen werden: {0}</value>
+  </data>
+  <data name="Sending" xml:space="preserve">
+    <value>Sende {0} von {1}…</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>{0} Tasteneinstellungen gesendet. Die Tastatur kann sie nicht bestätigen, teste daher die Tasten.</value>
+  </data>
+  <data name="ApplyFailed" xml:space="preserve">
+    <value>Anwenden abgebrochen: {0} {1} Tasten wurden gesendet und sind gespeichert. Stelle bei Bedarf ein Backup wieder her.</value>
+  </data>
+  <data name="ProfileChanged" xml:space="preserve">
+    <value>Das aktive Onboard-Profil hat sich auf {0} geändert. Wähle Aktualisieren und versuche es erneut.</value>
+  </data>
+  <data name="TriggerSummary" xml:space="preserve">
+    <value>{0}/{1} mm, RT {2} {3}/{4}, TZ {5}</value>
+  </data>
+  <data name="ConfirmTitle" xml:space="preserve">
+    <value>Änderungen anwenden</value>
+  </data>
+  <data name="ConfirmHeading" xml:space="preserve">
+    <value>Diese Einstellungen an {0} senden?</value>
+  </data>
+  <data name="ConfirmExperimental" xml:space="preserve">
+    <value>Mir ist bewusst, dass diese Tastatur nicht verifiziert ist und HallForge die Einstellungen nicht zurücklesen kann.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Anwenden</value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>HallForge {0} ist verfügbar.</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Neu starten und aktualisieren</value>
+  </data>
+  <data name="UpdateLater" xml:space="preserve">
+    <value>Später</value>
+  </data>
+  <data name="UpdateBlockedByPending" xml:space="preserve">
+    <value>Wende die offenen Tastenänderungen an oder verwirf sie, bevor du aktualisierst.</value>
+  </data>
+  <data name="UpdateDownloading" xml:space="preserve">
+    <value>Update wird heruntergeladen…</value>
+  </data>
+  <data name="UpdateFailed" xml:space="preserve">
+    <value>Das Update ist fehlgeschlagen: {0} Du kannst es später erneut versuchen.</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>HallForge ist auf dem neuesten Stand.</value>
+  </data>
+  <data name="UpdatesNotInstalled" xml:space="preserve">
+    <value>Updates gibt es nur für installierte Versionen.</value>
+  </data>
+  <data name="AutoCheckUpdates" xml:space="preserve">
+    <value>Automatisch nach Updates suchen</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>Über HallForge</value>
+  </data>
+  <data name="LicenseText" xml:space="preserve">
+    <value>Lizenziert unter der GNU General Public License v3.0 oder später.</value>
+  </data>
+  <data name="ThirdParty" xml:space="preserve">
+    <value>Bibliotheken von Drittanbietern</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+</root>

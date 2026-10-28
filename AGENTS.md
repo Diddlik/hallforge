@@ -111,7 +111,7 @@ Design:
 - Platform-specific constraints: Windows, Linux and macOS. HID access goes through HidSharp. The USB interface number can only be parsed from Windows device paths. Linux needs udev rules that use `TAG+="uaccess"` and never `MODE=0666`.
 - GUI toolkit, update mechanism, and distribution:
   - Avalonia 12 with the Fluent theme and CommunityToolkit.Mvvm.
-  - User-facing strings are in `src/HallForge.App/Strings.resx`, which generates the strongly typed `Strings` class at build time.
+  - User-facing strings are in `src/HallForge.App/Strings.resx` (English, neutral) and `Strings.de.resx` (German); the UI follows the OS display language. A test checks that translations keep the format placeholders of the neutral strings.
   - User preferences and window placement are stored in `%LocalAppData%/HallForge/settings.json` (`AppSettings`).
   - Velopack auto-update checks GitHub Releases, can be disabled in About, and restarts only when the user clicks.
   - Release: push tag `v<Version>` (must equal `<Version>` in `Directory.Build.props`). `.github/workflows/release.yml` packs the GUI with Velopack for win-x64, linux-x64 and osx-arm64, uploads it to GitHub Releases, and attaches a self-contained CLI zip per platform. Verified with v0.1.0 (GUI only; CLI zips start with the next release). The update path from one release to the next is not verified yet.
