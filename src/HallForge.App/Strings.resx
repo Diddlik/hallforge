@@ -232,7 +232,7 @@
     <value>Speed</value>
   </data>
   <data name="LightingVariant" xml:space="preserve">
-    <value>Variant</value>
+    <value>Direction</value>
   </data>
   <data name="LightingColor" xml:space="preserve">
     <value>Color (RRGGBB)</value>
@@ -323,5 +323,35 @@
   </data>
   <data name="LightingFireworks" xml:space="preserve">
     <value>Fireworks</value>
+  </data>
+  <data name="LightingVariantRight" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="LightingVariantLeft" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="LightingVariantDown" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="LightingVariantUp" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="LightingVariantZigZag" xml:space="preserve">
+    <value>Zigzag</value>
+  </data>
+  <data name="LightingVariantReturn" xml:space="preserve">
+    <value>Back and forth</value>
+  </data>
+  <data name="LightingVariantOutward" xml:space="preserve">
+    <value>Outward</value>
+  </data>
+  <data name="LightingVariantInward" xml:space="preserve">
+    <value>Inward</value>
+  </data>
+  <data name="LightingVariantCounterClockwise" xml:space="preserve">
+    <value>Counterclockwise</value>
+  </data>
+  <data name="LightingVariantClockwise" xml:space="preserve">
+    <value>Clockwise</value>
   </data>
 </root>

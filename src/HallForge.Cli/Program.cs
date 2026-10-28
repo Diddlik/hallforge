@@ -394,7 +394,7 @@ var modeOption = new Option<LightingMode>("--mode") { Description = "Lighting ef
 var brightnessOption = new Option<int>("--brightness") { Description = $"Brightness 0-{LightingState.MaxBrightness}.", Required = true };
 var speedOption = new Option<int>("--speed") { Description = $"Effect speed 0-{LightingState.MaxSpeed}.", DefaultValueFactory = _ => 0 };
 var colorOption = new Option<string>("--color") { Description = "Color as RRGGBB, or 'rainbow'.", Required = true };
-var effectOption = new Option<int>("--option") { Description = "Effect variant (0-15), e.g. direction for Wave.", DefaultValueFactory = _ => 0 };
+var effectOption = new Option<int>("--option") { Description = "Effect variant, e.g. direction for Wave (0 right, 1 left, 2 down, 3 up). See docs/protocol-research.md.", DefaultValueFactory = _ => 0 };
 var ledSet = new Command("set", "Set the lighting effect and verify it by reading it back.")
 {
     deviceOption, modeOption, brightnessOption, speedOption, colorOption, effectOption, dryRunOption, yesOption, experimentalOption,

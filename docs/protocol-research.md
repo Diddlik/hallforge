@@ -86,6 +86,8 @@ Response bytes (byte 0 = echo): 1 mode (0 off ... 24 fireworks, see `LightingMod
 
 Writing (SET_LEDPARAM 0x07, verified by vendor driver capture `ws/usb4`): `[07, mode, 4 - speed, brightness, option << 4 | color mode, R, G, B, checksum]` with the **Bit8** checksum (255 minus the low byte of the sum of bytes 0-7, stored at byte 8). Color mode 8 = fixed color, 7 = rainbow. Brightness and speed are 0-4. The vendor driver substitutes #FAFFFA for white and waits 500 ms after the write. HallForge reads the lighting back after every write and fails if it differs, so lighting writes are verified, unlike key settings. User picture, music and screen color modes are not writable because they need data HallForge does not provide.
 
+Option values the vendor driver writes for model 1778 (`LightingState.VariantsOf`, from the driver's lighting encoder, not individually tested on hardware): Wave 0 right, 1 left, 2 down, 3 up; Snake 0 zigzag, 1 back and forth; Kaleidoscope 0 outward, 1 inward; Line wave and Fireworks 0 right, 1 left; Circle wave 0 counterclockwise, 1 clockwise. All other writable effects use option 0.
+
 ## Next steps (Phase 1)
 
 1. Done: proof of concept on KeyQ (3.5 mm, confirmed by typing, then restored to 0.9 mm). See `hardware-compatibility.md`.

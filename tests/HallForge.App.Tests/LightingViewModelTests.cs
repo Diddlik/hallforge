@@ -46,4 +46,19 @@ public class LightingViewModelTests
     [Fact]
     public void Apply_IsDisabledUntilLightingWasRead() =>
         Assert.False(Lighting().ApplyCommand.CanExecute(null));
+
+    [Fact]
+    public void Variants_FollowTheEffectAndResetWhenItChanges()
+    {
+        var lighting = Lighting();
+        lighting.Mode = lighting.Modes.Single(m => m.Mode == LightingMode.Wave);
+        lighting.Variant = lighting.Variants[3];
+
+        Assert.Equal(3, lighting.Option);
+
+        lighting.Mode = lighting.Modes.Single(m => m.Mode == LightingMode.Raindrop);
+
+        Assert.False(lighting.HasVariants);
+        Assert.Equal(0, lighting.Option);
+    }
 }

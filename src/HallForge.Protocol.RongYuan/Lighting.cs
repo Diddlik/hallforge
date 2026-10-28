@@ -30,6 +30,21 @@ public enum LightingMode : byte
     Fireworks = 24,
 }
 
+/// <summary>Named effect variants. The option value is the index in <see cref="LightingState.VariantsOf"/>.</summary>
+public enum LightingVariant
+{
+    Right,
+    Left,
+    Down,
+    Up,
+    ZigZag,
+    Return,
+    Outward,
+    Inward,
+    CounterClockwise,
+    Clockwise,
+}
+
 /// <param name="Speed">0 (slowest) to 4; the firmware stores 4 minus this value.</param>
 /// <param name="Option">Effect variant, e.g. direction for Wave; meaning depends on the mode.</param>
 /// <param name="Rainbow">Cycles through colors instead of using <paramref name="Red"/>/<paramref name="Green"/>/<paramref name="Blue"/>.</param>
@@ -51,6 +66,20 @@ public sealed record LightingState(LightingMode Mode, int Brightness, int Speed,
     /// </summary>
     public static bool IsWritable(LightingMode mode) =>
         Enum.IsDefined(mode) && mode is not (LightingMode.UserPicture or LightingMode.MusicFollow2 or LightingMode.MusicFollow3 or LightingMode.ScreenColor);
+
+    /// <summary>
+    /// Variants the vendor driver writes for each effect (option nibble = index). Effects without variants get option 0.
+    /// Taken from the vendor driver's lighting encoder for model 1778.
+    /// </summary>
+    public static IReadOnlyList<LightingVariant> VariantsOf(LightingMode mode) => mode switch
+    {
+        LightingMode.Wave => [LightingVariant.Right, LightingVariant.Left, LightingVariant.Down, LightingVariant.Up],
+        LightingMode.Snake => [LightingVariant.ZigZag, LightingVariant.Return],
+        LightingMode.Kaleidoscope => [LightingVariant.Outward, LightingVariant.Inward],
+        LightingMode.LineWave or LightingMode.Fireworks => [LightingVariant.Right, LightingVariant.Left],
+        LightingMode.CircleWave => [LightingVariant.CounterClockwise, LightingVariant.Clockwise],
+        _ => [],
+    };
 
     /// <summary>Decodes a GET_LEDPARAM (0x87) response; byte 0 is the echoed command.</summary>
     public static LightingState Parse(byte[] response)

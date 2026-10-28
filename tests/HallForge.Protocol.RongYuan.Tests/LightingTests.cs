@@ -75,4 +75,12 @@ public class LightingEncodeTests
     [InlineData(LightingMode.Wave, 4, 5)]
     public void Encode_RejectsUnsupportedModesAndRanges(LightingMode mode, int brightness, int speed) =>
         Assert.Throws<ArgumentOutOfRangeException>(() => new LightingState(mode, brightness, speed, 0, true, 0, 0, 0).Encode());
+
+    [Fact]
+    public void VariantsOf_MatchesVendorOptionValues()
+    {
+        Assert.Equal([LightingVariant.Right, LightingVariant.Left, LightingVariant.Down, LightingVariant.Up], LightingState.VariantsOf(LightingMode.Wave));
+        Assert.Equal([LightingVariant.CounterClockwise, LightingVariant.Clockwise], LightingState.VariantsOf(LightingMode.CircleWave));
+        Assert.Empty(LightingState.VariantsOf(LightingMode.Breath));
+    }
 }

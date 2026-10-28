@@ -214,7 +214,7 @@
     <value>Tempo</value>
   </data>
   <data name="LightingVariant" xml:space="preserve">
-    <value>Variante</value>
+    <value>Richtung</value>
   </data>
   <data name="LightingColor" xml:space="preserve">
     <value>Farbe (RRGGBB)</value>
@@ -305,5 +305,35 @@
   </data>
   <data name="LightingFireworks" xml:space="preserve">
     <value>Feuerwerk</value>
+  </data>
+  <data name="LightingVariantRight" xml:space="preserve">
+    <value>Nach rechts</value>
+  </data>
+  <data name="LightingVariantLeft" xml:space="preserve">
+    <value>Nach links</value>
+  </data>
+  <data name="LightingVariantDown" xml:space="preserve">
+    <value>Nach unten</value>
+  </data>
+  <data name="LightingVariantUp" xml:space="preserve">
+    <value>Nach oben</value>
+  </data>
+  <data name="LightingVariantZigZag" xml:space="preserve">
+    <value>Zickzack</value>
+  </data>
+  <data name="LightingVariantReturn" xml:space="preserve">
+    <value>Hin und zurück</value>
+  </data>
+  <data name="LightingVariantOutward" xml:space="preserve">
+    <value>Nach außen</value>
+  </data>
+  <data name="LightingVariantInward" xml:space="preserve">
+    <value>Nach innen</value>
+  </data>
+  <data name="LightingVariantCounterClockwise" xml:space="preserve">
+    <value>Gegen den Uhrzeigersinn</value>
+  </data>
+  <data name="LightingVariantClockwise" xml:space="preserve">
+    <value>Im Uhrzeigersinn</value>
   </data>
 </root>

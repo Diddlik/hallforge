@@ -8,6 +8,8 @@ namespace HallForge.App;
 
 public sealed record LightingModeItem(LightingMode Mode, string Name);
 
+public sealed record LightingVariantItem(int Option, string Name);
+
 /// <summary>Edits the keyboard lighting. The firmware reports lighting, so every write is read back and verified.</summary>
 public sealed partial class LightingViewModel(
     KeyboardCandidate target, IHidTransport transport, Func<ApplyRequest, Task<bool>> confirm) : ObservableObject
@@ -31,6 +33,7 @@ public sealed partial class LightingViewModel(
     public partial string Status { get; set; } = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Variants), nameof(Variant), nameof(HasVariants))]
     public partial LightingModeItem? Mode { get; set; }
 
     [ObservableProperty]
@@ -40,7 +43,31 @@ public sealed partial class LightingViewModel(
     public partial double Speed { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Variant))]
     public partial int Option { get; set; }
+
+    public IReadOnlyList<LightingVariantItem> Variants => Mode is null ? [] : LightingState.VariantsOf(Mode.Mode)
+        .Select((v, i) => new LightingVariantItem(i, Strings.ResourceManager.GetString($"LightingVariant{v}", CultureInfo.CurrentUICulture) ?? v.ToString()))
+        .ToList();
+
+    public bool HasVariants => Variants.Count > 0;
+
+    public LightingVariantItem? Variant
+    {
+        get => Variants.FirstOrDefault(v => v.Option == Option);
+        set
+        {
+            if (value is not null)
+                Option = value.Option;
+        }
+    }
+
+    // Variant indices mean different things per effect, so a newly chosen effect starts at its first variant.
+    partial void OnModeChanged(LightingModeItem? oldValue, LightingModeItem? newValue)
+    {
+        if (oldValue is not null && newValue is not null && oldValue.Mode != newValue.Mode)
+            Option = 0;
+    }
 
     [ObservableProperty]
     public partial bool Rainbow { get; set; }

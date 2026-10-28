@@ -179,10 +179,16 @@
                                     <Slider Value="{Binding Speed}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
                                             AutomationProperties.Name="{x:Static app:Strings.LightingSpeed}" />
                                 </StackPanel>
-                                <StackPanel Spacing="4">
+                                <StackPanel Spacing="4" IsVisible="{Binding HasVariants}">
                                     <TextBlock Text="{x:Static app:Strings.LightingVariant}" />
-                                    <NumericUpDown Value="{Binding Option}" Minimum="0" Maximum="15" Increment="1" FormatString="0" Width="140" HorizontalAlignment="Left"
-                                                   AutomationProperties.Name="{x:Static app:Strings.LightingVariant}" />
+                                    <ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding Variant}" MinWidth="240"
+                                              AutomationProperties.Name="{x:Static app:Strings.LightingVariant}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate DataType="app:LightingVariantItem">
+                                                <TextBlock Text="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
                                 </StackPanel>
                                 <CheckBox Content="{x:Static app:Strings.LightingRainbow}" IsChecked="{Binding Rainbow}" />
                                 <StackPanel Spacing="4" IsEnabled="{Binding !Rainbow}">
