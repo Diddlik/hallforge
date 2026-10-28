@@ -45,6 +45,8 @@ public sealed class RongYuanClient(IHidConnection connection)
     private const byte MaxProfile = 3;
     // The vendor driver leaves at least this much time between per-key writes.
     private static readonly TimeSpan WriteSpacing = TimeSpan.FromMilliseconds(30);
+    // The vendor driver waits 500 ms after a lighting write before talking to the keyboard again.
+    private static readonly TimeSpan LightingSettle = TimeSpan.FromMilliseconds(500);
     private const int Attempts = 5;
     // Until the firmware has prepared a response, reading returns the request unchanged. Simple queries
     // answer within milliseconds; table reads may take longer, so the wait grows before giving up.
@@ -177,6 +179,24 @@ public sealed class RongYuanClient(IHidConnection connection)
     }
 
     public LightingState ReadLighting() => LightingState.Parse(Query(ReadCommand.GetLedParam));
+
+    /// <summary>
+    /// Writes the lighting effect and reads it back. Unlike key settings, the firmware reports lighting,
+    /// so the write is verified.
+    /// </summary>
+    /// <returns>The state the keyboard reports after the write.</returns>
+    /// <exception cref="ProtocolException">The keyboard reports a different state than was written.</exception>
+    public LightingState WriteLighting(LightingState lighting)
+    {
+        connection.SetFeature(lighting.Encode());
+        Thread.Sleep(LightingSettle);
+        var actual = ReadLighting();
+        // The color bytes are irrelevant in rainbow mode, so they are not compared there.
+        var expected = lighting.Rainbow ? lighting with { Red = actual.Red, Green = actual.Green, Blue = actual.Blue } : lighting;
+        if (actual != expected)
+            throw new ProtocolException($"The keyboard reports {actual} after writing {lighting}.");
+        return actual;
+    }
 
     public RongYuanIdentity Identify()
     {

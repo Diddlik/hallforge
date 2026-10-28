@@ -84,7 +84,7 @@ The vendor driver writes one key per report and never reads back. Payload offset
 
 Response bytes (byte 0 = echo): 1 mode (0 off ... 24 fireworks, see `LightingMode`), 2 = 4 - speed, 3 brightness, 4 = option << 4 | color mode (7 = rainbow), 5-7 RGB. Model 1778 answers it (recorded `87 13 02 02 07 B4 B4 B4`: press-action-off, brightness 2, speed 2, rainbow).
 
-Writing (SET_LEDPARAM 0x07) is not implemented. The vendor driver class for this model passes checksum type "1" and a 500 ms delay, and the documented reference uses a Bit8 checksum for LED commands. Which one this firmware expects must be confirmed with a capture first.
+Writing (SET_LEDPARAM 0x07, verified by vendor driver capture `ws/usb4`): `[07, mode, 4 - speed, brightness, option << 4 | color mode, R, G, B, checksum]` with the **Bit8** checksum (255 minus the low byte of the sum of bytes 0-7, stored at byte 8). Color mode 8 = fixed color, 7 = rainbow. Brightness and speed are 0-4. The vendor driver substitutes #FAFFFA for white and waits 500 ms after the write. HallForge reads the lighting back after every write and fails if it differs, so lighting writes are verified, unlike key settings. User picture, music and screen color modes are not writable because they need data HallForge does not provide.
 
 ## Next steps (Phase 1)
 

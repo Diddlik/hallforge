@@ -390,13 +390,95 @@ ledShow.SetAction(result =>
     }
 });
 
+var modeOption = new Option<LightingMode>("--mode") { Description = "Lighting effect, e.g. AlwaysOn, Breath, Wave, PressActionOff.", Required = true };
+var brightnessOption = new Option<int>("--brightness") { Description = $"Brightness 0-{LightingState.MaxBrightness}.", Required = true };
+var speedOption = new Option<int>("--speed") { Description = $"Effect speed 0-{LightingState.MaxSpeed}.", DefaultValueFactory = _ => 0 };
+var colorOption = new Option<string>("--color") { Description = "Color as RRGGBB, or 'rainbow'.", Required = true };
+var effectOption = new Option<int>("--option") { Description = "Effect variant (0-15), e.g. direction for Wave.", DefaultValueFactory = _ => 0 };
+var ledSet = new Command("set", "Set the lighting effect and verify it by reading it back.")
+{
+    deviceOption, modeOption, brightnessOption, speedOption, colorOption, effectOption, dryRunOption, yesOption, experimentalOption,
+};
+ledSet.SetAction(result =>
+{
+    var color = result.GetValue(colorOption)!;
+    var rainbow = color.Equals("rainbow", StringComparison.OrdinalIgnoreCase);
+    if (!rainbow && (color.Length != 6 || !int.TryParse(color, System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out _)))
+    {
+        Console.Error.WriteLine("--color must be RRGGBB (e.g. FF0000) or 'rainbow'.");
+        return ExitInvalidInput;
+    }
+    var rgb = rainbow ? [0, 0, 0] : Convert.FromHexString(color);
+    var lighting = new LightingState(result.GetValue(modeOption), result.GetValue(brightnessOption), result.GetValue(speedOption),
+        result.GetValue(effectOption), rainbow, rgb[0], rgb[1], rgb[2]);
+    try
+    {
+        lighting.Encode();
+    }
+    catch (ArgumentOutOfRangeException ex)
+    {
+        Console.Error.WriteLine($"Invalid lighting setting: {ex.Message}");
+        return ExitInvalidInput;
+    }
+
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    var dryRun = result.GetValue(dryRunOption);
+    if (!dryRun && !target.Definition!.Verified && !result.GetValue(experimentalOption))
+    {
+        Console.Error.WriteLine($"'{target.Definition.Name}' is not verified for writing. Use --dry-run to preview, or --experimental only for hardware research.");
+        return ExitUnsupported;
+    }
+    try
+    {
+        using var session = RongYuanSession.Open(transport, target);
+        var current = session.Client.ReadLighting();
+        // Rainbow ignores the color, so keep the keyboard's stored color instead of overwriting it.
+        if (rainbow)
+            lighting = lighting with { Red = current.Red, Green = current.Green, Blue = current.Blue };
+        Console.WriteLine($"Current: {current}");
+        Console.WriteLine($"New:     {lighting}");
+        if (dryRun)
+        {
+            Console.WriteLine("Dry run: nothing was sent.");
+            return 0;
+        }
+        if (!result.GetValue(yesOption))
+        {
+            Console.Write("Send this lighting setting to the keyboard? [y/N] ");
+            if (!string.Equals(Console.ReadLine()?.Trim(), "y", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Cancelled.");
+                return ExitCancelled;
+            }
+        }
+        session.Client.WriteLighting(lighting);
+        Console.WriteLine("Sent and verified: the keyboard reports the new lighting setting.");
+        return 0;
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitUnsupported;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Lighting write failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
     new Command("keys", "Inspect and configure key trigger settings.") { keysList, keysSet },
     new Command("backup", "Create and restore backups of key settings.") { importAkko, backupRestore },
     new Command("profiles", "Apply portable key setting profiles.") { profilesApply },
-    new Command("led", "Keyboard lighting.") { ledShow },
+    new Command("led", "Keyboard lighting.") { ledShow, ledSet },
     new Command("state", "Key settings known to HallForge (the device cannot report them).") { stateShow },
 };
 return root.Parse(args).Invoke();
