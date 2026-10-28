@@ -59,12 +59,10 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="app:ProfileItem">
                             <StackPanel Spacing="4">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" />
-                                    <Border Classes="pill warn" Padding="7,0" IsVisible="{Binding IsAggressive}" VerticalAlignment="Center">
-                                        <TextBlock Text="{x:Static app:Strings.Aggressive}" FontSize="11" />
-                                    </Border>
-                                </StackPanel>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" TextWrapping="Wrap" />
+                                <Border Classes="pill warn" Padding="7,0" IsVisible="{Binding IsAggressive}" HorizontalAlignment="Left">
+                                    <TextBlock Text="{x:Static app:Strings.Aggressive}" FontSize="11" />
+                                </Border>
                                 <TextBlock Classes="caption" Text="{Binding Coverage}" />
                                 <TextBlock Classes="caption" Text="{x:Static app:Strings.ProfileTemplate}" IsVisible="{Binding IsTemplate}" />
                                 <TextBlock Classes="caption" Text="{x:Static app:Strings.ProfileImported}" IsVisible="{Binding !IsTemplate}" />

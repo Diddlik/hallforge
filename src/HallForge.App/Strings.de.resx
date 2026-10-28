@@ -735,4 +735,7 @@
   <data name="UndoHelp" xml:space="preserve">
     <value>Letzte Entwurfsänderung rückgängig machen</value>
   </data>
+  <data name="PresetActions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
 </root>

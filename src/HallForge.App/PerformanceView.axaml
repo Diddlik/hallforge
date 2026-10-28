@@ -87,24 +87,26 @@
     <UserControl.DataTemplates>
         <DataTemplate DataType="app:TriggerFieldViewModel">
             <StackPanel Classes="field" Classes.inactive="{Binding IsInactive}" Spacing="6" IsEnabled="{Binding IsEnabled}">
-                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <Border Grid.Column="1" Background="Transparent" ToolTip.Tip="{Binding Help}" VerticalAlignment="Center">
+                    <Border Background="Transparent" ToolTip.Tip="{Binding Help}" VerticalAlignment="Center">
                         <Path Classes="icon small muted" Data="{StaticResource IconHelp}" />
                     </Border>
-                    <TextBox Grid.Column="3" Classes="mm" Classes.error="{Binding HasError}" Text="{Binding Input}" Width="104"
+                </StackPanel>
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="6">
+                    <Slider Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" SmallChange="{Binding Step}" LargeChange="{Binding Step}"
+                            TickFrequency="{Binding Step}" IsSnapToTickEnabled="True" Value="{Binding SliderValue}" VerticalAlignment="Center"
+                            Margin="0,-8,6,-8" AutomationProperties.Name="{Binding Label}" />
+                    <TextBox Grid.Column="1" Classes="mm" Classes.error="{Binding HasError}" Text="{Binding Input}" Width="96"
                              PlaceholderText="{Binding Placeholder}" TextAlignment="Right" FontWeight="Bold"
                              AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Note}">
                         <TextBox.InnerRightContent>
                             <TextBlock Text="mm" Classes="secondary" VerticalAlignment="Center" Margin="0,0,8,0" />
                         </TextBox.InnerRightContent>
                     </TextBox>
-                    <Button Grid.Column="4" Classes="step" Content="−" Command="{Binding DecreaseCommand}" AutomationProperties.Name="{Binding DecreaseName}" />
-                    <Button Grid.Column="5" Classes="step" Content="+" Command="{Binding IncreaseCommand}" AutomationProperties.Name="{Binding IncreaseName}" />
+                    <Button Grid.Column="2" Classes="step" Content="−" Command="{Binding DecreaseCommand}" AutomationProperties.Name="{Binding DecreaseName}" />
+                    <Button Grid.Column="3" Classes="step" Content="+" Command="{Binding IncreaseCommand}" AutomationProperties.Name="{Binding IncreaseName}" />
                 </Grid>
-                <Slider Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" SmallChange="{Binding Step}" LargeChange="{Binding Step}"
-                        TickFrequency="{Binding Step}" IsSnapToTickEnabled="True" Value="{Binding SliderValue}" Margin="0,-6"
-                        AutomationProperties.Name="{Binding Label}" />
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <TextBlock Classes="caption" Classes.warn="{Binding IsWarning}" Classes.error="{Binding HasError}" Text="{Binding Note}" TextWrapping="Wrap" />
                     <TextBlock Grid.Column="1" Classes="caption" Text="{Binding RangeText}" />
@@ -143,8 +145,7 @@
                     <!-- Keyboard -->
                     <Border Classes="panel" Padding="20,16,20,14">
                         <StackPanel Spacing="12">
-                            <DockPanel>
-                                <TextBlock DockPanel.Dock="Right" Classes="caption" Text="{x:Static app:Strings.SelectionHint}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                            <StackPanel Spacing="8">
                                 <WrapPanel ItemSpacing="8" LineSpacing="8">
                                     <TextBlock Text="{x:Static app:Strings.QuickSelect}" Classes="secondary" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0" />
                                     <ItemsControl ItemsSource="{Binding QuickSelect}">
@@ -162,7 +163,8 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </WrapPanel>
-                            </DockPanel>
+                                <TextBlock Classes="caption" Text="{x:Static app:Strings.SelectionHint}" />
+                            </StackPanel>
 
                             <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
                                 <ItemsControl x:Name="KeyboardView" ItemsSource="{Binding Keys}" Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
@@ -229,16 +231,16 @@
                     <!-- Selection -->
                     <Border Classes="panel">
                         <Panel>
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="4,8" IsVisible="{Binding !HasSelection}">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16" Margin="4,8" IsVisible="{Binding !HasSelection}">
                                 <Border Width="44" Height="44" CornerRadius="12" Background="{DynamicResource HfSurface2}">
                                     <Path Data="M3 3l7 18 2.5-7.5L20 11z" Stroke="{DynamicResource HfText2}" StrokeThickness="1.8" StrokeJoin="Round"
                                           Width="22" Height="22" Stretch="Uniform" />
                                 </Border>
-                                <StackPanel VerticalAlignment="Center">
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="{x:Static app:Strings.NoKeysSelected}" FontSize="16" FontWeight="SemiBold" />
                                     <TextBlock Text="{x:Static app:Strings.SelectKeysHint}" Classes="secondary" TextWrapping="Wrap" />
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                             <StackPanel Spacing="10" IsVisible="{Binding HasSelection}">
                                 <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="16">
                                     <TextBlock Classes="h2" Text="{Binding SelectionTitle}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />

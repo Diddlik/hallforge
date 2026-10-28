@@ -10,7 +10,7 @@ public sealed record ProfileGroupRow(string Keys, string Actuation, string Relea
 /// <summary>A key on the coverage preview: whether the selected profile changes it.</summary>
 public sealed record CoverageKey(double Left, double Top, double Width, double Height, string Legend, bool IsCovered);
 
-public sealed class ProfileItem(string path, KeyboardProfile profile, bool isTemplate)
+public sealed class ProfileItem(string path, KeyboardProfile profile, bool isTemplate, Func<string, string> legend)
 {
     public string Path { get; } = path;
     public string Name { get; } = profile.Name;
@@ -23,7 +23,7 @@ public sealed class ProfileItem(string path, KeyboardProfile profile, bool isTem
         || g.Settings.RapidTriggerReleaseMm < KeyboardEditorViewModel.RiskyRapidTriggerMm);
 
     public IReadOnlyList<ProfileGroupRow> Groups { get; } = profile.Groups
-        .Select(g => new ProfileGroupRow(string.Join(" ", g.KeyIds), Format(g.Settings.ActuationMm), Format(g.Settings.ReleaseMm),
+        .Select(g => new ProfileGroupRow(string.Join(" ", g.KeyIds.Select(legend)), Format(g.Settings.ActuationMm), Format(g.Settings.ReleaseMm),
             g.Settings.RapidTriggerEnabled is { } on ? (on ? Strings.On : Strings.Off) : Strings.Unchanged,
             g.Settings.RapidTriggerPressMm is null && g.Settings.RapidTriggerReleaseMm is null
                 ? Strings.Unchanged
@@ -78,7 +78,7 @@ public sealed partial class ProfileLibraryViewModel : ObservableObject
     {
         try
         {
-            var item = new ProfileItem(path, KeyboardProfile.Load(path), isTemplate);
+            var item = new ProfileItem(path, KeyboardProfile.Load(path), isTemplate, Legend);
             Profiles.Add(item);
             return item;
         }
@@ -88,6 +88,8 @@ public sealed partial class ProfileLibraryViewModel : ObservableObject
             return null;
         }
     }
+
+    private string Legend(string keyId) => _editor.Keys.FirstOrDefault(k => k.KeyId == keyId) is { Legend.Length: > 0 } key ? key.Legend : keyId;
 
     private bool HasSelection() => Selected is not null;
 

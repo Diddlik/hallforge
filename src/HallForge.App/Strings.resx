@@ -55,7 +55,7 @@
     <value>Movement</value>
   </data>
   <data name="PresetActions" xml:space="preserve">
-    <value>Q E R F</value>
+    <value>Actions</value>
   </data>
   <data name="PresetNumbers" xml:space="preserve">
     <value>1–5</value>
