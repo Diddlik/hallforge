@@ -4,7 +4,7 @@
              x:Class="HallForge.App.LightingView"
              x:DataType="app:LightingViewModel">
     <ScrollViewer>
-        <StackPanel Margin="24,20" Spacing="16" MaxWidth="640" HorizontalAlignment="Left">
+        <StackPanel Margin="24,20" Spacing="16" Width="640" HorizontalAlignment="Left">
             <StackPanel Spacing="2">
                 <TextBlock Classes="h1" Text="{x:Static app:Strings.TabLighting}" />
                 <TextBlock Classes="secondary" Text="{x:Static app:Strings.LightingIntro}" TextWrapping="Wrap" />
