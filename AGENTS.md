@@ -106,7 +106,7 @@ Design:
 
 ## Project facts
 
-- Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 1. The AKKO MOD007B ISO HE (model 1778) cannot read per-key settings back (see `docs/protocol-research.md`). Decision: HallForge writes complete key settings (`KeyTrigger`), keeps the last applied state itself, and imports the initial state from the vendor driver database. Writes are reported as sent, never as verified.
+- Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 1. The AKKO MOD007B ISO HE (model 1778) cannot read per-key settings back (see `docs/protocol-research.md`). Decision: HallForge writes complete key settings (`KeyTrigger`), keeps the last applied state itself, and imports the initial state from the vendor driver database. Writes are reported as sent, never as verified. State and backups are JSON files written by `StateStore` (Core) below `%LocalAppData%/HallForge`; the vendor database import is `AkkoDriverDatabase` (Protocol.RongYuan). Milestones after the MVP: LED setup, keyboard layout in the app (GitHub milestones 1 and 2).
 - Primary languages and runtimes: C# on .NET 10. The SDK is pinned in `global.json`. License: GPL-3.0-or-later.
 - Platform-specific constraints: Windows, Linux and macOS. HID access goes through HidSharp. The USB interface number can only be parsed from Windows device paths. Linux needs udev rules that use `TAG+="uaccess"` and never `MODE=0666`.
 - GUI toolkit, update mechanism, and distribution:
@@ -132,6 +132,7 @@ Design:
   - Millimeter input is parsed with `Millimeters.TryParse` (invariant '.', ',' rejected), never with the current culture.
   - The GUI and the CLI share the same services. Version numbers come only from `Directory.Build.props`, and package versions come only from `Directory.Packages.props`.
 - Generated files: `bin/` and `obj/`.
+- Local USB captures go to `ws/` (git-ignored; they may contain keystrokes).
 - Files or directories not to edit manually: `LICENSE` (verbatim GPL-3.0 text).
 
 ## Definition of done

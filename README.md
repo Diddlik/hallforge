@@ -15,6 +15,8 @@ dotnet run --project src/HallForge.Cli -- devices list          # keyboards with
 dotnet run --project src/HallForge.Cli -- devices list --all    # every HID interface
 dotnet run --project src/HallForge.Cli -- devices probe --device <id> --output report.json
 dotnet run --project src/HallForge.Cli -- devices identify --device <id>   # firmware model id and version (read-only)
+dotnet run --project src/HallForge.Cli -- backup import-akko --device <id>   # back up the settings the Akko Cloud Driver stored
+dotnet run --project src/HallForge.Cli -- state show --device <id>
 dotnet run --project src/HallForge.Cli -- keys list --device <id>
 dotnet run --project src/HallForge.Cli -- keys set --device <id> --key AltLeft --actuation 1.9 --release 1.9 --rapid-trigger false --rt-press 0.2 --rt-release 0.3 --deadzone 3.7 --dry-run
 dotnet run --project src/HallForge.App                          # GUI
@@ -26,6 +28,14 @@ dotnet run --project src/HallForge.App                          # GUI
 
 - **The keyboard uses a protocol that HallForge already supports:** add a JSON file to `devices/`. See `devices/akko-mod007b-iso-he.json`. Run `devices identify` to get the firmware model id for `firmwareModelIds`. Set `"verified": false` until the keyboard has been tested on real hardware.
 - **The keyboard uses a new protocol:** add a protocol project and give it a `protocol` id. Device definitions refer to that id.
+
+## State and backups
+
+The AKKO MOD007B ISO HE cannot report its key settings, so HallForge keeps what it knows:
+
+- `backup import-akko` reads the settings that the Akko Cloud Driver stored in its local database (`%AppData%/Akko Cloud Driver/iot_db/CONFIG/db`). It saves them as an immutable backup and as the initial state. The driver only stores keys that differ from its defaults, so all other keys stay unknown.
+- `keys set` records every write in the state.
+- Files live in `%LocalAppData%/HallForge/state` and `%LocalAppData%/HallForge/backups`.
 
 ## Releases and updates
 

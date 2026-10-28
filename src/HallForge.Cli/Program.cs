@@ -12,6 +12,7 @@ const int ExitCancelled = 6;
 
 var version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
 var transport = new HidSharpTransport();
+var stateStore = new StateStore(StateStore.DefaultRoot);
 var discovery = new KeyboardDiscoveryService(
     transport,
     DeviceDefinitionLoader.LoadDirectory(Path.Combine(AppContext.BaseDirectory, "devices")));
@@ -213,6 +214,7 @@ keysSet.SetAction(result =>
             }
         }
         client.WriteKeyTrigger(trigger, profile, matrixIndex);
+        stateStore.RecordWrite(definition, identity.DeviceId, profile, keyId, trigger);
         Console.WriteLine("Sent. This firmware cannot report settings back, so the result is not verified. Test the key to confirm.");
         return 0;
     }
@@ -236,12 +238,102 @@ keysList.SetAction(result =>
     return 0;
 });
 
+var databaseOption = new Option<FileInfo>("--db") { Description = "Akko Cloud Driver database file.", DefaultValueFactory = _ => new FileInfo(AkkoDriverDatabase.DefaultPath) };
+var replaceOption = new Option<bool>("--replace") { Description = "Replace the state HallForge already keeps for this profile." };
+var importAkko = new Command("import-akko", "Import the per-key settings the Akko Cloud Driver stored, as backup and initial state.") { deviceOption, databaseOption, replaceOption };
+importAkko.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null || target.Definition!.Protocol != "rongyuan")
+    {
+        Console.Error.WriteLine("Device not found or not a RongYuan device. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    var definition = target.Definition;
+    try
+    {
+        uint modelId;
+        byte profile;
+        using (var connection = transport.Open(target.Interface))
+        {
+            var client = new RongYuanClient(connection);
+            modelId = client.Identify().DeviceId;
+            if (!definition.FirmwareModelIds.Contains(modelId))
+            {
+                Console.Error.WriteLine($"Firmware model id {modelId} is not listed in '{definition.Id}'.");
+                return ExitUnsupported;
+            }
+            profile = client.ReadActiveProfile();
+        }
+
+        if (stateStore.Load(definition.Id, profile) is not null && !result.GetValue(replaceOption))
+        {
+            Console.Error.WriteLine($"HallForge already keeps a state for profile {profile} ({stateStore.StatePath(definition.Id, profile)}). Use --replace to overwrite it.");
+            return ExitInvalidInput;
+        }
+
+        var import = AkkoDriverDatabase.ReadProfile(result.GetValue(databaseOption)!.FullName, modelId, profile, definition);
+        foreach (var warning in import.Warnings)
+            Console.WriteLine($"Warning: {warning}");
+        var invalid = import.Keys.Where(k => definition.Limits.Validate(k.Value).Count > 0).Select(k => k.Key).ToList();
+        if (invalid.Count > 0)
+        {
+            Console.Error.WriteLine($"Imported values outside the model limits for: {string.Join(", ", invalid)}. Nothing was saved.");
+            return ExitInvalidInput;
+        }
+
+        var state = new KeyboardState(KeyboardState.CurrentFormatVersion, definition.Id, modelId, profile, "akko-driver-import", DateTime.UtcNow, import.Keys);
+        PrintState(state, definition);
+        var backup = stateStore.SaveBackup(state);
+        stateStore.Save(state);
+        Console.WriteLine($"Backup: {backup}");
+        Console.WriteLine($"{import.Keys.Count} keys imported. Keys not listed keep the driver's defaults and are unknown to HallForge.");
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Import failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
+var profileOption = new Option<int>("--profile") { Description = "Onboard profile (0-3).", DefaultValueFactory = _ => 0 };
+var stateShow = new Command("show", "Show the key settings HallForge last applied or imported.") { deviceOption, profileOption };
+stateShow.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    var state = stateStore.Load(target.Definition!.Id, result.GetValue(profileOption));
+    if (state is null)
+    {
+        Console.WriteLine("No state known yet. Run 'hallforge backup import-akko' or write keys with 'hallforge keys set'.");
+        return 0;
+    }
+    PrintState(state, target.Definition);
+    return 0;
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
     new Command("keys", "Inspect and configure key trigger settings.") { keysList, keysSet },
+    new Command("backup", "Create backups of key settings.") { importAkko },
+    new Command("state", "Key settings known to HallForge (the device cannot report them).") { stateShow },
 };
 return root.Parse(args).Invoke();
+
+static void PrintState(KeyboardState state, DeviceDefinition definition)
+{
+    Console.WriteLine($"{definition.Name}, profile {state.Profile}, source {state.Source}, updated {state.UpdatedAtUtc:u}");
+    Console.WriteLine("key              actuation  release  RT   press  release  deadzone");
+    foreach (var (keyId, t) in state.Keys.OrderBy(k => definition.Keys.GetValueOrDefault(k.Key)))
+        Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"{keyId,-16} {t.ActuationMm,9}  {t.ReleaseMm,7}  {(t.RapidTrigger ? "on" : "off"),-3}  {t.RapidTriggerPressMm,5}  {t.RapidTriggerReleaseMm,7}  {t.DeadzoneMm,8}"));
+}
 
 static Option<decimal> MillimeterOption(string name, string description) => new(name)
 {

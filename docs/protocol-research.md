@@ -83,5 +83,5 @@ The vendor driver writes one key per report and never reads back. Payload offset
 ## Next steps (Phase 1)
 
 1. Done: proof of concept on KeyQ (3.5 mm, confirmed by typing, then restored to 0.9 mm). See `hardware-compatibility.md`.
-2. Import the current per-key state from the vendor driver database as the initial backup.
-3. Keep the last applied state locally, because the device cannot report it.
+2. Done: `backup import-akko` imports the vendor driver state. The newest `devConfig_<modelId>` value in the log-structured database is the last one in the file, which was verified against today's AltLeft change. Array index = onboard profile.
+3. Done: `StateStore` keeps the last applied state.

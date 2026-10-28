@@ -484,6 +484,11 @@ heconfig backup restore backup.json --device <device-id> --yes
 - macOS HID Permissions und Packaging validieren.
 - OS-spezifische CI-/Hardware-Testberichte und bekannte Einschränkungen.
 
+### Meilensteine nach dem MVP (vom Owner festgelegt, 2026-10-28)
+
+- **LED setup:** Beleuchtung (Modi, Farben, Helligkeit) für unterstützte Geräte konfigurieren. Hebt den MVP-Ausschluss „kein RGB-Editor“ für diesen Meilenstein auf.
+- **Keyboard layout in the app:** Grafische, klickbare Tastaturansicht in der GUI mit Mehrfachauswahl und Trigger-Bearbeitung pro Taste.
+
 ### Phase 4 – Erweiterungen (nach MVP)
 
 - Mehr Modelle und Tastaturlayouts (zusätzliche Product IDs, ISO/ANSI, Layout-Mapping).
