@@ -2,7 +2,7 @@
 
 HallForge is a cross-platform configurator for hall-effect keyboards. It lets you edit actuation and rapid trigger settings for groups of keys, and save and apply complete profiles. It runs on Windows, Linux and macOS and talks to the keyboard directly over USB HID.
 
-**Status: Phase 1, read-only.** HallForge lists and inspects devices. For RongYuan keyboards it sends only allowlisted read commands. Nothing is ever written.
+**Status: Phase 1, experimental.** HallForge lists and inspects devices and can write the trigger setting of single keys on the AKKO MOD007B ISO HE. Writing to that model requires `--experimental` until it is verified on hardware.
 
 ## Build and run
 
@@ -15,6 +15,8 @@ dotnet run --project src/HallForge.Cli -- devices list          # keyboards with
 dotnet run --project src/HallForge.Cli -- devices list --all    # every HID interface
 dotnet run --project src/HallForge.Cli -- devices probe --device <id> --output report.json
 dotnet run --project src/HallForge.Cli -- devices identify --device <id>   # firmware model id and version (read-only)
+dotnet run --project src/HallForge.Cli -- keys list --device <id>
+dotnet run --project src/HallForge.Cli -- keys set --device <id> --key AltLeft --actuation 1.9 --release 1.9 --rapid-trigger false --rt-press 0.2 --rt-release 0.3 --deadzone 3.7 --dry-run
 dotnet run --project src/HallForge.App                          # GUI
 ```
 
@@ -34,7 +36,9 @@ Installed apps check for updates over HTTPS when they start. You can turn this o
 ## Safety
 
 - Firmware and bootloader commands are never exposed.
-- Devices that are unknown or not yet verified stay read-only.
+- Devices that are unknown stay read-only. Unverified devices are written only with `--experimental` and after confirmation.
+- Every write sends the complete setting of one key. Values use '.' as decimal separator; ',' is rejected.
+- The AKKO MOD007B ISO HE cannot report its settings back, so writes cannot be verified by reading them.
 - HallForge opens only the vendor configuration interface, never the normal keyboard input interface.
 
 ## License

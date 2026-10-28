@@ -56,8 +56,32 @@ The vendor driver was opened on the actuation page while USBPcap was capturing. 
 
 Consequence: for model 1778, per-key actuation, release and rapid trigger cannot currently be read back from the device. Backups and readback verification (requirements US-02, US-03 and 3.5 step 6) are not possible with the commands known so far.
 
+## Key trigger write, 0x1A (verified against a vendor driver capture, 2026-10-28)
+
+The vendor driver writes one key per report and never reads back. Payload offsets below exclude the report id byte:
+
+| Offset | Meaning |
+|---|---|
+| 0 | 0x1A |
+| 1 | Profile (0-3, from GET_PROFILE 0x84) |
+| 2 | 0x01 = normal mode |
+| 3 | Option (0 = normal; 2 dks, 3 mod-tap, 4/5 toggle, 6 gamepad are not supported by HallForge), `| 0x80` = rapid trigger on |
+| 4 | Actuation in 0.1 mm |
+| 5 | "Apply to all keys" flag; HallForge always sends 0 |
+| 6 | Matrix index |
+| 7 | Bit7 checksum over offsets 0-6 |
+| 8 | Release in 0.1 mm |
+| 9 / 10 | Rapid trigger press / release sensitivity in 0.1 mm |
+| 11-24 | DKS / mod-tap / gamepad fields, 0 in normal mode |
+| 25 | Deadzone as `mm * 10 - 1` |
+
+- Captured frames for AltLeft (matrix 23) are golden tests in `RongYuanClientTests`.
+- The vendor driver also sent a SET_KEYMATRIX_SIMPLE (0x13) in that session that rebinds AltLeft to its default 0xE2. HallForge never sends 0x13.
+- Default limits in the vendor driver: travel 0.1-4.0 mm, rapid trigger 0.1-2.5 mm, deadzone 0.1-4.0 mm (default 3.7), all in 0.1 mm steps. They are stored in the device definition.
+- The default key matrix of the model's driver class maps matrix index to HID usage. It is stored as `keys` (W3C `KeyboardEvent.code` names) in `devices/akko-mod007b-iso-he.json`. Fn (59), index 71 and the encoder (90, 91, 96, 97) are excluded.
+
 ## Next steps (Phase 1)
 
-1. Capture one vendor-driver write of a single non-primary key to learn the SET command and value encoding this firmware uses.
-2. Decide how HallForge handles a device without readback (see open decision in AGENTS.md).
-3. Map the matrix index to key ids for the ISO-DE layout. The vendor driver class for model 1778 contains the default key matrix.
+1. Proof of concept: write one non-primary key with `hallforge keys set --experimental`, test it by hand, and restore it.
+2. Import the current per-key state from the vendor driver database as the initial backup.
+3. Keep the last applied state locally, because the device cannot report it.

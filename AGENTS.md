@@ -106,7 +106,7 @@ Design:
 
 ## Project facts
 
-- Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 1, which is read-only. OPEN: the AKKO MOD007B ISO HE (model 1778) cannot read per-key settings back (see `docs/protocol-research.md`). How HallForge handles backups and write verification for such devices is undecided.
+- Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 1. The AKKO MOD007B ISO HE (model 1778) cannot read per-key settings back (see `docs/protocol-research.md`). Decision: HallForge writes complete key settings (`KeyTrigger`), keeps the last applied state itself, and imports the initial state from the vendor driver database. Writes are reported as sent, never as verified.
 - Primary languages and runtimes: C# on .NET 10. The SDK is pinned in `global.json`. License: GPL-3.0-or-later.
 - Platform-specific constraints: Windows, Linux and macOS. HID access goes through HidSharp. The USB interface number can only be parsed from Windows device paths. Linux needs udev rules that use `TAG+="uaccess"` and never `MODE=0666`.
 - GUI toolkit, update mechanism, and distribution:
@@ -128,7 +128,8 @@ Design:
   - A new keyboard on a known protocol needs only a JSON file. A new protocol gets its own `HallForge.Protocol.<Name>` project.
   - Unknown or unverified devices are never written to.
   - Firmware, bootloader, keymatrix, macro and FN commands are never exposed.
-  - Every SET command goes through an allowlist.
+  - Every SET command goes through an allowlist. The only write is the per-key trigger setting (0x1A) in `RongYuanClient`. Unverified definitions need `--experimental`.
+  - Millimeter input is parsed with `Millimeters.TryParse` (invariant '.', ',' rejected), never with the current culture.
   - The GUI and the CLI share the same services. Version numbers come only from `Directory.Build.props`, and package versions come only from `Directory.Packages.props`.
 - Generated files: `bin/` and `obj/`.
 - Files or directories not to edit manually: `LICENSE` (verbatim GPL-3.0 text).

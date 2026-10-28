@@ -7,6 +7,8 @@ using HallForge.Transport.Hid;
 const int ExitDeviceNotFound = 2;
 const int ExitUnsupported = 3;
 const int ExitDeviceError = 4;
+const int ExitInvalidInput = 5;
+const int ExitCancelled = 6;
 
 var version = typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
 var transport = new HidSharpTransport();
@@ -132,10 +134,127 @@ magnetism.SetAction(result =>
     }
 });
 
+var keyOption = new Option<string>("--key") { Description = "Key id, e.g. KeyW or AltLeft (see 'keys list').", Required = true };
+var actuationOption = MillimeterOption("--actuation", "Actuation point in mm.");
+var releaseOption = MillimeterOption("--release", "Release point in mm.");
+var rapidTriggerOption = new Option<bool>("--rapid-trigger") { Description = "Enable rapid trigger.", Required = true };
+var rtPressOption = MillimeterOption("--rt-press", "Rapid trigger press sensitivity in mm.");
+var rtReleaseOption = MillimeterOption("--rt-release", "Rapid trigger release sensitivity in mm.");
+var deadzoneOption = MillimeterOption("--deadzone", "Deadzone in mm.");
+var dryRunOption = new Option<bool>("--dry-run") { Description = "Validate and show the report without sending it." };
+var yesOption = new Option<bool>("--yes") { Description = "Do not ask for confirmation." };
+var experimentalOption = new Option<bool>("--experimental") { Description = "Allow writing to a device whose definition is not verified yet (hardware research only)." };
+
+// All values are required: the firmware cannot report the current state, so every write replaces the full key setting.
+var keysSet = new Command("set", "Write the complete trigger setting of one key.")
+{
+    deviceOption, keyOption, actuationOption, releaseOption, rapidTriggerOption, rtPressOption, rtReleaseOption, deadzoneOption,
+    dryRunOption, yesOption, experimentalOption,
+};
+keysSet.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null || target.Definition!.Protocol != "rongyuan")
+    {
+        Console.Error.WriteLine("Device not found or not a RongYuan device. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    var definition = target.Definition;
+    if (!definition.Verified && !result.GetValue(experimentalOption))
+    {
+        Console.Error.WriteLine($"'{definition.Name}' is not verified for writing. Use --experimental only for hardware research.");
+        return ExitUnsupported;
+    }
+    var keyId = result.GetValue(keyOption)!;
+    if (!definition.Keys.TryGetValue(keyId, out var matrixIndex))
+    {
+        Console.Error.WriteLine($"Unknown key '{keyId}'. Run 'hallforge keys list --device <id>'.");
+        return ExitInvalidInput;
+    }
+    var trigger = new KeyTrigger(
+        result.GetValue(actuationOption), result.GetValue(releaseOption), result.GetValue(rapidTriggerOption),
+        result.GetValue(rtPressOption), result.GetValue(rtReleaseOption), result.GetValue(deadzoneOption));
+    if (definition.Limits.Validate(trigger) is { Count: > 0 } errors)
+    {
+        foreach (var error in errors)
+            Console.Error.WriteLine(error);
+        return ExitInvalidInput;
+    }
+
+    try
+    {
+        using var connection = transport.Open(target.Interface);
+        var client = new RongYuanClient(connection);
+        var identity = client.Identify();
+        if (!definition.FirmwareModelIds.Contains(identity.DeviceId))
+        {
+            Console.Error.WriteLine($"Firmware model id {identity.DeviceId} is not listed in '{definition.Id}'; refusing to write.");
+            return ExitUnsupported;
+        }
+        var profile = client.ReadActiveProfile();
+        var report = RongYuanClient.Encode(trigger, profile, matrixIndex);
+        Console.WriteLine($"Device:  {definition.Name} (firmware model {identity.DeviceId}), profile {profile}");
+        Console.WriteLine($"Key:     {keyId} (matrix {matrixIndex})");
+        Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+            $"Values:  actuation {trigger.ActuationMm} mm, release {trigger.ReleaseMm} mm, rapid trigger {(trigger.RapidTrigger ? "on" : "off")} ({trigger.RapidTriggerPressMm}/{trigger.RapidTriggerReleaseMm} mm), deadzone {trigger.DeadzoneMm} mm"));
+        Console.WriteLine($"Report:  {Convert.ToHexString(report.AsSpan(1, Array.FindLastIndex(report, b => b != 0)))}");
+        if (result.GetValue(dryRunOption))
+        {
+            Console.WriteLine("Dry run: nothing was sent.");
+            return 0;
+        }
+        if (!result.GetValue(yesOption))
+        {
+            Console.Write("Send this setting to the keyboard? [y/N] ");
+            if (!string.Equals(Console.ReadLine()?.Trim(), "y", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Cancelled.");
+                return ExitCancelled;
+            }
+        }
+        client.WriteKeyTrigger(trigger, profile, matrixIndex);
+        Console.WriteLine("Sent. This firmware cannot report settings back, so the result is not verified. Test the key to confirm.");
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Write failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
+var keysList = new Command("list", "List configurable keys of a device definition.") { deviceOption };
+keysList.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    Console.WriteLine(string.Join(" ", target.Definition!.Keys.Keys));
+    return 0;
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
+    new Command("keys", "Inspect and configure key trigger settings.") { keysList, keysSet },
 };
 return root.Parse(args).Invoke();
+
+static Option<decimal> MillimeterOption(string name, string description) => new(name)
+{
+    Description = description + " Use '.' as decimal separator.",
+    Required = true,
+    CustomParser = result =>
+    {
+        var text = result.Tokens.Single().Value;
+        if (Millimeters.TryParse(text, out var mm))
+            return mm;
+        result.AddError($"{name}: '{text}' is not a millimeter value like 0.5.");
+        return 0;
+    },
+};
 
 static string Format(int? value) => value is { } v ? DiagnosticReport.Hex(v) : "?";

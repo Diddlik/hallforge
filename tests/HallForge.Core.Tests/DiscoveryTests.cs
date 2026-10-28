@@ -11,7 +11,13 @@ public class DiscoveryTests
           "protocol": "rongyuan",
           "verified": false,
           "match": { "vendorIds": ["0x3151"], "productIds": [], "usagePage": "0xFFFF", "usage": "0x0002" },
-          "firmwareModelIds": [1778]
+          "firmwareModelIds": [1778],
+          "limits": {
+            "travel": { "minMm": 0.1, "maxMm": 4.0, "stepMm": 0.1 },
+            "rapidTrigger": { "minMm": 0.1, "maxMm": 2.5, "stepMm": 0.1 },
+            "deadzone": { "minMm": 0.1, "maxMm": 4.0, "stepMm": 0.1 }
+          },
+          "keys": { "KeyW": 14, "AltLeft": 23 }
         }
         """;
 
@@ -44,6 +50,45 @@ public class DiscoveryTests
     [Fact]
     public void Parse_RejectsUnknownFields() =>
         Assert.ThrowsAny<System.Text.Json.JsonException>(() => DeviceDefinitionLoader.Parse(Definition.Replace("\"verified\"", "\"writeEnabled\": true, \"verified\"", StringComparison.Ordinal)));
+
+    [Fact]
+    public void Parse_RejectsDuplicateMatrixPositions() =>
+        Assert.ThrowsAny<System.Text.Json.JsonException>(() => DeviceDefinitionLoader.Parse(Definition.Replace("\"AltLeft\": 23", "\"AltLeft\": 14", StringComparison.Ordinal)));
+
+    [Fact]
+    public void Parse_RejectsMatrixPositionOutsideMatrix() =>
+        Assert.ThrowsAny<System.Text.Json.JsonException>(() => DeviceDefinitionLoader.Parse(Definition.Replace("\"AltLeft\": 23", "\"AltLeft\": 126", StringComparison.Ordinal)));
+
+    [Fact]
+    public void Limits_RejectValuesOutsideRangeOrStep()
+    {
+        var limits = DeviceDefinitionLoader.Parse(Definition).Limits;
+
+        Assert.Empty(limits.Validate(new KeyTrigger(1.9m, 1.9m, false, 0.2m, 0.3m, 3.7m)));
+        Assert.Equal(3, limits.Validate(new KeyTrigger(4.1m, 0.05m, true, 2.6m, 0.3m, 3.7m)).Count);
+    }
+
+    [Theory]
+    [InlineData("0.2", true, 0.2)]
+    [InlineData("1.9", true, 1.9)]
+    [InlineData("0,2", false, 0)]
+    [InlineData("1,000", false, 0)]
+    [InlineData("-1", false, 0)]
+    public void Millimeters_ParseIndependentOfCulture(string text, bool valid, double expected)
+    {
+        var previous = System.Globalization.CultureInfo.CurrentCulture;
+        System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
+        try
+        {
+            Assert.Equal(valid, Millimeters.TryParse(text, out var mm));
+            if (valid)
+                Assert.Equal((decimal)expected, mm);
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = previous;
+        }
+    }
 
     [Fact]
     public void Discover_MatchesOnlyTheConfigInterface()

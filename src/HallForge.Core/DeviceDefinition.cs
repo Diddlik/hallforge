@@ -12,13 +12,16 @@ namespace HallForge.Core;
 /// Model ids the firmware reports. Vendors reuse one USB product id for many boards, so only this id
 /// confirms the model; a device whose firmware reports another id must not be configured with this definition.
 /// </param>
+/// <param name="Keys">Configurable keys by W3C <c>KeyboardEvent.code</c> name, mapped to the device's matrix position.</param>
 public sealed record DeviceDefinition(
     string Id,
     string Name,
     string Protocol,
     bool Verified,
     DeviceMatch Match,
-    IReadOnlyList<uint> FirmwareModelIds)
+    IReadOnlyList<uint> FirmwareModelIds,
+    TriggerLimits Limits,
+    IReadOnlyDictionary<string, int> Keys)
 {
     public bool Matches(HidInterfaceInfo hid) =>
         Match.VendorIds.Contains(hid.VendorId)
@@ -64,6 +67,10 @@ public static class DeviceDefinitionLoader
             ?? throw new JsonException("Definition is null.");
         if (string.IsNullOrWhiteSpace(definition.Id) || definition.Match.VendorIds.Count == 0)
             throw new JsonException("Definition requires an id and at least one vendor id.");
+        if (definition.Keys.Values.Distinct().Count() != definition.Keys.Count)
+            throw new JsonException("Two keys share a matrix position.");
+        if (definition.Keys.Values.Any(i => i is < 0 or >= TriggerLimits.MatrixSize))
+            throw new JsonException($"Matrix positions must be between 0 and {TriggerLimits.MatrixSize - 1}.");
         return definition;
     }
 }

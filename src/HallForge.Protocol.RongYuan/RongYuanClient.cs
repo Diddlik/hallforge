@@ -9,6 +9,7 @@ namespace HallForge.Protocol.RongYuan;
 /// </summary>
 public enum ReadCommand : byte
 {
+    GetProfile = 0x84,
     GetUsbVersion = 0x8F,
     GetFeatureList = 0xE6,
 }
@@ -35,6 +36,14 @@ public sealed class RongYuanClient(IHidConnection connection)
     public const int ReportLength = 65;
     public const int PageLength = 64;
     private const byte GetMultiMagnetism = 0xE5;
+    // The only write this client can send: one key's trigger settings (vendor name FEA_CMD_SET_MAGNETISM_MODE).
+    private const byte SetKeyTriggerCommand = 0x1A;
+    private const byte NormalMode = 0x01;
+    private const byte RapidTriggerFlag = 0x80;
+    // Onboard profiles 0-3; the firmware does not bounds-check the profile byte.
+    private const byte MaxProfile = 3;
+    // The vendor driver leaves at least this much time between per-key writes.
+    private static readonly TimeSpan WriteSpacing = TimeSpan.FromMilliseconds(30);
     private const int Attempts = 5;
     // Until the firmware has prepared a response, reading returns the request unchanged. Simple queries
     // answer within milliseconds; table reads may take longer, so the wait grows before giving up.
@@ -57,6 +66,40 @@ public sealed class RongYuanClient(IHidConnection connection)
         if (page > 3)
             throw new ArgumentOutOfRangeException(nameof(page));
         return Frame(GetMultiMagnetism, [(byte)table, 0x01, page]);
+    }
+
+    /// <summary>
+    /// Encodes a complete normal-mode trigger setting for one key. Values are sent in 0.1 mm units;
+    /// the deadzone is sent as <c>mm * 10 - 1</c>. Layout verified against a USB capture of the vendor driver.
+    /// </summary>
+    public static byte[] Encode(KeyTrigger trigger, byte profile, int matrixIndex)
+    {
+        if (profile > MaxProfile)
+            throw new ArgumentOutOfRangeException(nameof(profile));
+        if (matrixIndex is < 0 or >= TriggerLimits.MatrixSize)
+            throw new ArgumentOutOfRangeException(nameof(matrixIndex));
+
+        var report = Frame(SetKeyTriggerCommand, [
+            profile,
+            NormalMode,
+            trigger.RapidTrigger ? RapidTriggerFlag : (byte)0,
+            Tenths(trigger.ActuationMm),
+            0,
+            (byte)matrixIndex,
+        ]);
+        report[9] = Tenths(trigger.ReleaseMm);
+        report[10] = Tenths(trigger.RapidTriggerPressMm);
+        report[11] = Tenths(trigger.RapidTriggerReleaseMm);
+        report[26] = (byte)(Tenths(trigger.DeadzoneMm) - 1);
+        return report;
+    }
+
+    private static byte Tenths(decimal mm)
+    {
+        var tenths = mm * 10;
+        if (tenths != decimal.Truncate(tenths) || tenths is < 1 or > 255)
+            throw new ArgumentOutOfRangeException(nameof(mm), $"{mm} mm cannot be encoded in 0.1 mm steps.");
+        return (byte)tenths;
     }
 
     private static byte[] Frame(byte command, ReadOnlySpan<byte> parameters)
@@ -117,6 +160,19 @@ public sealed class RongYuanClient(IHidConnection connection)
             data.AddRange(ReadPage(table, (byte)page));
         var bytes = data.ToArray();
         return Enumerable.Range(0, keyCount).Select(i => BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(i * 2))).ToList();
+    }
+
+    public byte ReadActiveProfile()
+    {
+        var profile = Query(ReadCommand.GetProfile)[1];
+        return profile <= MaxProfile ? profile : throw new ProtocolException($"Unexpected active profile {profile}.");
+    }
+
+    /// <summary>Sends one key's settings. The firmware does not acknowledge or report them back, so success cannot be verified.</summary>
+    public void WriteKeyTrigger(KeyTrigger trigger, byte profile, int matrixIndex)
+    {
+        connection.SetFeature(Encode(trigger, profile, matrixIndex));
+        Thread.Sleep(WriteSpacing);
     }
 
     public RongYuanIdentity Identify()

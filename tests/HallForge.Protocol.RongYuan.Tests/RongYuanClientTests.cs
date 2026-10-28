@@ -98,6 +98,34 @@ public class RongYuanClientTests
         Assert.Equal(20, values[32]);
     }
 
+    // Payloads recorded from the vendor driver writing AltLeft (matrix index 23) on a MOD007B ISO HE.
+    [Theory]
+    [InlineData(1.9, 1.9, true, "1a0001801300173a130203")]
+    [InlineData(1.4, 1.9, true, "1a0001800e00173f130203")]
+    [InlineData(1.9, 1.9, false, "1a000100130017ba130203")]
+    public void Encode_KeyTrigger_MatchesVendorDriverCapture(double actuation, double release, bool rapidTrigger, string expectedPrefix)
+    {
+        var trigger = new KeyTrigger((decimal)actuation, (decimal)release, rapidTrigger, 0.2m, 0.3m, 3.7m);
+
+        var report = RongYuanClient.Encode(trigger, profile: 0, matrixIndex: 23);
+
+        Assert.Equal(65, report.Length);
+        Assert.Equal(expectedPrefix, Convert.ToHexStringLower(report, 1, 11));
+        Assert.Equal(0x24, report[26]);
+        Assert.All(report.Skip(12).Take(14).Concat(report.Skip(27)), b => Assert.Equal(0, b));
+    }
+
+    [Fact]
+    public void Encode_KeyTrigger_RejectsValuesThatCannotBeEncoded()
+    {
+        var valid = new KeyTrigger(1.9m, 1.9m, false, 0.2m, 0.3m, 3.7m);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => RongYuanClient.Encode(valid with { ActuationMm = 0.25m }, 0, 23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => RongYuanClient.Encode(valid with { RapidTriggerPressMm = 0m }, 0, 23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => RongYuanClient.Encode(valid, 4, 23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => RongYuanClient.Encode(valid, 0, 126));
+    }
+
     [Fact]
     public void Query_RetriesUntilResponseEchoesCommand()
     {
