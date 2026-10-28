@@ -32,9 +32,32 @@ Documented facts, not yet verified on our hardware unless noted:
 - The driver class for this model only overrides the default key matrix. Everything else comes from the shared RongYuan base class.
 - The base class reads per-key tables with the same request as ours: `[0xE5, table, 1, page]` with a Bit7 checksum, 2 pages per table, one value per matrix position. The table ids match: 0 press, 1 lift, 2 RT press, 3 RT lift, 6 deadzone, 7 key mode.
 - Bytes are sent by the native `iot_driver.exe`, not by the JS, so the exact framing on the wire is not visible there.
-- Open question: why does the keyboard echo our identical request? The next step is a USB capture of the vendor driver (USBPcap and Wireshark) while it reads the key settings.
+- The vendor driver stores per-key settings in its own local database (`%AppData%/Akko Cloud Driver/iot_db/CONFIG`, entries such as `"travel":9`, `"liftTravel":9`, `"firePressTravel":2`) instead of reading them from the keyboard.
+
+## USB capture of the vendor driver (2026-10-28, wired MOD007B, model 1778)
+
+The vendor driver was opened on the actuation page while USBPcap was capturing. All 14 exchanges were simple GET commands, and the keyboard answered every one of them. **No 0xE5 (GET_MULTI_MAGNETISM) was sent.** The keyboard echoes our 0xE5, which is consistent with this firmware not supporting per-key reads at all.
+
+| Request | Response (non-zero prefix) | Notes |
+|---|---|---|
+| 0xFD | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | Returns the buffer of a previous 0x9F; meaning unknown |
+| 0x8F GET_USB_VERSION | `8F F2 06 00 00 00 00 70` | Model id 1778 |
+| 0x87 GET_LEDPARAM | `87 13 02 02 07 B4 B4 B4` | |
+| 0xF0 | `F0 03 01` | |
+| 0x80 GET_REV | `80 01 01` | |
+| 0xAE GET_MLED_VERSION | `AE 03 01` | |
+| 0x84 GET_PROFILE | `84 00 01` | Active profile 0 |
+| 0x85 GET_LEDONOFF | `85` | |
+| 0x86 GET_DEBOUNCE | `86 00 10 01` | |
+| 0x92 | `92 78 00 78 00 84 03 58 02` | Sleep times? (0x78 = 120, 0x384 = 900, 0x258 = 600) |
+| 0x97 GET_AUTOOS_EN | `97` | |
+| 0x9D GET_KEY_MAGNETISM_MODE | `9D 03` | |
+| 0x9F | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | |
+
+Consequence: for model 1778, per-key actuation, release and rapid trigger cannot currently be read back from the device. Backups and readback verification (requirements US-02, US-03 and 3.5 step 6) are not possible with the commands known so far.
 
 ## Next steps (Phase 1)
 
-1. Capture the vendor driver's traffic to find what it does differently. Then read one press-travel page and compare it with the values shown in the AKKO driver to derive the precision factor.
-2. Map the matrix index to key ids for the ISO-DE layout.
+1. Capture one vendor-driver write of a single non-primary key to learn the SET command and value encoding this firmware uses.
+2. Decide how HallForge handles a device without readback (see open decision in AGENTS.md).
+3. Map the matrix index to key ids for the ISO-DE layout. The vendor driver class for model 1778 contains the default key matrix.
