@@ -17,8 +17,9 @@ Observed on 2026-10-28, Windows 11 (build 26300), with `hallforge devices probe`
 - Release number (bcdDevice): 0x0103.
 - This matches the RongYuan interface layout in the monsgeek-akko-linux protocol reference: config on interface 2, usage 0xFFFF / 0x02, 64-byte feature report, report ID 0.
 - Firmware identification (`hallforge devices identify`, 2026-10-28):
-  - GET_USB_VERSION gives firmware model id **1778** and version **0x0070**. The raw response is `8F F2 06 00 00 00 00 70 00`, followed by zeros.
-  - GET_FEATURE_LIST gives `E6 00 00 00 00 00 00 19`, followed by zeros. The 0xAA validity marker is missing, so the precision is **unknown**.
+  - GET_USB_VERSION gives firmware model id **1778**. The raw response is `8F F2 06 00 00 00 00 70 00`, followed by zeros. Byte 7 (0x70) is our own checksum echoed back, not a version.
+  - GET_FEATURE_LIST and GET_MULTI_MAGNETISM come back as the unchanged request. See "Echo behavior" in `protocol-research.md`. The precision is **unknown**.
+  - The vendor driver lists id 1778 as `yc3121_mod007b_iso_he_soc_uk_8k`, which confirms the model.
   - Model id 1778 is not in the monsgeek-akko-linux device database. That database lists PID 0x4035 for at least ten other boards, including MOD007B HE ids 847, 1637, 3160 and 3161. This is why definitions match on `firmwareModelIds`.
 - Support level: `Unverified`. Only GET_USB_VERSION and GET_FEATURE_LIST have been sent to the device.
 

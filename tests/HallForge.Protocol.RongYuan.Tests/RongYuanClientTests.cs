@@ -4,18 +4,23 @@ namespace HallForge.Protocol.RongYuan.Tests;
 
 public class RongYuanClientTests
 {
-    /// <summary>Replies with queued responses and records every report sent.</summary>
+    /// <summary>
+    /// Replies with queued responses and records every report sent. Like the firmware's report buffer,
+    /// it keeps returning the last response once the queue is empty.
+    /// </summary>
     private sealed class FakeConnection(params byte[][] responses) : IHidConnection
     {
         private readonly Queue<byte[]> _responses = new(responses);
+        private byte[] _last = [];
         public List<byte[]> Sent { get; } = [];
 
         public void SetFeature(byte[] report) => Sent.Add(report.ToArray());
 
         public void GetFeature(byte[] report)
         {
-            var next = _responses.Count > 0 ? _responses.Dequeue() : [];
-            next.CopyTo(report.AsSpan(1));
+            if (_responses.Count > 0)
+                _last = _responses.Dequeue();
+            _last.CopyTo(report.AsSpan(1));
         }
 
         public void Dispose()
@@ -53,6 +58,47 @@ public class RongYuanClientTests
         Assert.Throws<ArgumentOutOfRangeException>(() => RongYuanClient.Encode((ReadCommand)opcode));
 
     [Fact]
+    public void Encode_MagnetismPage_UsesDocumentedLayout()
+    {
+        var report = RongYuanClient.Encode(MagnetismTable.LiftTravel, 2);
+
+        Assert.Equal([0x00, 0xE5, 0x01, 0x01, 0x02, 0, 0, 0], report.Take(8));
+        Assert.Equal(RongYuanClient.Checksum([0xE5, 0x01, 0x01, 0x02, 0, 0, 0]), report[8]);
+    }
+
+    [Theory]
+    [InlineData(0x04, 0)] // DKS travel: not allowlisted
+    [InlineData(0x00, 4)] // page beyond the matrix
+    public void Encode_MagnetismPage_RejectsOutsideBounds(byte table, byte page) =>
+        Assert.Throws<ArgumentOutOfRangeException>(() => RongYuanClient.Encode((MagnetismTable)table, page));
+
+    [Fact]
+    public void ReadPage_AcceptsOnlyTwoIdenticalConsecutiveReads()
+    {
+        var stale = Response(0x8F, 0xF2);
+        var page = Response(0x14, 0x00, 0x1E, 0x00);
+        var connection = new FakeConnection(stale, page, page);
+
+        var result = new RongYuanClient(connection).ReadPage(MagnetismTable.PressTravel, 0);
+
+        Assert.Equal(page, result);
+        Assert.Equal(3, connection.Sent.Count);
+    }
+
+    [Fact]
+    public void ReadTravelTable_DecodesLittleEndianAcrossPages()
+    {
+        var page0 = Response([.. Enumerable.Repeat<byte>(0, 62), 0x2C, 0x01]);
+        var page1 = Response(0x14, 0x00);
+        var connection = new FakeConnection(page0, page0, page1, page1);
+
+        var values = new RongYuanClient(connection).ReadTravelTable(MagnetismTable.PressTravel, 33);
+
+        Assert.Equal(300, values[31]);
+        Assert.Equal(20, values[32]);
+    }
+
+    [Fact]
     public void Query_RetriesUntilResponseEchoesCommand()
     {
         var connection = new FakeConnection(Response(0xE6), Response(0x8F, 1, 2));
@@ -86,18 +132,30 @@ public class RongYuanClientTests
         Assert.Equal((byte)2, identity.PrecisionCode);
     }
 
-    // Recorded from an AKKO MOD007B ISO HE (USB 0x3151:0x4035) on 2026-10-28.
+    // Recorded from an AKKO MOD007B ISO HE (USB 0x3151:0x4035) on 2026-10-28. The firmware fills in the
+    // model id but echoes everything else, including our checksum where other models report the version.
     [Fact]
-    public void Identify_ParsesRecordedMod007bResponses()
+    public void Identify_RecordedMod007b_ReportsModelIdOnly()
     {
-        var usbVersion = Response(Convert.FromHexString("8FF206000000007000"));
-        var featureList = Response(Convert.FromHexString("E6000000000000190000"));
+        var connection = new FakeConnection(
+            Response(Convert.FromHexString("8FF206000000007000")),
+            Response(Convert.FromHexString("E6000000000000190000")));
 
-        var identity = RongYuanIdentity.Parse(usbVersion, featureList);
+        var identity = new RongYuanClient(connection).Identify();
 
         Assert.Equal(1778u, identity.DeviceId);
-        Assert.Equal(0x0070, identity.FirmwareVersion);
+        Assert.Null(identity.FirmwareVersion);
+        Assert.Null(identity.FeatureListResponse);
         Assert.Null(identity.PrecisionCode);
+    }
+
+    // Recorded from the same keyboard: GET_MULTI_MAGNETISM comes back as the unchanged request.
+    [Fact]
+    public void ReadPage_RecordedMod007bEcho_IsReportedAsNotSupported()
+    {
+        var echo = Response(Convert.FromHexString("E50001000000001900"));
+
+        Assert.Throws<CommandNotSupportedException>(() => new RongYuanClient(new FakeConnection(echo)).ReadPage(MagnetismTable.PressTravel, 0));
     }
 
     [Fact]

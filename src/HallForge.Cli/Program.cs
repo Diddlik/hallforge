@@ -70,10 +70,10 @@ identify.SetAction(result =>
         var identity = new RongYuanClient(connection).Identify();
         var text = string.Join(Environment.NewLine,
             $"Firmware device id: {identity.DeviceId}",
-            $"Firmware version:   {identity.FirmwareText} (0x{identity.FirmwareVersion:X4})",
+            $"Firmware version:   {identity.FirmwareText ?? "not reported"}",
             $"Precision code:     {identity.PrecisionCode?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "unknown"}",
             $"GET_USB_VERSION:    {Convert.ToHexString(identity.UsbVersionResponse)}",
-            $"GET_FEATURE_LIST:   {Convert.ToHexString(identity.FeatureListResponse)}");
+            $"GET_FEATURE_LIST:   {(identity.FeatureListResponse is { } list ? Convert.ToHexString(list) : "not supported")}");
         Console.WriteLine(text);
         if (!target.Definition.FirmwareModelIds.Contains(identity.DeviceId))
             Console.WriteLine($"Warning: firmware model id {identity.DeviceId} is not listed in '{target.Definition.Id}'. The device is not the expected model and stays unsupported.");
@@ -88,9 +88,53 @@ identify.SetAction(result =>
     }
 });
 
+var keysOption = new Option<int>("--keys") { Description = "Matrix positions to read (1-126).", DefaultValueFactory = _ => 96 };
+var magnetism = new Command("magnetism", "Read raw per-key travel tables (read-only) for protocol research.") { deviceOption, keysOption };
+magnetism.SetAction(result =>
+{
+    var keyCount = result.GetValue(keysOption);
+    if (keyCount is < 1 or > 126)
+    {
+        Console.Error.WriteLine("--keys must be between 1 and 126.");
+        return ExitUnsupported;
+    }
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null || target.Definition!.Protocol != "rongyuan")
+    {
+        Console.Error.WriteLine("Device not found or not a RongYuan device. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+
+    try
+    {
+        using var connection = transport.Open(target.Interface);
+        var client = new RongYuanClient(connection);
+        var identity = client.Identify();
+        if (!target.Definition.FirmwareModelIds.Contains(identity.DeviceId))
+        {
+            Console.Error.WriteLine($"Firmware model id {identity.DeviceId} is not listed in '{target.Definition.Id}'; refusing to read model-specific tables.");
+            return ExitUnsupported;
+        }
+
+        var tables = new[] { MagnetismTable.PressTravel, MagnetismTable.LiftTravel, MagnetismTable.RapidTriggerPress, MagnetismTable.RapidTriggerLift }
+            .Select(t => client.ReadTravelTable(t, keyCount))
+            .ToList();
+        Console.WriteLine("index  press  lift  rtPress  rtLift   (raw values)");
+        for (var i = 0; i < keyCount; i++)
+            Console.WriteLine(string.Create(System.Globalization.CultureInfo.InvariantCulture,
+                $"{i,5}  {tables[0][i],5}  {tables[1][i],4}  {tables[2][i],7}  {tables[3][i],6}"));
+        return 0;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Read failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
-    new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify },
+    new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
 };
 return root.Parse(args).Invoke();
 
