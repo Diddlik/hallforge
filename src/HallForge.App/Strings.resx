@@ -40,7 +40,7 @@
     <value>Keyboard</value>
   </data>
   <data name="ExperimentalBadge" xml:space="preserve">
-    <value>Experimental: this keyboard cannot report its settings, so writes are not verified.</value>
+    <value>Experimental: this keyboard cannot report its key settings, so key changes are not verified. Lighting changes are read back.</value>
   </data>
   <data name="KeyboardViewName" xml:space="preserve">
     <value>Keyboard layout. Select keys to edit them.</value>
@@ -215,5 +215,113 @@
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
+  </data>
+  <data name="TabKeys" xml:space="preserve">
+    <value>Keys</value>
+  </data>
+  <data name="TabLighting" xml:space="preserve">
+    <value>Lighting</value>
+  </data>
+  <data name="LightingEffect" xml:space="preserve">
+    <value>Effect</value>
+  </data>
+  <data name="LightingBrightness" xml:space="preserve">
+    <value>Brightness</value>
+  </data>
+  <data name="LightingSpeed" xml:space="preserve">
+    <value>Speed</value>
+  </data>
+  <data name="LightingVariant" xml:space="preserve">
+    <value>Variant</value>
+  </data>
+  <data name="LightingColor" xml:space="preserve">
+    <value>Color (RRGGBB)</value>
+  </data>
+  <data name="LightingRainbow" xml:space="preserve">
+    <value>Rainbow</value>
+  </data>
+  <data name="ApplyLighting" xml:space="preserve">
+    <value>Apply lighting</value>
+  </data>
+  <data name="LightingLoaded" xml:space="preserve">
+    <value>Lighting read from the keyboard.</value>
+  </data>
+  <data name="LightingUnchanged" xml:space="preserve">
+    <value>The keyboard already uses this lighting.</value>
+  </data>
+  <data name="LightingVerified" xml:space="preserve">
+    <value>Lighting applied and verified: the keyboard reports the new setting.</value>
+  </data>
+  <data name="LightingFailed" xml:space="preserve">
+    <value>Lighting could not be applied: {0}</value>
+  </data>
+  <data name="InvalidColor" xml:space="preserve">
+    <value>Enter the color as six hex digits, e.g. FF0000.</value>
+  </data>
+  <data name="LightingSummary" xml:space="preserve">
+    <value>{0}, brightness {1}, speed {2}, {3}</value>
+  </data>
+  <data name="LightingOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="LightingAlwaysOn" xml:space="preserve">
+    <value>Always on</value>
+  </data>
+  <data name="LightingBreath" xml:space="preserve">
+    <value>Breathing</value>
+  </data>
+  <data name="LightingNeon" xml:space="preserve">
+    <value>Neon</value>
+  </data>
+  <data name="LightingWave" xml:space="preserve">
+    <value>Wave</value>
+  </data>
+  <data name="LightingRipple" xml:space="preserve">
+    <value>Ripple</value>
+  </data>
+  <data name="LightingRaindrop" xml:space="preserve">
+    <value>Raindrop</value>
+  </data>
+  <data name="LightingSnake" xml:space="preserve">
+    <value>Snake</value>
+  </data>
+  <data name="LightingPressAction" xml:space="preserve">
+    <value>Light up on press</value>
+  </data>
+  <data name="LightingConverge" xml:space="preserve">
+    <value>Converge</value>
+  </data>
+  <data name="LightingSineWave" xml:space="preserve">
+    <value>Sine wave</value>
+  </data>
+  <data name="LightingKaleidoscope" xml:space="preserve">
+    <value>Kaleidoscope</value>
+  </data>
+  <data name="LightingLineWave" xml:space="preserve">
+    <value>Line wave</value>
+  </data>
+  <data name="LightingLaser" xml:space="preserve">
+    <value>Laser</value>
+  </data>
+  <data name="LightingCircleWave" xml:space="preserve">
+    <value>Circle wave</value>
+  </data>
+  <data name="LightingDazzling" xml:space="preserve">
+    <value>Dazzling</value>
+  </data>
+  <data name="LightingRainDown" xml:space="preserve">
+    <value>Rain down</value>
+  </data>
+  <data name="LightingMeteor" xml:space="preserve">
+    <value>Meteor</value>
+  </data>
+  <data name="LightingPressActionOff" xml:space="preserve">
+    <value>Off until pressed</value>
+  </data>
+  <data name="LightingTrain" xml:space="preserve">
+    <value>Train</value>
+  </data>
+  <data name="LightingFireworks" xml:space="preserve">
+    <value>Fireworks</value>
   </data>
 </root>

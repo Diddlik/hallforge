@@ -116,7 +116,7 @@ Design:
   - Velopack auto-update checks GitHub Releases, can be disabled in About, and restarts only when the user clicks.
   - Release: push tag `v<Version>` (must equal `<Version>` in `Directory.Build.props`). `.github/workflows/release.yml` packs the GUI with Velopack for win-x64, linux-x64 and osx-arm64, uploads it to GitHub Releases, and attaches a self-contained CLI zip per platform. Verified with v0.1.0 (GUI only; CLI zips start with the next release). The update path from one release to the next is not verified yet.
   - New third-party libraries must be added to `MainViewModel.ThirdPartyLibraries` and to the README.
-  - The keyboard editor is `KeyboardEditorViewModel` (draft of `TriggerPatch` per key, presets, apply via `RongYuanSession`); keys are drawn from the definition's `layout`. `ApplyDialog` is the confirmation step and requires an explicit acknowledgement for unverified devices.
+  - The keyboard editor is `KeyboardEditorViewModel` (draft of `TriggerPatch` per key, presets, apply via `RongYuanSession`); keys are drawn from the definition's `layout`. `ApplyDialog` is the confirmation step and requires an explicit acknowledgement for unverified devices. The lighting tab is `LightingViewModel` (reads `GET_LEDPARAM`, writes and verifies `SET_LEDPARAM`, same dialog).
   - "Restart and update" is blocked while key changes are pending, so an update never discards a draft.
   - Format localized strings with `Text.Format` (analyzer CA1863 rejects direct `string.Format` with resource strings).
 - Build command: `dotnet build`

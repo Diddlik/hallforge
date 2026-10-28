@@ -37,7 +37,7 @@
     <value>Tastatur</value>
   </data>
   <data name="ExperimentalBadge" xml:space="preserve">
-    <value>Experimentell: Diese Tastatur kann ihre Einstellungen nicht zurückmelden, Schreibvorgänge sind daher nicht überprüfbar.</value>
+    <value>Experimentell: Diese Tastatur kann ihre Tasteneinstellungen nicht zurückmelden, Tastenänderungen sind daher nicht überprüfbar. Beleuchtungsänderungen werden zurückgelesen.</value>
   </data>
   <data name="KeyboardViewName" xml:space="preserve">
     <value>Tastaturlayout. Wähle Tasten aus, um sie zu bearbeiten.</value>
@@ -197,5 +197,113 @@
   </data>
   <data name="Close" xml:space="preserve">
     <value>Schließen</value>
+  </data>
+  <data name="TabKeys" xml:space="preserve">
+    <value>Tasten</value>
+  </data>
+  <data name="TabLighting" xml:space="preserve">
+    <value>Beleuchtung</value>
+  </data>
+  <data name="LightingEffect" xml:space="preserve">
+    <value>Effekt</value>
+  </data>
+  <data name="LightingBrightness" xml:space="preserve">
+    <value>Helligkeit</value>
+  </data>
+  <data name="LightingSpeed" xml:space="preserve">
+    <value>Tempo</value>
+  </data>
+  <data name="LightingVariant" xml:space="preserve">
+    <value>Variante</value>
+  </data>
+  <data name="LightingColor" xml:space="preserve">
+    <value>Farbe (RRGGBB)</value>
+  </data>
+  <data name="LightingRainbow" xml:space="preserve">
+    <value>Regenbogen</value>
+  </data>
+  <data name="ApplyLighting" xml:space="preserve">
+    <value>Beleuchtung anwenden</value>
+  </data>
+  <data name="LightingLoaded" xml:space="preserve">
+    <value>Beleuchtung von der Tastatur gelesen.</value>
+  </data>
+  <data name="LightingUnchanged" xml:space="preserve">
+    <value>Die Tastatur nutzt diese Beleuchtung bereits.</value>
+  </data>
+  <data name="LightingVerified" xml:space="preserve">
+    <value>Beleuchtung angewendet und geprüft: Die Tastatur meldet die neue Einstellung.</value>
+  </data>
+  <data name="LightingFailed" xml:space="preserve">
+    <value>Beleuchtung konnte nicht angewendet werden: {0}</value>
+  </data>
+  <data name="InvalidColor" xml:space="preserve">
+    <value>Gib die Farbe als sechs Hex-Ziffern ein, z. B. FF0000.</value>
+  </data>
+  <data name="LightingSummary" xml:space="preserve">
+    <value>{0}, Helligkeit {1}, Tempo {2}, {3}</value>
+  </data>
+  <data name="LightingOff" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="LightingAlwaysOn" xml:space="preserve">
+    <value>Dauerlicht</value>
+  </data>
+  <data name="LightingBreath" xml:space="preserve">
+    <value>Atmen</value>
+  </data>
+  <data name="LightingNeon" xml:space="preserve">
+    <value>Neon</value>
+  </data>
+  <data name="LightingWave" xml:space="preserve">
+    <value>Welle</value>
+  </data>
+  <data name="LightingRipple" xml:space="preserve">
+    <value>Kreise</value>
+  </data>
+  <data name="LightingRaindrop" xml:space="preserve">
+    <value>Regentropfen</value>
+  </data>
+  <data name="LightingSnake" xml:space="preserve">
+    <value>Schlange</value>
+  </data>
+  <data name="LightingPressAction" xml:space="preserve">
+    <value>Leuchten beim Drücken</value>
+  </data>
+  <data name="LightingConverge" xml:space="preserve">
+    <value>Zusammenlaufen</value>
+  </data>
+  <data name="LightingSineWave" xml:space="preserve">
+    <value>Sinuswelle</value>
+  </data>
+  <data name="LightingKaleidoscope" xml:space="preserve">
+    <value>Kaleidoskop</value>
+  </data>
+  <data name="LightingLineWave" xml:space="preserve">
+    <value>Linienwelle</value>
+  </data>
+  <data name="LightingLaser" xml:space="preserve">
+    <value>Laser</value>
+  </data>
+  <data name="LightingCircleWave" xml:space="preserve">
+    <value>Kreiswelle</value>
+  </data>
+  <data name="LightingDazzling" xml:space="preserve">
+    <value>Funkeln</value>
+  </data>
+  <data name="LightingRainDown" xml:space="preserve">
+    <value>Regen</value>
+  </data>
+  <data name="LightingMeteor" xml:space="preserve">
+    <value>Meteor</value>
+  </data>
+  <data name="LightingPressActionOff" xml:space="preserve">
+    <value>Aus bis zum Drücken</value>
+  </data>
+  <data name="LightingTrain" xml:space="preserve">
+    <value>Zug</value>
+  </data>
+  <data name="LightingFireworks" xml:space="preserve">
+    <value>Feuerwerk</value>
   </data>
 </root>

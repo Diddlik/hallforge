@@ -46,7 +46,10 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
         CanvasWidth = _definition.Layout.Max(g => g.X + g.W) * KeyViewModel.Pitch;
         CanvasHeight = _definition.Layout.Max(g => g.Y + g.H) * KeyViewModel.Pitch;
         Limits = _definition.Limits;
+        Lighting = new LightingViewModel(target, transport, confirm);
     }
+
+    public LightingViewModel Lighting { get; }
 
     public ObservableCollection<KeyViewModel> Keys { get; }
     public double CanvasWidth { get; }

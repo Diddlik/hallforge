@@ -82,6 +82,7 @@ public sealed partial class MainViewModel(
             Status = "";
             Keyboard = new KeyboardEditorViewModel(target, legends, transport, store, request => ConfirmApply(request));
             await Keyboard.LoadStateCommand.ExecuteAsync(null);
+            await Keyboard.Lighting.LoadCommand.ExecuteAsync(null);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

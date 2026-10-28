@@ -43,6 +43,7 @@ dotnet run --project src/HallForge.App                          # GUI
 - "Load profile..." adds a profile to the pending changes. Nothing is written before "Apply".
 - "Apply" lists every change and asks for confirmation. For unverified keyboards it also asks you to acknowledge that writes cannot be verified.
 - Without a backup, the GUI offers "Create backup from AKKO driver" first.
+- The "Lighting" tab reads the current effect from the keyboard and sets effect, brightness, speed, variant and color (or rainbow). After "Apply lighting" the keyboard is read again, so the change is verified.
 
 ## State and backups
 

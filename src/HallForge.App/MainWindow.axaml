@@ -50,6 +50,8 @@
         <ContentControl Content="{Binding Keyboard}">
             <ContentControl.DataTemplates>
                 <DataTemplate DataType="app:KeyboardEditorViewModel">
+                    <TabControl>
+                    <TabItem Header="{x:Static app:Strings.TabKeys}">
                     <DockPanel>
                         <!-- Footer: status and the single primary action -->
                         <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,16,0,0">
@@ -147,6 +149,56 @@
                             </ItemsControl>
                         </Viewbox>
                     </DockPanel>
+                    </TabItem>
+                    <TabItem Header="{x:Static app:Strings.TabLighting}" DataContext="{Binding Lighting}">
+                        <DockPanel x:DataType="app:LightingViewModel" Margin="0,16,0,0">
+                            <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,16,0,0">
+                                <TextBlock Text="{Binding Status}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <ProgressBar Grid.Column="1" IsIndeterminate="True" Width="80" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+                                <Button Grid.Column="2" Content="{x:Static app:Strings.ApplyLighting}" Command="{Binding ApplyCommand}" Classes="accent" />
+                            </Grid>
+                            <StackPanel Spacing="16" MaxWidth="480" HorizontalAlignment="Left" IsEnabled="{Binding IsLoaded}">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{x:Static app:Strings.LightingEffect}" />
+                                    <ComboBox ItemsSource="{Binding Modes}" SelectedItem="{Binding Mode}" MinWidth="240"
+                                              AutomationProperties.Name="{x:Static app:Strings.LightingEffect}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate DataType="app:LightingModeItem">
+                                                <TextBlock Text="{Binding Name}" />
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{x:Static app:Strings.LightingBrightness}" />
+                                    <Slider Value="{Binding Brightness}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
+                                            AutomationProperties.Name="{x:Static app:Strings.LightingBrightness}" />
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{x:Static app:Strings.LightingSpeed}" />
+                                    <Slider Value="{Binding Speed}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
+                                            AutomationProperties.Name="{x:Static app:Strings.LightingSpeed}" />
+                                </StackPanel>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{x:Static app:Strings.LightingVariant}" />
+                                    <NumericUpDown Value="{Binding Option}" Minimum="0" Maximum="15" Increment="1" FormatString="0" Width="140" HorizontalAlignment="Left"
+                                                   AutomationProperties.Name="{x:Static app:Strings.LightingVariant}" />
+                                </StackPanel>
+                                <CheckBox Content="{x:Static app:Strings.LightingRainbow}" IsChecked="{Binding Rainbow}" />
+                                <StackPanel Spacing="4" IsEnabled="{Binding !Rainbow}">
+                                    <TextBlock Text="{x:Static app:Strings.LightingColor}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBox Text="{Binding ColorHex}" Width="140" MaxLength="6"
+                                                 AutomationProperties.Name="{x:Static app:Strings.LightingColor}" />
+                                        <Border Width="32" Height="32" CornerRadius="4" BorderThickness="1"
+                                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                Background="{Binding ColorPreview, FallbackValue=Transparent}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </DockPanel>
+                    </TabItem>
+                    </TabControl>
                 </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>
