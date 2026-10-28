@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="WindowTitle" xml:space="preserve">
+    <value>HallForge {0}</value>
+  </data>
+  <data name="KeyboardsHeading" xml:space="preserve">
+    <value>Keyboards</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="DeviceListName" xml:space="preserve">
+    <value>Detected keyboards</value>
+  </data>
+  <data name="Searching" xml:space="preserve">
+    <value>Searching for keyboards…</value>
+  </data>
+  <data name="NoKeyboardFound" xml:space="preserve">
+    <value>No supported keyboard found. Connect the keyboard with a USB cable and select Refresh.</value>
+  </data>
+  <data name="KeyboardsFound" xml:space="preserve">
+    <value>{0} keyboard interface(s) found. This version only reads devices and never writes to them.</value>
+  </data>
+  <data name="ListFailed" xml:space="preserve">
+    <value>Could not list HID devices: {0} Check the device permissions and select Refresh.</value>
+  </data>
+  <data name="DeviceItem" xml:space="preserve">
+    <value>{0} ({1}:{2}), {3}</value>
+  </data>
+  <data name="SupportSupported" xml:space="preserve">
+    <value>supported</value>
+  </data>
+  <data name="SupportReadOnly" xml:space="preserve">
+    <value>not verified, read-only</value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>HallForge {0} is available.</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Restart and update</value>
+  </data>
+  <data name="UpdateLater" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="UpdateDownloading" xml:space="preserve">
+    <value>Downloading the update…</value>
+  </data>
+  <data name="UpdateFailed" xml:space="preserve">
+    <value>The update failed: {0} You can try again later.</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>HallForge is up to date.</value>
+  </data>
+  <data name="UpdatesNotInstalled" xml:space="preserve">
+    <value>Updates are only available for installed releases.</value>
+  </data>
+  <data name="AutoCheckUpdates" xml:space="preserve">
+    <value>Check for updates automatically</value>
+  </data>
+  <data name="CheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>About HallForge</value>
+  </data>
+  <data name="Copyright" xml:space="preserve">
+    <value>Copyright (C) 2026 HallForge contributors</value>
+  </data>
+  <data name="LicenseText" xml:space="preserve">
+    <value>Licensed under the GNU General Public License v3.0 or later.</value>
+  </data>
+  <data name="ThirdParty" xml:space="preserve">
+    <value>Third-party libraries</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+</root>

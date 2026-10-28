@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            exe: HallForge.App.exe
+          - os: ubuntu-latest
+            rid: linux-x64
+            exe: HallForge.App
+          - os: macos-latest
+            rid: osx-arm64
+            exe: HallForge.App
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          version=$(dotnet msbuild src/HallForge.App -getProperty:Version)
+          # Directory.Build.props is the single version source; the tag must agree with it.
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then echo "Tag $GITHUB_REF_NAME does not match version $version"; exit 1; fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+      - run: dotnet test --configuration Release
+      - run: dotnet publish src/HallForge.App -c Release -r ${{ matrix.rid }} --self-contained -o publish
+      - run: dotnet tool install -g vpk --version 1.2.161
+      - name: Package
+        run: vpk pack --packId HallForge --packTitle HallForge --packVersion ${{ steps.version.outputs.value }} --packDir publish --mainExe ${{ matrix.exe }}
+      - name: Upload
+        run: vpk upload github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "HallForge ${{ steps.version.outputs.value }}" --merge --publish

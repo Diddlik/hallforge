@@ -109,13 +109,19 @@ Design:
 - Purpose and scope: HallForge is a cross-platform configurator for hall-effect keyboards (actuation, release, rapid trigger, profiles, backups). It has a GUI and a CLI. Requirements and phases are in `AKKO_HE_Configurator_Requirements.md`. It is vendor-neutral, and AKKO (RongYuan protocol) is only the first supported family. The current state is Phase 0, which is read-only.
 - Primary languages and runtimes: C# on .NET 10. The SDK is pinned in `global.json`. License: GPL-3.0-or-later.
 - Platform-specific constraints: Windows, Linux and macOS. HID access goes through HidSharp. The USB interface number can only be parsed from Windows device paths. Linux needs udev rules that use `TAG+="uaccess"` and never `MODE=0666`.
-- GUI toolkit, update mechanism, and distribution: Avalonia 12 with the Fluent theme. Distribution is through GitHub Releases. Auto-update is decided to use Velopack but is not implemented yet. The About dialog is OPEN for Phase 1.
+- GUI toolkit, update mechanism, and distribution:
+  - Avalonia 12 with the Fluent theme and CommunityToolkit.Mvvm.
+  - User-facing strings are in `src/HallForge.App/Strings.resx`, which generates the strongly typed `Strings` class at build time.
+  - User preferences and window placement are stored in `%LocalAppData%/HallForge/settings.json` (`AppSettings`).
+  - Velopack auto-update checks GitHub Releases, can be disabled in About, and restarts only when the user clicks.
+  - Release: push tag `v<Version>` and `.github/workflows/release.yml` packs and uploads. The release pipeline is OPEN until the first tag run verifies it.
+  - New third-party libraries must be added to `MainViewModel.ThirdPartyLibraries` and to the README.
 - Build command: `dotnet build`
 - Test command: `dotnet test`. It uses xUnit v3 on Microsoft.Testing.Platform, configured in `global.json`.
 - Lint and format command: analyzers run during the build (`AnalysisLevel` latest-recommended, `TreatWarningsAsErrors`). Format with `dotnet format`.
 - Local run command: `dotnet run --project src/HallForge.Cli -- devices list --all` and `dotnet run --project src/HallForge.App`.
 - Required environment: .NET 10 SDK. Hardware tests need a keyboard connected by USB cable. The first device is AKKO VID `0x3151` PID `0x4035`.
-- Important entry points: `src/HallForge.Cli/Program.cs` (CLI `hallforge`), `src/HallForge.App` (GUI), `src/HallForge.Core/KeyboardDiscoveryService.cs`, `src/HallForge.Transport.Hid/HidSharpEnumerator.cs`.
+- Important entry points: `src/HallForge.Cli/Program.cs` (CLI `hallforge`), `src/HallForge.App` (GUI, `MainViewModel`), `src/HallForge.Core/KeyboardDiscoveryService.cs`, `src/HallForge.Transport.Hid/HidSharpEnumerator.cs`.
 - Architecture constraints:
   - `Core` is vendor-neutral and has no HidSharp, UI or protocol specifics.
   - Keyboards are described as data in `devices/*.json`, one file per model or family. Each file names a `protocol` id, the USB match and a `verified` flag.

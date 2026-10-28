@@ -1,48 +1,60 @@
-using System.Reflection;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using HallForge.Core;
-using HallForge.Transport.Hid;
 
 namespace HallForge.App;
 
 public partial class MainWindow : Window
 {
-    private readonly KeyboardDiscoveryService _discovery = new(
-        new HidSharpEnumerator(),
-        DeviceDefinitionLoader.LoadDirectory(Path.Combine(AppContext.BaseDirectory, "devices")));
+    private readonly AppSettings _settings;
 
-    public MainWindow()
+    // Required by the Avalonia designer and XAML loader.
+    public MainWindow() : this(new AppSettings())
     {
-        InitializeComponent();
-        var version = typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
-        Title = $"HallForge {version.Split('+')[0]}";
-        Opened += (_, _) => _ = RefreshAsync();
     }
 
-    private void OnRefresh(object? sender, RoutedEventArgs e) => _ = RefreshAsync();
-
-    private async Task RefreshAsync()
+    public MainWindow(AppSettings settings)
     {
-        RefreshButton.IsEnabled = false;
-        StatusText.Text = "Searching for keyboards…";
+        _settings = settings;
+        InitializeComponent();
+        RestorePlacement();
+        Closing += (_, _) => SavePlacement();
+    }
+
+    private void OnAbout(object? sender, RoutedEventArgs e) =>
+        new AboutWindow { DataContext = DataContext }.ShowDialog(this);
+
+    private void RestorePlacement()
+    {
+        if (_settings.Window is not { } placement)
+            return;
+
+        Width = Math.Max(placement.Width, MinWidth);
+        Height = Math.Max(placement.Height, MinHeight);
+        var position = new PixelPoint(placement.X, placement.Y);
+        // Skip the saved position if its monitor is gone, so the window never opens off-screen.
+        if (Screens.All.Any(s => s.WorkingArea.Contains(position)))
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Position = position;
+        }
+        if (placement.Maximized)
+            WindowState = WindowState.Maximized;
+    }
+
+    private void SavePlacement()
+    {
+        var maximized = WindowState == WindowState.Maximized;
+        // A maximized window reports the screen size; keep the last normal size instead.
+        var (width, height) = maximized && _settings.Window is { } previous ? (previous.Width, previous.Height) : (Width, Height);
+        _settings.Window = new WindowPlacement(width, height, Position.X, Position.Y, maximized);
         try
         {
-            // HID enumeration blocks; keep the UI thread responsive.
-            var candidates = await Task.Run(() => _discovery.Discover());
-            DeviceList.ItemsSource = candidates.Select(c =>
-                $"{c.Interface.ProductName ?? "Unknown device"}  ({DiagnosticReport.Hex(c.Interface.VendorId)}:{DiagnosticReport.Hex(c.Interface.ProductId)})  {c.Support}, read-only");
-            StatusText.Text = candidates.Count == 0
-                ? "No supported keyboard found. Connect the keyboard via USB cable and select Refresh."
-                : $"{candidates.Count} configuration interface(s) found.";
+            _settings.Save();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            StatusText.Text = $"Could not list HID devices: {ex.Message}. Check device permissions and select Refresh.";
-        }
-        finally
-        {
-            RefreshButton.IsEnabled = true;
+            // Losing window placement is not worth blocking the app from closing.
         }
     }
 }

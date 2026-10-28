@@ -1,14 +1,25 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:app="using:HallForge.App"
         x:Class="HallForge.App.MainWindow"
+        x:DataType="app:MainViewModel"
         Width="800" Height="480" MinWidth="480" MinHeight="320"
-        Title="HallForge">
+        Title="{x:Static app:MainViewModel.Title}">
     <DockPanel Margin="16">
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
-            <TextBlock Text="Keyboards" FontSize="20" VerticalAlignment="Center" />
-            <Button x:Name="RefreshButton" Content="Refresh" Click="OnRefresh" Classes="accent" />
-        </StackPanel>
-        <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Margin="0,8,0,0" TextWrapping="Wrap" />
-        <ListBox x:Name="DeviceList" AutomationProperties.Name="Detected keyboards" />
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,16">
+            <TextBlock Text="{x:Static app:Strings.KeyboardsHeading}" FontSize="20" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="{x:Static app:Strings.Refresh}" Command="{Binding RefreshCommand}" Classes="accent" />
+            <Button Grid.Column="2" Content="{x:Static app:Strings.About}" Click="OnAbout" />
+        </Grid>
+        <Border DockPanel.Dock="Top" IsVisible="{Binding IsUpdateReady}" Padding="12" Margin="0,0,0,16" CornerRadius="4"
+                Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <TextBlock Text="{Binding UpdateMessage}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                <Button Grid.Column="1" Content="{x:Static app:Strings.UpdateInstall}" Command="{Binding InstallUpdateCommand}" />
+                <Button Grid.Column="2" Content="{x:Static app:Strings.UpdateLater}" Command="{Binding PostponeUpdateCommand}" />
+            </Grid>
+        </Border>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Status}" Margin="0,8,0,0" TextWrapping="Wrap" />
+        <ListBox ItemsSource="{Binding Devices}" AutomationProperties.Name="{x:Static app:Strings.DeviceListName}" />
     </DockPanel>
 </Window>

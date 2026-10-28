@@ -10,6 +10,9 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Velopack" />
     <None Include="..\..\devices\*.json" Link="devices\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Update="Strings.resx" StronglyTypedFileName="$(IntermediateOutputPath)Strings.Designer.cs" StronglyTypedLanguage="CSharp" StronglyTypedNamespace="HallForge.App" StronglyTypedClassName="Strings" PublicClass="true" />
   </ItemGroup>
 </Project>

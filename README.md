@@ -24,6 +24,12 @@ dotnet run --project src/HallForge.App                          # GUI
 - **The keyboard uses a protocol that HallForge already supports:** add a JSON file to `devices/`. See `devices/rongyuan-akko-monsgeek.json`. Set `"verified": false` until the keyboard has been tested on real hardware.
 - **The keyboard uses a new protocol:** add a protocol project and give it a `protocol` id. Device definitions refer to that id.
 
+## Releases and updates
+
+Releases are built by `.github/workflows/release.yml` when a tag `v<version>` is pushed. The tag must match `<Version>` in `Directory.Build.props`. Velopack packages the GUI for Windows x64, Linux x64 and macOS arm64 and uploads it to GitHub Releases.
+
+Installed apps check for updates over HTTPS when they start. You can turn this off under About. A downloaded update is verified by its hash and installed only when you select "Restart and update".
+
 ## Safety
 
 - Firmware and bootloader commands are never exposed.
@@ -41,6 +47,8 @@ Third-party libraries:
 | Library | License |
 |---|---|
 | Avalonia | MIT |
+| CommunityToolkit.Mvvm | MIT |
 | HidSharp | Apache-2.0 |
 | System.CommandLine | MIT |
+| Velopack | MIT |
 | xUnit (tests only) | Apache-2.0 |
