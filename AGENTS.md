@@ -114,7 +114,7 @@ Design:
   - User-facing strings are in `src/HallForge.App/Strings.resx`, which generates the strongly typed `Strings` class at build time.
   - User preferences and window placement are stored in `%LocalAppData%/HallForge/settings.json` (`AppSettings`).
   - Velopack auto-update checks GitHub Releases, can be disabled in About, and restarts only when the user clicks.
-  - Release: push tag `v<Version>` and `.github/workflows/release.yml` packs and uploads. The release pipeline is OPEN until the first tag run verifies it.
+  - Release: push tag `v<Version>` (must equal `<Version>` in `Directory.Build.props`). `.github/workflows/release.yml` packs the GUI with Velopack for win-x64, linux-x64 and osx-arm64, uploads it to GitHub Releases, and attaches a self-contained CLI zip per platform. Verified with v0.1.0 (GUI only; CLI zips start with the next release). The update path from one release to the next is not verified yet.
   - New third-party libraries must be added to `MainViewModel.ThirdPartyLibraries` and to the README.
 - Build command: `dotnet build`
 - Test command: `dotnet test`. It uses xUnit v3 on Microsoft.Testing.Platform, configured in `global.json`.

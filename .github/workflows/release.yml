@@ -43,3 +43,12 @@ jobs:
         run: vpk pack --packId HallForge --packTitle HallForge --packVersion ${{ steps.version.outputs.value }} --packDir publish --mainExe ${{ matrix.exe }}
       - name: Upload
         run: vpk upload github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "HallForge ${{ steps.version.outputs.value }}" --merge --publish
+      - name: Upload CLI
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dotnet publish src/HallForge.Cli -c Release -r ${{ matrix.rid }} --self-contained -p:PublishSingleFile=true -o cli
+          $zip = "hallforge-cli-${{ steps.version.outputs.value }}-${{ matrix.rid }}.zip"
+          Compress-Archive -Path cli/* -DestinationPath $zip
+          gh release upload ${{ github.ref_name }} $zip --clobber
