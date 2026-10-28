@@ -11,7 +11,7 @@ public class LightingViewModelTests
         var range = new TravelRange(0.1m, 4.0m, 0.1m);
         var definition = new DeviceDefinition("test", "Test", "rongyuan", false, new DeviceMatch([0x3151], [], 0xFFFF, 2), [1778],
             new TriggerLimits(range, range, range), new Dictionary<string, int>(), []);
-        return new LightingViewModel(new KeyboardCandidate(hid, definition), new NoDevice(), _ => Task.FromResult(false));
+        return new LightingViewModel(new KeyboardCandidate(hid, definition), new NoDevice(), _ => Task.CompletedTask);
     }
 
     private sealed class NoDevice : IHidTransport

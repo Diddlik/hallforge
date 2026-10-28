@@ -11,6 +11,16 @@ namespace HallForge.App;
 
 public sealed record ThirdPartyLibrary(string Name, string License);
 
+/// <summary>Navigation targets; the values are the positions in the navigation list.</summary>
+public enum Page
+{
+    Performance = 0,
+    KeyMapping = 1,
+    Lighting = 2,
+    Profiles = 3,
+    Device = 4,
+}
+
 public sealed partial class MainViewModel(
     KeyboardDiscoveryService discovery, IHidTransport transport, StateStore store, KeyLegends legends, AppSettings settings) : ObservableObject
 {
@@ -32,11 +42,49 @@ public sealed partial class MainViewModel(
         new("Velopack", "MIT"),
     ];
 
-    /// <summary>Set by the view; asks the user to confirm a write.</summary>
-    public Func<ApplyRequest, Task<bool>> ConfirmApply { get; set; } = _ => Task.FromResult(false);
+    /// <summary>Set by the view; shows the review dialog, which also sends, and completes when it closes.</summary>
+    public Func<ReviewViewModel, Task> ShowReview { get; set; } = _ => Task.CompletedTask;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasKeyboard), nameof(IsNoDevice), nameof(ShowDevicePage), nameof(ShowPerformancePage), nameof(ShowLightingPage), nameof(ShowProfilesPage))]
     public partial KeyboardEditorViewModel? Keyboard { get; set; }
+
+    [ObservableProperty]
+    public partial ProfileLibraryViewModel? Profiles { get; set; }
+
+    public bool HasKeyboard => Keyboard is not null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNoDevice))]
+    public partial bool IsSearching { get; set; }
+
+    public bool IsNoDevice => !IsSearching && Keyboard is null;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowDevicePage), nameof(ShowPerformancePage), nameof(ShowLightingPage), nameof(ShowProfilesPage))]
+    public partial int PageIndex { get; set; } = (int)Page.Device;
+
+    // Without a keyboard every page shows the device page, which explains how to connect one.
+    public bool ShowDevicePage => Keyboard is null || PageIndex == (int)Page.Device;
+    public bool ShowPerformancePage => Keyboard is not null && PageIndex == (int)Page.Performance;
+    public bool ShowLightingPage => Keyboard is not null && PageIndex == (int)Page.Lighting;
+    public bool ShowProfilesPage => Keyboard is not null && PageIndex == (int)Page.Profiles;
+
+    public bool IsNavigationCollapsed
+    {
+        get => settings.NavigationCollapsed;
+        set
+        {
+            settings.NavigationCollapsed = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleNavigation() => IsNavigationCollapsed = !IsNavigationCollapsed;
+
+    [RelayCommand]
+    private void ShowDevice() => PageIndex = (int)Page.Device;
 
     [ObservableProperty]
     public partial string Status { get; set; } = "";
@@ -68,7 +116,15 @@ public sealed partial class MainViewModel(
     private async Task RefreshAsync()
     {
         Status = Strings.Searching;
+        // Drafts exist only in memory; replacing the editor would silently drop them.
+        if (Keyboard is { PendingCount: > 0 })
+        {
+            Status = Strings.RefreshBlockedByPending;
+            return;
+        }
         Keyboard = null;
+        Profiles = null;
+        IsSearching = true;
         try
         {
             // HID enumeration blocks; keep the UI thread responsive.
@@ -80,13 +136,20 @@ public sealed partial class MainViewModel(
                 return;
             }
             Status = "";
-            Keyboard = new KeyboardEditorViewModel(target, legends, transport, store, request => ConfirmApply(request));
+            Keyboard = new KeyboardEditorViewModel(target, legends, transport, store, review => ShowReview(review));
+            Profiles = new ProfileLibraryViewModel(Path.Combine(AppContext.BaseDirectory, "profiles"), Keyboard, () => PageIndex = (int)Page.Performance);
+            if (PageIndex == (int)Page.Device)
+                PageIndex = (int)Page.Performance;
             await Keyboard.LoadStateCommand.ExecuteAsync(null);
             await Keyboard.Lighting.LoadCommand.ExecuteAsync(null);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Status = Format(Strings.ListFailed, ex.Message);
+        }
+        finally
+        {
+            IsSearching = false;
         }
     }
 

@@ -12,7 +12,7 @@ public sealed record LightingVariantItem(int Option, string Name);
 
 /// <summary>Edits the keyboard lighting. The firmware reports lighting, so every write is read back and verified.</summary>
 public sealed partial class LightingViewModel(
-    KeyboardCandidate target, IHidTransport transport, Func<ApplyRequest, Task<bool>> confirm) : ObservableObject
+    KeyboardCandidate target, IHidTransport transport, Func<ReviewViewModel, Task> review) : ObservableObject
 {
     private LightingState? _current;
 
@@ -125,10 +125,15 @@ public sealed partial class LightingViewModel(
             Status = Strings.LightingUnchanged;
             return;
         }
-        var line = $"{Describe(_current)} → {Describe(wanted)}";
-        if (!await confirm(new ApplyRequest(target.Definition!.Name, [line], !target.Definition.Verified)))
-            return;
+        var row = new ReviewRow(Strings.TabLighting, $"{Describe(_current)} → {Describe(wanted)}", "");
+        var definition = target.Definition!;
+        await review(new ReviewViewModel(definition.Name, [row], Strings.LightingReviewSummary, [Strings.LightingReviewNote],
+            definition.Verified ? null : Strings.LightingAcknowledgeExperimental, Strings.ApplyLighting,
+            (r, _) => SendAsync(wanted, r)));
+    }
 
+    private async Task SendAsync(LightingState wanted, ReviewViewModel review)
+    {
         IsBusy = true;
         try
         {
@@ -138,10 +143,12 @@ public sealed partial class LightingViewModel(
                 return session.Client.WriteLighting(wanted);
             }));
             Status = Strings.LightingVerified;
+            review.Finish(1, ReviewRowStatus.Verified, false, Strings.LightingVerified);
         }
         catch (Exception ex) when (ex is IOException or ProtocolException or DeviceNotSupportedException or UnauthorizedAccessException)
         {
             Status = Text.Format(Strings.LightingFailed, ex.Message);
+            review.Finish(0, ReviewRowStatus.Verified, ex is not DeviceNotSupportedException, Status);
         }
         finally
         {

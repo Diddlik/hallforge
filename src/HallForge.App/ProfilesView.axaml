@@ -1,0 +1,152 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:HallForge.App"
+             x:Class="HallForge.App.ProfilesView"
+             x:DataType="app:ProfileLibraryViewModel">
+    <UserControl.Styles>
+        <Style Selector="ListBox.cards">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.cards ListBoxItem">
+            <Setter Property="Padding" Value="16,14" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfBorder}" />
+            <Setter Property="Background" Value="{DynamicResource HfSurface1}" />
+        </Style>
+        <Style Selector="ListBox.cards ListBoxItem:selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource HfAccent}" />
+        </Style>
+        <Style Selector="ListBox.cards ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+        </Style>
+        <Style Selector="ListBox.cards ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+        </Style>
+        <Style Selector="Border.mini">
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfKeyBorder}" />
+            <Setter Property="Background" Value="{DynamicResource HfKeyBg}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfText3}" />
+        </Style>
+        <Style Selector="Border.mini.covered">
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfAccent}" />
+            <Setter Property="Background" Value="{DynamicResource HfKeySelBg}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfText}" />
+        </Style>
+        <Style Selector="Grid.tableHeader > TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="24,20" Spacing="16">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <StackPanel Spacing="2">
+                    <TextBlock Classes="h1" Text="{x:Static app:Strings.NavProfiles}" />
+                    <TextBlock Classes="secondary" Text="{x:Static app:Strings.ProfilesIntro}" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="outline" Content="{x:Static app:Strings.ImportProfile}" Click="OnImport" VerticalAlignment="Center" />
+            </Grid>
+
+            <Grid ColumnDefinitions="340,*" ColumnSpacing="16">
+                <ListBox Classes="cards" ItemsSource="{Binding Profiles}" SelectedItem="{Binding Selected}" VerticalAlignment="Top"
+                         AutomationProperties.Name="{x:Static app:Strings.NavProfiles}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="app:ProfileItem">
+                            <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="14" />
+                                    <Border Classes="pill warn" Padding="7,0" IsVisible="{Binding IsAggressive}" VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Static app:Strings.Aggressive}" FontSize="11" />
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Classes="caption" Text="{Binding Coverage}" />
+                                <TextBlock Classes="caption" Text="{x:Static app:Strings.ProfileTemplate}" IsVisible="{Binding IsTemplate}" />
+                                <TextBlock Classes="caption" Text="{x:Static app:Strings.ProfileImported}" IsVisible="{Binding !IsTemplate}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Border Grid.Column="1" Classes="panel" VerticalAlignment="Top" IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <StackPanel Spacing="16">
+                        <TextBlock Classes="h2" Text="{Binding Selected.Name, FallbackValue=''}" />
+
+                        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" MaxHeight="200" HorizontalAlignment="Left">
+                            <ItemsControl ItemsSource="{Binding CoverageKeys}" Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
+                                          AutomationProperties.Name="{x:Static app:Strings.CoverageMap}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.Styles>
+                                    <Style Selector="ContentPresenter" x:DataType="app:CoverageKey">
+                                        <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                        <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                                    </Style>
+                                </ItemsControl.Styles>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="app:CoverageKey">
+                                        <Border Classes="mini" Classes.covered="{Binding IsCovered}" Width="{Binding Width}" Height="{Binding Height}">
+                                            <TextBlock Text="{Binding Legend}" FontSize="13" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Viewbox>
+                        <WrapPanel ItemSpacing="20">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Classes="mini covered" Width="18" Height="18" />
+                                <TextBlock Classes="caption" Text="{x:Static app:Strings.CoveredByProfile}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Border Classes="mini" Width="18" Height="18" />
+                                <TextBlock Classes="caption" Text="{x:Static app:Strings.UntouchedByProfile}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </WrapPanel>
+
+                        <Border BorderBrush="{DynamicResource HfBorder}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+                            <StackPanel>
+                                <Grid Classes="tableHeader" ColumnDefinitions="2*,*,*,*,1.4*" Background="{DynamicResource HfSurface2}">
+                                    <TextBlock Margin="12,7" Text="{x:Static app:Strings.ColumnKeys}" />
+                                    <TextBlock Grid.Column="1" Margin="12,7" Text="{x:Static app:Strings.Actuation}" />
+                                    <TextBlock Grid.Column="2" Margin="12,7" Text="{x:Static app:Strings.Release}" />
+                                    <TextBlock Grid.Column="3" Margin="12,7" Text="{x:Static app:Strings.RapidTrigger}" />
+                                    <TextBlock Grid.Column="4" Margin="12,7" Text="{x:Static app:Strings.ColumnRapidTriggerDistances}" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{Binding Selected.Groups, FallbackValue={x:Null}}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="app:ProfileGroupRow">
+                                            <Border BorderBrush="{DynamicResource HfBorder}" BorderThickness="0,1,0,0">
+                                                <Grid ColumnDefinitions="2*,*,*,*,1.4*">
+                                                    <TextBlock Margin="12,7" Text="{Binding Keys}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                                    <TextBlock Grid.Column="1" Margin="12,7" Text="{Binding Actuation}" />
+                                                    <TextBlock Grid.Column="2" Margin="12,7" Text="{Binding Release}" />
+                                                    <TextBlock Grid.Column="3" Margin="12,7" Text="{Binding RapidTrigger}" />
+                                                    <TextBlock Grid.Column="4" Margin="12,7" Text="{Binding RapidTriggerDistances}" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                            <TextBlock Classes="secondary" Text="{Binding Status}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Classes="outline" Content="{x:Static app:Strings.OpenPerformance}" Command="{Binding OpenPerformanceCommand}" />
+                            <Button Grid.Column="2" Classes="accent" Content="{x:Static app:Strings.LoadIntoDraft}" Command="{Binding LoadIntoDraftCommand}"
+                                    FontWeight="Bold" Padding="18,6" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

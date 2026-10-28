@@ -9,7 +9,7 @@ public class LocalizationTests
 
     [Fact]
     public void German_UiCulture_UsesGermanStrings() =>
-        Assert.Equal("Anwenden", Resources.GetString(nameof(Strings.Apply), new CultureInfo("de-DE")));
+        Assert.Equal("Rückgängig", Resources.GetString(nameof(Strings.Undo), new CultureInfo("de-DE")));
 
     [Fact]
     public void German_FormatStrings_KeepThePlaceholdersOfTheNeutralStrings()

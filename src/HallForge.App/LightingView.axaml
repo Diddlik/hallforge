@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:HallForge.App"
+             x:Class="HallForge.App.LightingView"
+             x:DataType="app:LightingViewModel">
+    <ScrollViewer>
+        <StackPanel Margin="24,20" Spacing="16" MaxWidth="640" HorizontalAlignment="Left">
+            <StackPanel Spacing="2">
+                <TextBlock Classes="h1" Text="{x:Static app:Strings.TabLighting}" />
+                <TextBlock Classes="secondary" Text="{x:Static app:Strings.LightingIntro}" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Border Classes="note" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <Path Classes="icon small" Data="{StaticResource IconInfo}" Stroke="{DynamicResource HfText2}" VerticalAlignment="Top" Margin="0,2,0,0" />
+                    <TextBlock Grid.Column="1" Text="{Binding Status}" TextWrapping="Wrap" />
+                    <ProgressBar Grid.Column="2" IsIndeterminate="True" Width="80" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+
+            <Border Classes="panel">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="16" IsEnabled="{Binding IsLoaded}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="{x:Static app:Strings.LightingEffect}" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding Modes}" SelectedItem="{Binding Mode}" MinWidth="280"
+                                      AutomationProperties.Name="{x:Static app:Strings.LightingEffect}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="app:LightingModeItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Spacing="6" IsVisible="{Binding HasVariants}">
+                            <TextBlock Text="{x:Static app:Strings.LightingVariant}" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding Variant}" MinWidth="280"
+                                      AutomationProperties.Name="{x:Static app:Strings.LightingVariant}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="app:LightingVariantItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{x:Static app:Strings.LightingBrightness}" FontWeight="SemiBold" />
+                                <Slider Value="{Binding Brightness}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
+                                        AutomationProperties.Name="{x:Static app:Strings.LightingBrightness}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="6">
+                                <TextBlock Text="{x:Static app:Strings.LightingSpeed}" FontWeight="SemiBold" />
+                                <Slider Value="{Binding Speed}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
+                                        AutomationProperties.Name="{x:Static app:Strings.LightingSpeed}" />
+                            </StackPanel>
+                        </Grid>
+                        <Border Classes="divider" />
+                        <CheckBox Content="{x:Static app:Strings.LightingRainbow}" IsChecked="{Binding Rainbow}" />
+                        <StackPanel Spacing="6" IsEnabled="{Binding !Rainbow}">
+                            <TextBlock Text="{x:Static app:Strings.LightingColor}" FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox Text="{Binding ColorHex}" Width="140" MaxLength="6"
+                                         AutomationProperties.Name="{x:Static app:Strings.LightingColor}" />
+                                <Border Width="32" Height="32" CornerRadius="16" BorderThickness="1"
+                                        BorderBrush="{DynamicResource HfBorder}"
+                                        Background="{Binding ColorPreview, FallbackValue=Transparent}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                    <Border Classes="divider" />
+                    <Button Classes="accent" Content="{x:Static app:Strings.ApplyLighting}" Command="{Binding ApplyCommand}"
+                            HorizontalAlignment="Right" FontWeight="Bold" Padding="18,6" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

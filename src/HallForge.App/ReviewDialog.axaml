@@ -1,0 +1,94 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:app="using:HallForge.App"
+        x:Class="HallForge.App.ReviewDialog"
+        x:DataType="app:ReviewViewModel"
+        Width="780" Height="620" MinWidth="520" MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource HfBg}"
+        Title="{Binding Heading}">
+    <Window.Styles>
+        <Style Selector="Grid.tableHeader > TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel Margin="24">
+        <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="0,0,0,16">
+            <TextBlock Classes="h1" Text="{Binding Heading}" />
+            <TextBlock Classes="secondary" Text="{Binding Target}" />
+            <TextBlock Classes="secondary" Text="{Binding Summary}" IsVisible="{Binding IsReview}" />
+            <TextBlock Classes="secondary" Text="{Binding ProgressText}" IsVisible="{Binding !IsReview}" />
+        </StackPanel>
+
+        <!-- Review: notes, acknowledgement and the single primary action -->
+        <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="0,16,0,0" IsVisible="{Binding IsReview}">
+            <ItemsControl ItemsSource="{Binding Notes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="8" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Border Classes="note warn">
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <CheckBox IsChecked="{Binding Acknowledged}" IsVisible="{Binding NeedsAcknowledgement}">
+                <TextBlock Text="{Binding Acknowledgement}" TextWrapping="Wrap" />
+            </CheckBox>
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                <Button Classes="outline" Content="{x:Static app:Strings.Cancel}" Click="OnClose" IsCancel="True" />
+                <Button Classes="accent" Content="{Binding SendText}" Command="{Binding SendCommand}" FontWeight="Bold" Padding="18,6" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Sending: progress and stop -->
+        <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="0,16,0,0" IsVisible="{Binding IsSending}">
+            <ProgressBar Minimum="0" Maximum="{Binding Rows.Count}" Value="{Binding Completed}" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <TextBlock Classes="secondary" Text="{x:Static app:Strings.DeviceLocked}" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Classes="outline" Content="{x:Static app:Strings.StopAfterCurrent}" Command="{Binding StopCommand}" />
+            </Grid>
+        </StackPanel>
+
+        <!-- Result -->
+        <StackPanel DockPanel.Dock="Bottom" Spacing="12" Margin="0,16,0,0" IsVisible="{Binding IsDone}">
+            <Border Classes="note" Classes.warn="{Binding HasProblem}">
+                <TextBlock Text="{Binding Result}" TextWrapping="Wrap" />
+            </Border>
+            <Button Classes="accent" Content="{x:Static app:Strings.Done}" Click="OnClose" IsDefault="True" HorizontalAlignment="Right" Padding="18,6" />
+        </StackPanel>
+
+        <Border BorderBrush="{DynamicResource HfBorder}" BorderThickness="1" CornerRadius="10" ClipToBounds="True" Background="{DynamicResource HfSurface1}">
+            <DockPanel>
+                <Grid DockPanel.Dock="Top" Classes="tableHeader" ColumnDefinitions="*,3*,2*,1.3*" Background="{DynamicResource HfSurface2}">
+                    <TextBlock Margin="12,7" Text="{x:Static app:Strings.ColumnKey}" />
+                    <TextBlock Grid.Column="1" Margin="12,7" Text="{x:Static app:Strings.ColumnChanges}" />
+                    <TextBlock Grid.Column="2" Margin="12,7" Text="{x:Static app:Strings.ColumnUntouched}" />
+                    <TextBlock Grid.Column="3" Margin="12,7" Text="{x:Static app:Strings.ColumnStatus}" />
+                </Grid>
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="app:ReviewRow">
+                                <Border BorderBrush="{DynamicResource HfBorder}" BorderThickness="0,1,0,0">
+                                    <Grid ColumnDefinitions="*,3*,2*,1.3*">
+                                        <TextBlock Margin="12,7" Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="1" Margin="12,7" Text="{Binding Changes}" Classes="draft" FontWeight="Normal" TextWrapping="Wrap" />
+                                        <TextBlock Grid.Column="2" Margin="12,7" Text="{Binding Untouched}" Classes="secondary" TextWrapping="Wrap" />
+                                        <TextBlock Grid.Column="3" Margin="12,7" Text="{Binding StatusText}" TextWrapping="Wrap" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</Window>

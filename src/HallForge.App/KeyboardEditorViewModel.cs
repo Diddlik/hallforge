@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HallForge.Core;
@@ -8,45 +7,115 @@ using HallForge.Protocol.RongYuan;
 
 namespace HallForge.App;
 
-/// <summary>Shows what the user is asked to confirm before keys are written.</summary>
-public sealed record ApplyRequest(string DeviceName, IReadOnlyList<string> Changes, bool RequiresExperimentalConsent);
+public enum KeySource
+{
+    AppState,
+    Draft,
+    Unknown,
+}
+
+/// <summary>Old value and, when the draft changes it, the new one.</summary>
+public sealed record ValueChange(string Old, string? New)
+{
+    public bool IsChanged => New is not null;
+}
+
+public sealed partial class PresetItem(string id, string label) : ObservableObject
+{
+    public string Id { get; } = id;
+    public string Label { get; } = label;
+
+    [ObservableProperty]
+    public partial bool IsActive { get; set; }
+}
+
+public sealed record SelectionRow(string Key, ValueChange Actuation, ValueChange Release, ValueChange RapidTrigger, KeySource Source)
+{
+    public string SourceText => Source switch
+    {
+        KeySource.Draft => Strings.SourceDraft,
+        KeySource.Unknown => Strings.SourceUnknown,
+        _ => Strings.SourceAppState,
+    };
+
+    public string SourceHelp => Source switch
+    {
+        KeySource.Draft => Strings.SourceDraftHelp,
+        KeySource.Unknown => Strings.SourceUnknownHelp,
+        _ => Strings.SourceAppStateHelp,
+    };
+
+    public bool IsDraft => Source == KeySource.Draft;
+    public bool IsUnknown => Source == KeySource.Unknown;
+}
 
 /// <summary>
-/// Edits the trigger settings of one keyboard. Changes stay in a draft until Apply, which validates the whole draft,
-/// asks for confirmation and writes through the same <see cref="RongYuanSession"/> path as the CLI.
+/// Edits the trigger settings of one keyboard. Changes stay in a draft until Review &amp; Apply, which validates the
+/// whole draft, shows every change and writes through the same <see cref="RongYuanSession"/> path as the CLI.
 /// </summary>
 public sealed partial class KeyboardEditorViewModel : ObservableObject
 {
+    private const int UndoLimit = 50;
+    // Below these distances accidental or repeated presses become likely while typing.
+    internal const decimal RiskyActuationMm = 0.6m;
+    internal const decimal RiskyRapidTriggerMm = 0.2m;
+
     private static readonly Dictionary<string, string[]> Presets = new()
     {
         ["WASD"] = ["KeyW", "KeyA", "KeyS", "KeyD"],
         ["Movement"] = ["KeyW", "KeyA", "KeyS", "KeyD", "ShiftLeft", "ControlLeft", "Space"],
-        ["Actions"] = ["KeyQ", "KeyE", "KeyF", "KeyR"],
+        ["Actions"] = ["KeyQ", "KeyE", "KeyR", "KeyF", "KeyG", "KeyC", "KeyV"],
         ["Numbers"] = ["Digit1", "Digit2", "Digit3", "Digit4", "Digit5"],
+    };
+
+    private static readonly Dictionary<string, TriggerPatch> Templates = new()
+    {
+        ["Comfort"] = new TriggerPatch(2.0m, 2.0m, false),
+        ["Sensitive"] = new TriggerPatch(1.2m, 1.2m, true, 0.3m, 0.3m),
+        ["Gaming"] = new TriggerPatch(0.6m, 0.6m, true, 0.2m, 0.2m),
     };
 
     private readonly KeyboardCandidate _target;
     private readonly IHidTransport _transport;
     private readonly StateStore _store;
-    private readonly Func<ApplyRequest, Task<bool>> _confirm;
+    private readonly Func<ReviewViewModel, Task> _review;
     private readonly DeviceDefinition _definition;
-    private int _profile;
-    private bool _refreshingEditor;
+    private readonly Stack<Dictionary<string, TriggerPatch?>> _undo = new();
+    private string? _lastEdit;
+    private KeyViewModel? _anchor;
+    private bool _bulkSelect;
 
-    public KeyboardEditorViewModel(KeyboardCandidate target, KeyLegends legends, IHidTransport transport, StateStore store, Func<ApplyRequest, Task<bool>> confirm)
+    public KeyboardEditorViewModel(KeyboardCandidate target, KeyLegends legends, IHidTransport transport, StateStore store, Func<ReviewViewModel, Task> review)
     {
         _target = target;
         _definition = target.Definition!;
         _transport = transport;
         _store = store;
-        _confirm = confirm;
+        _review = review;
         Keys = new ObservableCollection<KeyViewModel>(_definition.Layout.Select(g => new KeyViewModel(g, legends.For(g.Key))));
         foreach (var key in Keys)
             key.PropertyChanged += OnKeyChanged;
         CanvasWidth = _definition.Layout.Max(g => g.X + g.W) * KeyViewModel.Pitch;
         CanvasHeight = _definition.Layout.Max(g => g.Y + g.H) * KeyViewModel.Pitch;
-        Limits = _definition.Limits;
-        Lighting = new LightingViewModel(target, transport, confirm);
+        var limits = _definition.Limits;
+        Actuation = new TriggerFieldViewModel(Strings.Actuation, Strings.ActuationHelp, limits.Travel,
+            t => t.ActuationMm, mm => new TriggerPatch(ActuationMm: mm), Edit);
+        Release = new TriggerFieldViewModel(Strings.Release, Strings.ReleaseHelp, limits.Travel,
+            t => t.ReleaseMm, mm => new TriggerPatch(ReleaseMm: mm), Edit);
+        RapidTriggerPress = new TriggerFieldViewModel(Strings.RapidTriggerPress, Strings.RapidTriggerPressHelp, limits.RapidTrigger,
+            t => t.RapidTriggerPressMm, mm => new TriggerPatch(RapidTriggerPressMm: mm), Edit);
+        RapidTriggerRelease = new TriggerFieldViewModel(Strings.RapidTriggerRelease, Strings.RapidTriggerReleaseHelp, limits.RapidTrigger,
+            t => t.RapidTriggerReleaseMm, mm => new TriggerPatch(RapidTriggerReleaseMm: mm), Edit);
+        Deadzone = new TriggerFieldViewModel(Strings.Deadzone, Strings.DeadzoneHelp, limits.Deadzone,
+            t => t.DeadzoneMm, mm => new TriggerPatch(DeadzoneMm: mm), Edit);
+        foreach (var field in Fields)
+            field.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(TriggerFieldViewModel.HasError))
+                    HasInputError = Fields.Any(f => f.HasError);
+            };
+        Lighting = new LightingViewModel(target, transport, review);
+        RefreshEditor(keepInput: false);
     }
 
     public LightingViewModel Lighting { get; }
@@ -54,90 +123,136 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
     public ObservableCollection<KeyViewModel> Keys { get; }
     public double CanvasWidth { get; }
     public double CanvasHeight { get; }
-    public TriggerLimits Limits { get; }
     public string DeviceName => _definition.Name;
     public bool IsExperimental => !_definition.Verified;
+    public string UsbId => $"{_target.Interface.VendorId:X4}:{_target.Interface.ProductId:X4}";
+    public string ModelIds => string.Join(", ", _definition.FirmwareModelIds);
+    public string LayoutSummary => Text.Format(Strings.LayoutSummary, Keys.Count);
+
+    public TriggerFieldViewModel Actuation { get; }
+    public TriggerFieldViewModel Release { get; }
+    public TriggerFieldViewModel RapidTriggerPress { get; }
+    public TriggerFieldViewModel RapidTriggerRelease { get; }
+    public TriggerFieldViewModel Deadzone { get; }
+    public IReadOnlyList<TriggerFieldViewModel> TravelFields => [Actuation, Release];
+    public IReadOnlyList<TriggerFieldViewModel> RapidTriggerFields => [RapidTriggerPress, RapidTriggerRelease];
+    private IEnumerable<TriggerFieldViewModel> Fields => [Actuation, Release, RapidTriggerPress, RapidTriggerRelease, Deadzone];
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ApplyCommand), nameof(ImportBackupCommand), nameof(LoadStateCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReviewCommand), nameof(ImportBackupCommand), nameof(LoadStateCommand))]
     public partial bool IsBusy { get; set; }
 
     [ObservableProperty]
     public partial string Status { get; set; } = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ProfileText), nameof(HeaderInfo))]
+    public partial int? Profile { get; set; }
+
+    public string ProfileText => Profile is { } p ? Text.Format(Strings.OnboardProfile, p + 1) : Strings.OnboardProfileUnknown;
+    public string HeaderInfo => $"{ProfileText} · {Strings.HeaderCapabilities}";
+
+    [ObservableProperty]
     public partial bool NeedsBackup { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ApplyText))]
-    [NotifyCanExecuteChangedFor(nameof(ApplyCommand), nameof(DiscardCommand))]
+    public partial bool ShowValues { get; set; }
+
+    // Draft summary for the pending-changes bar.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasDrafts), nameof(DraftTitle))]
+    [NotifyCanExecuteChangedFor(nameof(ReviewCommand), nameof(DiscardCommand))]
     public partial int PendingCount { get; set; }
 
-    public string ApplyText => Text.Format(Strings.ApplyCount, PendingCount);
-
-    public bool HasSelection => Keys.Any(k => k.IsSelected);
-
-    // Editor fields show the common value of the selection, or null when it differs or is unknown.
     [ObservableProperty]
-    public partial decimal? Actuation { get; set; }
+    [NotifyPropertyChangedFor(nameof(DraftTitle))]
+    public partial int FieldChangeCount { get; set; }
 
-    [ObservableProperty]
-    public partial decimal? Release { get; set; }
+    public bool HasDrafts => PendingCount > 0;
+    public string DraftTitle => Text.Format(Strings.DraftSummary, PendingCount, FieldChangeCount);
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
+    public partial int UndoDepth { get; set; }
+
+    // Selection panel.
+    public ObservableCollection<SelectionRow> SelectionRows { get; } = [];
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ResetSelectionCommand), nameof(RapidTriggerOnCommand), nameof(RapidTriggerOffCommand), nameof(ApplyTemplateCommand))]
+    public partial bool HasSelection { get; set; }
+
+    [ObservableProperty]
+    public partial string SelectionTitle { get; set; } = "";
+
+    [ObservableProperty]
+    public partial string SelectionCounts { get; set; } = "";
+
+    [ObservableProperty]
+    public partial string ScopeText { get; set; } = "";
+
+    public IReadOnlyList<PresetItem> QuickSelect { get; } =
+    [
+        new("WASD", Strings.PresetWasd), new("Movement", Strings.PresetMovement), new("Actions", Strings.PresetActions),
+        new("Numbers", Strings.PresetNumbers), new("All", Strings.PresetAll), new("None", Strings.PresetNone),
+    ];
+
+    public IReadOnlyList<PresetItem> TemplateItems { get; } =
+    [
+        new("Comfort", Strings.TemplateComfort), new("Sensitive", Strings.TemplateSensitive), new("Gaming", Strings.TemplateGaming),
+    ];
+
+    // Rapid trigger state of the selection: true, false, or null when mixed, unknown or nothing is selected.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsRapidTriggerOn), nameof(IsRapidTriggerOff))]
     public partial bool? RapidTrigger { get; set; }
 
-    [ObservableProperty]
-    public partial decimal? RapidTriggerPress { get; set; }
+    public bool IsRapidTriggerOn => RapidTrigger == true;
+    public bool IsRapidTriggerOff => RapidTrigger == false;
 
     [ObservableProperty]
-    public partial decimal? RapidTriggerRelease { get; set; }
+    public partial string RapidTriggerNote { get; set; } = "";
 
     [ObservableProperty]
-    public partial decimal? Deadzone { get; set; }
+    public partial bool RapidTriggerNoteIsWarning { get; set; }
 
-    partial void OnActuationChanged(decimal? value) => Edit(new TriggerPatch(ActuationMm: value), value is null);
-    partial void OnReleaseChanged(decimal? value) => Edit(new TriggerPatch(ReleaseMm: value), value is null);
-    partial void OnRapidTriggerChanged(bool? value) => Edit(new TriggerPatch(RapidTriggerEnabled: value), value is null);
-    partial void OnRapidTriggerPressChanged(decimal? value) => Edit(new TriggerPatch(RapidTriggerPressMm: value), value is null);
-    partial void OnRapidTriggerReleaseChanged(decimal? value) => Edit(new TriggerPatch(RapidTriggerReleaseMm: value), value is null);
-    partial void OnDeadzoneChanged(decimal? value) => Edit(new TriggerPatch(DeadzoneMm: value), value is null);
+    [ObservableProperty]
+    public partial string RiskText { get; set; } = "";
 
-    private void Edit(TriggerPatch patch, bool cleared)
-    {
-        if (_refreshingEditor || cleared)
-            return;
-        foreach (var key in Keys.Where(k => k.IsSelected))
-            key.Pending = (key.Pending ?? new TriggerPatch()).Then(patch);
-        PendingCount = Keys.Count(k => k.IsPending);
-    }
+    [ObservableProperty]
+    public partial bool HasRisk { get; set; }
+
+    [ObservableProperty]
+    public partial bool HasInputError { get; set; }
+
+    private IEnumerable<KeyViewModel> Selected => Keys.Where(k => k.IsSelected);
 
     private void OnKeyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(KeyViewModel.IsSelected))
+        if (e.PropertyName == nameof(KeyViewModel.IsSelected) && !_bulkSelect)
         {
-            OnPropertyChanged(nameof(HasSelection));
-            RefreshEditor();
+            _lastEdit = null;
+            RefreshEditor(keepInput: false);
         }
     }
 
-    private void RefreshEditor()
+    /// <summary>Click selects one key, <paramref name="toggle"/> adds or removes it, <paramref name="extend"/> selects the range from the last clicked key.</summary>
+    public void Pick(KeyViewModel key, bool toggle, bool extend)
     {
-        var selected = Keys.Where(k => k.IsSelected).Select(k => k.Effective).ToList();
-        _refreshingEditor = true;
-        Actuation = Common(selected, t => t.ActuationMm);
-        Release = Common(selected, t => t.ReleaseMm);
-        RapidTrigger = Common(selected, t => t.RapidTrigger);
-        RapidTriggerPress = Common(selected, t => t.RapidTriggerPressMm);
-        RapidTriggerRelease = Common(selected, t => t.RapidTriggerReleaseMm);
-        Deadzone = Common(selected, t => t.DeadzoneMm);
-        _refreshingEditor = false;
+        if (extend && _anchor is not null)
+        {
+            var from = Keys.IndexOf(_anchor);
+            var to = Keys.IndexOf(key);
+            var range = Keys.Skip(Math.Min(from, to)).Take(Math.Abs(to - from) + 1).ToHashSet();
+            SetSelection(k => k.IsSelected || range.Contains(k));
+            return;
+        }
+        _anchor = key;
+        if (toggle)
+            key.IsSelected = !key.IsSelected;
+        else
+            SetSelection(k => k == key);
     }
-
-    private static T? Common<T>(List<KeyTrigger?> triggers, Func<KeyTrigger, T> field) where T : struct =>
-        triggers.Count > 0 && triggers.All(t => t is not null) && triggers.Select(t => field(t!)).Distinct().Count() == 1
-            ? field(triggers[0]!)
-            : null;
 
     [RelayCommand]
     private void Select(string preset)
@@ -148,40 +263,200 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
             "None" => [],
             _ => Presets[preset].ToHashSet(),
         };
-        foreach (var key in Keys)
-            key.IsSelected = ids.Contains(key.KeyId);
+        _anchor = Keys.FirstOrDefault(k => ids.Contains(k.KeyId));
+        SetSelection(k => ids.Contains(k.KeyId));
     }
 
-    [RelayCommand(CanExecute = nameof(CanDiscard))]
+    private void SetSelection(Func<KeyViewModel, bool> selected)
+    {
+        _bulkSelect = true;
+        foreach (var key in Keys)
+            key.IsSelected = selected(key);
+        _bulkSelect = false;
+        _lastEdit = null;
+        RefreshEditor(keepInput: false);
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private void RapidTriggerOn() => Edit(new TriggerPatch(RapidTriggerEnabled: true), null);
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private void RapidTriggerOff() => Edit(new TriggerPatch(RapidTriggerEnabled: false), null);
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private void ApplyTemplate(string name) => Edit(Templates[name], null);
+
+    /// <param name="field">Consecutive edits of the same field on the same selection form one undo step, so dragging a slider is undone at once.</param>
+    private void Edit(TriggerPatch patch, string? field)
+    {
+        var selected = Selected.ToList();
+        if (selected.Count == 0)
+            return;
+        if (field is null || field != _lastEdit)
+            Remember();
+        _lastEdit = field;
+        foreach (var key in selected)
+            key.Pending = Trim((key.Pending ?? new TriggerPatch()).Then(patch), key.Known);
+        RefreshEditor(keepInput: true);
+    }
+
+    /// <summary>Drops fields that equal the known setting, so a draft only holds real changes.</summary>
+    private static TriggerPatch? Trim(TriggerPatch patch, KeyTrigger? known)
+    {
+        if (known is not null)
+            patch = new TriggerPatch(
+                patch.ActuationMm == known.ActuationMm ? null : patch.ActuationMm,
+                patch.ReleaseMm == known.ReleaseMm ? null : patch.ReleaseMm,
+                patch.RapidTriggerEnabled == known.RapidTrigger ? null : patch.RapidTriggerEnabled,
+                patch.RapidTriggerPressMm == known.RapidTriggerPressMm ? null : patch.RapidTriggerPressMm,
+                patch.RapidTriggerReleaseMm == known.RapidTriggerReleaseMm ? null : patch.RapidTriggerReleaseMm,
+                patch.DeadzoneMm == known.DeadzoneMm ? null : patch.DeadzoneMm);
+        return patch == new TriggerPatch() ? null : patch;
+    }
+
+    private static int FieldCount(TriggerPatch? p) => p is null ? 0 :
+        new object?[] { p.ActuationMm, p.ReleaseMm, p.RapidTriggerEnabled, p.RapidTriggerPressMm, p.RapidTriggerReleaseMm, p.DeadzoneMm }.Count(v => v is not null);
+
+    private void Remember()
+    {
+        if (_undo.Count == UndoLimit)
+        {
+            var kept = _undo.Reverse().Skip(1).ToList();
+            _undo.Clear();
+            foreach (var snapshot in kept)
+                _undo.Push(snapshot);
+        }
+        _undo.Push(Keys.ToDictionary(k => k.KeyId, k => k.Pending));
+        UndoDepth = _undo.Count;
+    }
+
+    private bool CanUndo() => UndoDepth > 0;
+
+    [RelayCommand(CanExecute = nameof(CanUndo))]
+    private void Undo()
+    {
+        var snapshot = _undo.Pop();
+        UndoDepth = _undo.Count;
+        foreach (var key in Keys)
+            key.Pending = snapshot.GetValueOrDefault(key.KeyId);
+        _lastEdit = null;
+        RefreshEditor(keepInput: false);
+    }
+
+    [RelayCommand(CanExecute = nameof(HasDrafts))]
     private void Discard()
     {
+        Remember();
         foreach (var key in Keys)
             key.Pending = null;
-        PendingCount = 0;
-        RefreshEditor();
+        _lastEdit = null;
+        RefreshEditor(keepInput: false);
     }
 
-    private bool CanDiscard() => PendingCount > 0;
+    private bool CanResetSelection() => Selected.Any(k => k.IsPending);
 
-    /// <summary>Adds a profile to the draft; nothing is written until Apply.</summary>
-    public void LoadProfile(string path)
+    [RelayCommand(CanExecute = nameof(CanResetSelection))]
+    private void ResetSelection()
+    {
+        Remember();
+        foreach (var key in Selected)
+            key.Pending = null;
+        _lastEdit = null;
+        RefreshEditor(keepInput: false);
+    }
+
+    private void RefreshEditor(bool keepInput)
+    {
+        var selected = Selected.ToList();
+        var triggers = selected.Select(k => k.Effective).ToList();
+        HasSelection = selected.Count > 0;
+
+        var rapidTrigger = triggers.Select(t => t?.RapidTrigger).ToList();
+        RapidTrigger = rapidTrigger.Count > 0 && rapidTrigger.All(v => v is not null) && rapidTrigger.Distinct().Count() == 1 ? rapidTrigger[0] : null;
+        RapidTriggerNoteIsWarning = false;
+        if (selected.Count == 0)
+            RapidTriggerNote = Strings.SelectKeysToEdit;
+        else if (RapidTrigger is { } on)
+            RapidTriggerNote = on ? Strings.RapidTriggerOnNote : Strings.RapidTriggerOffNote;
+        else
+        {
+            var unknown = rapidTrigger.Count(v => v is null);
+            RapidTriggerNote = unknown == rapidTrigger.Count
+                ? Strings.FieldUnknown
+                : Text.Format(Strings.RapidTriggerMixed, rapidTrigger.Count(v => v == true), rapidTrigger.Count(v => v == false), unknown);
+            RapidTriggerNoteIsWarning = true;
+        }
+
+        Actuation.Refresh(triggers, false, keepInput);
+        Release.Refresh(triggers, false, keepInput);
+        RapidTriggerPress.Refresh(triggers, RapidTrigger == false, keepInput);
+        RapidTriggerRelease.Refresh(triggers, RapidTrigger == false, keepInput);
+        Deadzone.Refresh(triggers, false, keepInput);
+
+        var risky = selected.Count(k => k.Effective is { } t
+            && (t.ActuationMm < RiskyActuationMm || (t.RapidTrigger && (t.RapidTriggerPressMm < RiskyRapidTriggerMm || t.RapidTriggerReleaseMm < RiskyRapidTriggerMm))));
+        HasRisk = risky > 0;
+        RiskText = Text.Format(Strings.RiskWarning, risky);
+
+        SelectionRows.Clear();
+        foreach (var key in selected)
+            SelectionRows.Add(Row(key));
+        var names = string.Join(", ", selected.Take(6).Select(k => Name(k))) + (selected.Count > 6 ? $" +{selected.Count - 6}" : "");
+        SelectionTitle = selected.Count == 1 ? Text.Format(Strings.OneKeySelected, names) : Text.Format(Strings.KeysSelected, selected.Count, names);
+        SelectionCounts = Text.Format(Strings.SelectionCounts, selected.Count(k => k.Known is null && !k.IsPending));
+        ScopeText = selected.Count == 0 ? Strings.NoKeysSelected : Text.Format(Strings.SelectionScope, selected.Count);
+        var ids = selected.Select(k => k.KeyId).ToHashSet();
+        foreach (var preset in QuickSelect)
+            preset.IsActive = preset.Id == "All" ? ids.Count == Keys.Count : Presets.TryGetValue(preset.Id, out var keys) && ids.SetEquals(keys);
+
+        PendingCount = Keys.Count(k => k.IsPending);
+        FieldChangeCount = Keys.Sum(k => FieldCount(k.Pending));
+        ResetSelectionCommand.NotifyCanExecuteChanged();
+    }
+
+    private static string Name(KeyViewModel key) => key.Legend.Length > 0 ? key.Legend : key.KeyId;
+
+    private static SelectionRow Row(KeyViewModel key)
+    {
+        string Old<T>(Func<KeyTrigger, T> field, Func<T, string> format) => key.Known is { } k ? format(field(k)) : Strings.Unknown;
+        string? New<T>(T? value, Func<T, string> format) where T : struct => value is { } v ? format(v) : null;
+        var p = key.Pending;
+        return new SelectionRow(Name(key),
+            new ValueChange(Old(t => t.ActuationMm, Mm.Format), New(p?.ActuationMm, Mm.Format)),
+            new ValueChange(Old(t => t.ReleaseMm, Mm.Format), New(p?.ReleaseMm, Mm.Format)),
+            new ValueChange(Old(t => t.RapidTrigger, OnOff), New(p?.RapidTriggerEnabled, OnOff)),
+            key.IsPending ? KeySource.Draft : key.Known is null ? KeySource.Unknown : KeySource.AppState);
+    }
+
+    private static string OnOff(bool on) => on ? Strings.On : Strings.Off;
+
+    /// <summary>Adds a profile to the draft; nothing is written until Review &amp; Apply.</summary>
+    /// <returns>Number of keys the profile changed in the draft.</returns>
+    public int LoadProfile(string path)
     {
         try
         {
             var patches = KeyboardProfile.Load(path).Resolve();
             var unknown = patches.Keys.Where(id => Keys.All(k => k.KeyId != id)).ToList();
+            Remember();
+            _lastEdit = null;
+            var loaded = 0;
             foreach (var key in Keys)
                 if (patches.TryGetValue(key.KeyId, out var patch))
-                    key.Pending = (key.Pending ?? new TriggerPatch()).Then(patch);
-            PendingCount = Keys.Count(k => k.IsPending);
-            RefreshEditor();
+                {
+                    key.Pending = Trim((key.Pending ?? new TriggerPatch()).Then(patch), key.Known);
+                    loaded++;
+                }
+            RefreshEditor(keepInput: false);
             Status = unknown.Count == 0
                 ? Text.Format(Strings.ProfileLoaded, Path.GetFileName(path))
                 : Text.Format(Strings.ProfileKeysIgnored, string.Join(", ", unknown));
+            return loaded;
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
             Status = Text.Format(Strings.ProfileLoadFailed, ex.Message);
+            return 0;
         }
     }
 
@@ -192,17 +467,17 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
         Status = Strings.Connecting;
         try
         {
-            var (state, hasBackup) = await Task.Run(() =>
+            var (profile, state, hasBackup) = await Task.Run(() =>
             {
                 using var session = RongYuanSession.Open(_transport, _target);
-                _profile = session.Profile;
-                return (_store.Load(_definition.Id, session.Profile), _store.HasBackup(_definition.Id, session.Profile));
+                return (session.Profile, _store.Load(_definition.Id, session.Profile), _store.HasBackup(_definition.Id, session.Profile));
             });
+            Profile = profile;
             foreach (var key in Keys)
                 key.Known = state?.Keys.GetValueOrDefault(key.KeyId);
             NeedsBackup = !hasBackup;
-            RefreshEditor();
-            Status = Text.Format(hasBackup ? Strings.StateLoaded : Strings.NoBackupYet, _profile, state?.Keys.Count ?? 0);
+            RefreshEditor(keepInput: false);
+            Status = hasBackup ? "" : Strings.NoBackupYet;
         }
         catch (Exception ex) when (ex is IOException or ProtocolException or DeviceNotSupportedException or InvalidDataException or UnauthorizedAccessException)
         {
@@ -241,12 +516,22 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
 
     private bool IsIdle() => !IsBusy;
 
-    private bool CanApply() => !IsBusy && PendingCount > 0;
+    private bool CanReview() => !IsBusy && PendingCount > 0;
 
-    [RelayCommand(CanExecute = nameof(CanApply))]
-    private async Task ApplyAsync()
+    [RelayCommand(CanExecute = nameof(CanReview))]
+    private async Task ReviewAsync()
     {
-        var state = _store.Load(_definition.Id, _profile);
+        if (HasInputError)
+        {
+            Status = Strings.FixInput;
+            return;
+        }
+        if (Profile is not { } profile)
+        {
+            Status = Strings.NotConnected;
+            return;
+        }
+        var state = _store.Load(_definition.Id, profile);
         var draft = Keys.Where(k => k.Pending is not null).ToDictionary(k => k.KeyId, k => k.Pending!);
         var plan = ApplyPlan.Create(draft, _definition, state);
         if (!plan.CanApply)
@@ -259,46 +544,99 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
             Status = Strings.BackupRequired;
             return;
         }
-        var lines = plan.Changes.Select(c => $"{Keys.First(k => k.KeyId == c.KeyId).Legend}: {Describe(c.Before)} → {Describe(c.After)}").ToList();
-        if (!await _confirm(new ApplyRequest(_definition.Name, lines, IsExperimental)))
+        if (plan.Changes.Count == 0)
+        {
+            Status = Strings.NothingToApply;
             return;
+        }
 
+        var changes = plan.Changes.Select(c => (Change: c, Fields: ChangedFields(c.Before, c.After))).ToList();
+        var rows = changes.Select(c => new ReviewRow(Name(Keys.First(k => k.KeyId == c.Change.KeyId)), string.Join(" · ", c.Fields), Untouched(c.Change.Before, c.Change.After))).ToList();
+        var notes = new List<string> { Strings.ReviewNoReadback, Strings.ReviewBackup };
+        if (plan.Changes.Any(c => c.Before is null))
+            notes.Add(Strings.ReviewUnknownKeys);
+        var acknowledgement = IsExperimental ? Strings.ReviewAcknowledgeExperimental : Strings.ReviewAcknowledge;
+        var review = new ReviewViewModel(Text.Format(Strings.ReviewTarget, DeviceName, profile + 1), rows,
+            Text.Format(Strings.ReviewSummary, plan.Changes.Count, changes.Sum(c => c.Fields.Count)),
+            notes, acknowledgement, Text.Format(Strings.ReviewSend, plan.Changes.Count),
+            (r, cancellation) => SendAsync(plan, profile, r, cancellation));
+        await _review(review);
+    }
+
+    private async Task SendAsync(ApplyPlan plan, int profile, ReviewViewModel review, CancellationToken cancellation)
+    {
         IsBusy = true;
         var sent = 0;
+        var opened = false;
+        var progress = new Progress<int>(_ => review.Report(ReviewRowStatus.Sent));
         try
         {
-            var progress = new Progress<int>(n => Status = Text.Format(Strings.Sending, n, plan.Changes.Count));
             await Task.Run(() =>
             {
                 using var session = RongYuanSession.Open(_transport, _target);
-                if (session.Profile != _profile)
-                    throw new InvalidDataException(Text.Format(Strings.ProfileChanged, session.Profile));
-                session.Apply(plan, _store, _ => ((IProgress<int>)progress).Report(++sent));
-            });
+                if (session.Profile != profile)
+                    throw new InvalidDataException(Text.Format(Strings.ProfileChanged, session.Profile + 1));
+                opened = true;
+                session.Apply(plan, _store, _ => ((IProgress<int>)progress).Report(Interlocked.Increment(ref sent)), cancellation);
+            }, CancellationToken.None);
+            review.Finish(sent, ReviewRowStatus.Sent, false, Text.Format(Strings.Sent, sent));
             Status = Text.Format(Strings.Sent, sent);
+        }
+        catch (OperationCanceledException)
+        {
+            review.Finish(sent, ReviewRowStatus.Sent, false, Text.Format(Strings.SendStopped, sent));
+            Status = Text.Format(Strings.SendStopped, sent);
         }
         catch (Exception ex) when (ex is IOException or ProtocolException or DeviceNotSupportedException or InvalidDataException or UnauthorizedAccessException)
         {
+            // A failed write may or may not have reached the keyboard; its draft stays so it can be retried.
+            review.Finish(sent, ReviewRowStatus.Sent, opened, Text.Format(Strings.ApplyFailed, ex.Message, sent));
             Status = Text.Format(Strings.ApplyFailed, ex.Message, sent);
         }
         finally
         {
             // Keys already sent are recorded in the state, so reloading shows exactly what the keyboard received.
-            var saved = _store.Load(_definition.Id, _profile);
+            var saved = _store.Load(_definition.Id, profile);
             foreach (var key in Keys)
             {
                 key.Known = saved?.Keys.GetValueOrDefault(key.KeyId);
-                if (key.Pending is not null && key.Pending.ApplyTo(key.Known) == key.Known)
-                    key.Pending = null;
+                key.Pending = key.Pending is null ? null : Trim(key.Pending, key.Known);
             }
-            PendingCount = Keys.Count(k => k.IsPending);
-            RefreshEditor();
+            _undo.Clear();
+            UndoDepth = 0;
+            RefreshEditor(keepInput: false);
             IsBusy = false;
         }
     }
 
-    private static string Describe(KeyTrigger? t) => t is null
-        ? Strings.Unknown
-        : Text.Format(Strings.TriggerSummary, t.ActuationMm, t.ReleaseMm,
-            t.RapidTrigger ? Strings.On : Strings.Off, t.RapidTriggerPressMm, t.RapidTriggerReleaseMm, t.DeadzoneMm);
+    private static List<string> ChangedFields(KeyTrigger? before, KeyTrigger after)
+    {
+        var changes = new List<string>();
+        void Add(string name, string? old, string now)
+        {
+            if (old != now)
+                changes.Add(old is null ? $"{name} {now}" : $"{name} {old} → {now}");
+        }
+        Add(Strings.Actuation, before is null ? null : Mm.Format(before.ActuationMm), Mm.Format(after.ActuationMm));
+        Add(Strings.Release, before is null ? null : Mm.Format(before.ReleaseMm), Mm.Format(after.ReleaseMm));
+        Add(Strings.RapidTrigger, before is null ? null : OnOff(before.RapidTrigger), OnOff(after.RapidTrigger));
+        Add(Strings.RapidTriggerPress, before is null ? null : Mm.Format(before.RapidTriggerPressMm), Mm.Format(after.RapidTriggerPressMm));
+        Add(Strings.RapidTriggerRelease, before is null ? null : Mm.Format(before.RapidTriggerReleaseMm), Mm.Format(after.RapidTriggerReleaseMm));
+        Add(Strings.Deadzone, before is null ? null : Mm.Format(before.DeadzoneMm), Mm.Format(after.DeadzoneMm));
+        return changes;
+    }
+
+    private static string Untouched(KeyTrigger? before, KeyTrigger after)
+    {
+        if (before is null)
+            return "—";
+        var same = new List<string>();
+        if (before.ActuationMm == after.ActuationMm) same.Add(Strings.Actuation);
+        if (before.ReleaseMm == after.ReleaseMm) same.Add(Strings.Release);
+        if (before.RapidTrigger == after.RapidTrigger) same.Add(Strings.RapidTrigger);
+        if (before.RapidTriggerPressMm == after.RapidTriggerPressMm) same.Add(Strings.RapidTriggerPress);
+        if (before.RapidTriggerReleaseMm == after.RapidTriggerReleaseMm) same.Add(Strings.RapidTriggerRelease);
+        if (before.DeadzoneMm == after.DeadzoneMm) same.Add(Strings.Deadzone);
+        return same.Count == 0 ? "—" : string.Join(", ", same);
+    }
 }

@@ -1,0 +1,376 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:HallForge.App"
+             x:Class="HallForge.App.PerformanceView"
+             x:DataType="app:KeyboardEditorViewModel">
+    <UserControl.Styles>
+        <!-- Keycaps: selection in accent, drafts as a cyan bar, unknown settings as a '?' badge -->
+        <Style Selector="Button.key">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource HfKeyBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfKeyBorder}" />
+            <Setter Property="Foreground" Value="{DynamicResource HfKeyText}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Face" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.key /template/ Border#Face">
+            <Setter Property="BoxShadow" Value="inset 0 -3 0 0 #33000000" />
+        </Style>
+        <Style Selector="Button.key:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource HfText3}" />
+        </Style>
+        <Style Selector="Button.key.selected">
+            <Setter Property="Background" Value="{DynamicResource HfKeySelBg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfAccent}" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style Selector="Button.key.selected /template/ Border#Face">
+            <Setter Property="BoxShadow" Value="inset 0 -3 0 0 #33000000, 0 0 14 0 #66A78BFA" />
+        </Style>
+
+        <Style Selector="Button.segment">
+            <Setter Property="MinWidth" Value="52" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.segment.on">
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfAccent}" />
+            <Setter Property="Foreground" Value="{DynamicResource HfText}" />
+        </Style>
+
+        <Style Selector="StackPanel.field.inactive">
+            <Setter Property="Opacity" Value="0.6" />
+        </Style>
+        <Style Selector="TextBox.mm.error">
+            <Setter Property="BorderBrush" Value="{DynamicResource HfErr}" />
+        </Style>
+        <Style Selector="Button.step">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="{DynamicResource HfSurface2}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+        <Style Selector="Path.icon.muted">
+            <Setter Property="Stroke" Value="{DynamicResource HfText3}" />
+        </Style>
+        <Style Selector="Grid.tableHeader > TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </UserControl.Styles>
+
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="app:TriggerFieldViewModel">
+            <StackPanel Classes="field" Classes.inactive="{Binding IsInactive}" Spacing="6" IsEnabled="{Binding IsEnabled}">
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
+                    <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <Border Grid.Column="1" Background="Transparent" ToolTip.Tip="{Binding Help}" VerticalAlignment="Center">
+                        <Path Classes="icon small muted" Data="{StaticResource IconHelp}" />
+                    </Border>
+                    <TextBox Grid.Column="3" Classes="mm" Classes.error="{Binding HasError}" Text="{Binding Input}" Width="104"
+                             PlaceholderText="{Binding Placeholder}" TextAlignment="Right" FontWeight="Bold"
+                             AutomationProperties.Name="{Binding Label}" AutomationProperties.HelpText="{Binding Note}">
+                        <TextBox.InnerRightContent>
+                            <TextBlock Text="mm" Classes="secondary" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        </TextBox.InnerRightContent>
+                    </TextBox>
+                    <Button Grid.Column="4" Classes="step" Content="−" Command="{Binding DecreaseCommand}" AutomationProperties.Name="{Binding DecreaseName}" />
+                    <Button Grid.Column="5" Classes="step" Content="+" Command="{Binding IncreaseCommand}" AutomationProperties.Name="{Binding IncreaseName}" />
+                </Grid>
+                <Slider Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" SmallChange="{Binding Step}" LargeChange="{Binding Step}"
+                        TickFrequency="{Binding Step}" IsSnapToTickEnabled="True" Value="{Binding SliderValue}" Margin="0,-6"
+                        AutomationProperties.Name="{Binding Label}" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <TextBlock Classes="caption" Classes.warn="{Binding IsWarning}" Classes.error="{Binding HasError}" Text="{Binding Note}" TextWrapping="Wrap" />
+                    <TextBlock Grid.Column="1" Classes="caption" Text="{Binding RangeText}" />
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.DataTemplates>
+
+    <ScrollViewer>
+        <StackPanel Margin="24,20" Spacing="16">
+            <!-- Title -->
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+                <StackPanel Spacing="2">
+                    <TextBlock Classes="h1" Text="{x:Static app:Strings.NavPerformance}" />
+                    <TextBlock Classes="secondary" Text="{x:Static app:Strings.PerformanceIntro}" TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Grid.Column="1" Classes="pill" VerticalAlignment="Center" ToolTip.Tip="{x:Static app:Strings.OnboardProfileHelp}">
+                    <TextBlock Text="{Binding ProfileText}" />
+                </Border>
+                <ToggleSwitch Grid.Column="2" IsChecked="{Binding ShowValues}" VerticalAlignment="Center"
+                              OnContent="{x:Static app:Strings.ShowValues}" OffContent="{x:Static app:Strings.ShowValues}" />
+            </Grid>
+
+            <!-- Status of the last action -->
+            <Border Classes="note" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+                    <Path Classes="icon small" Data="{StaticResource IconInfo}" Stroke="{DynamicResource HfText2}" VerticalAlignment="Top" Margin="0,2,0,0" />
+                    <TextBlock Grid.Column="1" Text="{Binding Status}" TextWrapping="Wrap" />
+                    <ProgressBar Grid.Column="2" IsIndeterminate="True" Width="80" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+                    <Button Grid.Column="3" Classes="accent" Content="{x:Static app:Strings.ImportBackup}" Command="{Binding ImportBackupCommand}" IsVisible="{Binding NeedsBackup}" />
+                </Grid>
+            </Border>
+
+            <Grid ColumnDefinitions="*,340" ColumnSpacing="16">
+                <StackPanel Spacing="16">
+                    <!-- Keyboard -->
+                    <Border Classes="panel" Padding="20,16,20,14">
+                        <StackPanel Spacing="12">
+                            <DockPanel>
+                                <TextBlock DockPanel.Dock="Right" Classes="caption" Text="{x:Static app:Strings.SelectionHint}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                <WrapPanel ItemSpacing="8" LineSpacing="8">
+                                    <TextBlock Text="{x:Static app:Strings.QuickSelect}" Classes="secondary" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                    <ItemsControl ItemsSource="{Binding QuickSelect}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel ItemSpacing="8" LineSpacing="8" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="app:PresetItem">
+                                                <Button Classes="chip" Classes.on="{Binding IsActive}" Content="{Binding Label}"
+                                                        Command="{Binding $parent[UserControl].((app:KeyboardEditorViewModel)DataContext).SelectCommand}"
+                                                        CommandParameter="{Binding Id}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </WrapPanel>
+                            </DockPanel>
+
+                            <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+                                <ItemsControl x:Name="KeyboardView" ItemsSource="{Binding Keys}" Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
+                                              AutomationProperties.Name="{x:Static app:Strings.KeyboardViewName}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.Styles>
+                                        <Style Selector="ContentPresenter" x:DataType="app:KeyViewModel">
+                                            <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                            <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                                        </Style>
+                                    </ItemsControl.Styles>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="app:KeyViewModel">
+                                            <Button Classes="key" Classes.selected="{Binding IsSelected}" Width="{Binding Width}" Height="{Binding Height}"
+                                                    Click="OnKeyClick" AutomationProperties.Name="{Binding AccessibleName}" ToolTip.Tip="{Binding AccessibleName}">
+                                                <Panel>
+                                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Legend}" FontWeight="SemiBold" FontSize="13" HorizontalAlignment="Center" />
+                                                        <TextBlock Text="{Binding ValueText}" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                                                   Classes="secondary" Classes.draft="{Binding IsPending}"
+                                                                   IsVisible="{Binding $parent[UserControl].((app:KeyboardEditorViewModel)DataContext).ShowValues}" />
+                                                    </StackPanel>
+                                                    <Border IsVisible="{Binding IsUnknown}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="3"
+                                                            Width="14" Height="14" CornerRadius="7" BorderThickness="1"
+                                                            Background="{DynamicResource HfWarnSoft}" BorderBrush="{DynamicResource HfWarn}">
+                                                        <TextBlock Text="?" FontSize="9" FontWeight="Black" Foreground="{DynamicResource HfWarn}"
+                                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <Border IsVisible="{Binding IsPending}" Width="16" Height="3" CornerRadius="2" Margin="0,0,0,5"
+                                                            HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="{DynamicResource HfCyan}" />
+                                                </Panel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Viewbox>
+
+                            <WrapPanel ItemSpacing="20" LineSpacing="8" AutomationProperties.Name="{x:Static app:Strings.KeyLegend}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="18" Height="18" CornerRadius="5" BorderThickness="1.5" Background="{DynamicResource HfKeySelBg}" BorderBrush="{DynamicResource HfAccent}" />
+                                    <TextBlock Classes="caption" Text="{x:Static app:Strings.KeySelected}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="18" Height="18" CornerRadius="5" BorderThickness="1" Background="{DynamicResource HfKeyBg}" BorderBrush="{DynamicResource HfKeyBorder}">
+                                        <Border Height="3" CornerRadius="2" Margin="3,0,3,3" VerticalAlignment="Bottom" Background="{DynamicResource HfCyan}" />
+                                    </Border>
+                                    <TextBlock Classes="caption" Text="{x:Static app:Strings.LegendModified}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Width="16" Height="16" CornerRadius="8" BorderThickness="1" Background="{DynamicResource HfWarnSoft}" BorderBrush="{DynamicResource HfWarn}">
+                                        <TextBlock Text="?" FontSize="10" FontWeight="Black" Foreground="{DynamicResource HfWarn}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Classes="caption" Text="{x:Static app:Strings.LegendUnknown}" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Classes="caption" Text="{Binding LayoutSummary}" VerticalAlignment="Center" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Selection -->
+                    <Border Classes="panel">
+                        <Panel>
+                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="4,8" IsVisible="{Binding !HasSelection}">
+                                <Border Width="44" Height="44" CornerRadius="12" Background="{DynamicResource HfSurface2}">
+                                    <Path Data="M3 3l7 18 2.5-7.5L20 11z" Stroke="{DynamicResource HfText2}" StrokeThickness="1.8" StrokeJoin="Round"
+                                          Width="22" Height="22" Stretch="Uniform" />
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Static app:Strings.NoKeysSelected}" FontSize="16" FontWeight="SemiBold" />
+                                    <TextBlock Text="{x:Static app:Strings.SelectKeysHint}" Classes="secondary" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Spacing="10" IsVisible="{Binding HasSelection}">
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="16">
+                                    <TextBlock Classes="h2" Text="{Binding SelectionTitle}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Classes="secondary" Text="{Binding SelectionCounts}" VerticalAlignment="Center" />
+                                    <Button Grid.Column="3" Classes="outline" Content="{x:Static app:Strings.ResetSelection}" Command="{Binding ResetSelectionCommand}" />
+                                </Grid>
+                                <Border BorderBrush="{DynamicResource HfBorder}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+                                    <DockPanel>
+                                        <Grid DockPanel.Dock="Top" Classes="tableHeader" ColumnDefinitions="1.2*,*,*,*,*" Background="{DynamicResource HfSurface2}">
+                                            <TextBlock Margin="12,7" Text="{x:Static app:Strings.ColumnKey}" />
+                                            <TextBlock Grid.Column="1" Margin="12,7" Text="{x:Static app:Strings.Actuation}" />
+                                            <TextBlock Grid.Column="2" Margin="12,7" Text="{x:Static app:Strings.Release}" />
+                                            <TextBlock Grid.Column="3" Margin="12,7" Text="{x:Static app:Strings.RapidTrigger}" />
+                                            <TextBlock Grid.Column="4" Margin="12,7" Text="{x:Static app:Strings.ColumnSource}" />
+                                        </Grid>
+                                        <ScrollViewer MaxHeight="176">
+                                            <ItemsControl ItemsSource="{Binding SelectionRows}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="app:SelectionRow">
+                                                        <Border BorderBrush="{DynamicResource HfBorder}" BorderThickness="0,1,0,0">
+                                                            <Grid ColumnDefinitions="1.2*,*,*,*,*">
+                                                                <Grid.DataTemplates>
+                                                                    <DataTemplate DataType="app:ValueChange">
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <TextBlock Text="{Binding Old}" />
+                                                                            <TextBlock Text=" → " Classes="secondary" IsVisible="{Binding IsChanged}" />
+                                                                            <TextBlock Text="{Binding New}" Classes="draft" IsVisible="{Binding IsChanged}" />
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </Grid.DataTemplates>
+                                                                <TextBlock Margin="12,7" Text="{Binding Key}" FontWeight="SemiBold" />
+                                                                <ContentControl Grid.Column="1" Margin="12,7" Content="{Binding Actuation}" />
+                                                                <ContentControl Grid.Column="2" Margin="12,7" Content="{Binding Release}" />
+                                                                <ContentControl Grid.Column="3" Margin="12,7" Content="{Binding RapidTrigger}" />
+                                                                <Border Grid.Column="4" Margin="12,5" HorizontalAlignment="Left" Classes="pill" Padding="8,1"
+                                                                        Classes.draft="{Binding IsDraft}" Classes.warn="{Binding IsUnknown}" ToolTip.Tip="{Binding SourceHelp}">
+                                                                    <TextBlock Text="{Binding SourceText}" FontSize="12" />
+                                                                </Border>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DockPanel>
+                                </Border>
+                            </StackPanel>
+                        </Panel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Trigger settings for the selection -->
+                <Border Grid.Column="1" Classes="panel" Padding="18,16" VerticalAlignment="Top">
+                    <StackPanel Spacing="14">
+                        <StackPanel Spacing="2">
+                            <TextBlock Classes="h2" Text="{x:Static app:Strings.TriggerSettings}" />
+                            <TextBlock Classes="secondary" Text="{Binding ScopeText}" TextWrapping="Wrap" />
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Classes="caption" FontWeight="SemiBold" Text="{x:Static app:Strings.TemplatesHeading}" />
+                            <ItemsControl ItemsSource="{Binding TemplateItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel ItemSpacing="6" LineSpacing="6" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="app:PresetItem">
+                                        <Button Classes="chip" Content="{Binding Label}" FontWeight="Normal"
+                                                Command="{Binding $parent[UserControl].((app:KeyboardEditorViewModel)DataContext).ApplyTemplateCommand}"
+                                                CommandParameter="{Binding Id}" ToolTip.Tip="{x:Static app:Strings.TemplateHelp}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <Border Classes="divider" />
+                        <ItemsControl ItemsSource="{Binding TravelFields}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="14" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <Border Classes="divider" />
+
+                        <StackPanel Spacing="6">
+                            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+                                <TextBlock Text="{x:Static app:Strings.RapidTrigger}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                <Border Grid.Column="1" Background="Transparent" ToolTip.Tip="{x:Static app:Strings.RapidTriggerHelp}" VerticalAlignment="Center">
+                        <Path Classes="icon small muted" Data="{StaticResource IconHelp}" />
+                    </Border>
+                                <Border Grid.Column="3" Padding="2" CornerRadius="8" Background="{DynamicResource HfSurface2}" BorderBrush="{DynamicResource HfBorder}" BorderThickness="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Classes="segment" Classes.on="{Binding IsRapidTriggerOff}" Content="{x:Static app:Strings.Off}" Command="{Binding RapidTriggerOffCommand}"
+                                                AutomationProperties.Name="{x:Static app:Strings.RapidTriggerOffName}" />
+                                        <Button Classes="segment" Classes.on="{Binding IsRapidTriggerOn}" Content="{x:Static app:Strings.On}" Command="{Binding RapidTriggerOnCommand}"
+                                                AutomationProperties.Name="{x:Static app:Strings.RapidTriggerOnName}" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock Classes="caption" Classes.warn="{Binding RapidTriggerNoteIsWarning}" Text="{Binding RapidTriggerNote}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding RapidTriggerFields}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="14" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+
+                        <Border Classes="note warn" IsVisible="{Binding HasRisk}">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <Path Classes="icon small" Data="{StaticResource IconWarning}" Stroke="{DynamicResource HfWarn}" VerticalAlignment="Top" Margin="0,2,0,0" />
+                                <TextBlock Grid.Column="1" FontSize="12" TextWrapping="Wrap" Text="{Binding RiskText}" />
+                            </Grid>
+                        </Border>
+
+                        <Border Classes="divider" />
+                        <Expander Header="{x:Static app:Strings.Advanced}" HorizontalAlignment="Stretch">
+                            <StackPanel Spacing="12">
+                                <ContentControl Content="{Binding Deadzone}" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Path Classes="icon small muted" Data="{StaticResource IconLock}" />
+                                    <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{x:Static app:Strings.CalibrationUnavailable}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

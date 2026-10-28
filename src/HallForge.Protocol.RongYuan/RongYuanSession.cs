@@ -51,14 +51,15 @@ public sealed class RongYuanSession : IDisposable
     }
 
     /// <param name="sent">Called after each key is sent and recorded, for progress reporting.</param>
-    public void Apply(ApplyPlan plan, StateStore store, Action<KeyChange>? sent = null) =>
+    public void Apply(ApplyPlan plan, StateStore store, Action<KeyChange>? sent = null, CancellationToken cancellation = default) =>
         plan.Execute(
             change => Client.WriteKeyTrigger(change.After, Profile, change.MatrixIndex),
             change =>
             {
                 store.RecordWrite(Definition, ModelId, Profile, change.KeyId, change.After);
                 sent?.Invoke(change);
-            });
+            },
+            cancellation);
 
     /// <summary>Saves the settings the Akko Cloud Driver stored for the active profile as backup and as current state.</summary>
     /// <exception cref="InvalidDataException">The database has no data for this model or values outside the model limits.</exception>

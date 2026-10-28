@@ -12,14 +12,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Refresh" xml:space="preserve">
-    <value>Aktualisieren</value>
-  </data>
   <data name="About" xml:space="preserve">
     <value>Über</value>
-  </data>
-  <data name="LoadProfile" xml:space="preserve">
-    <value>Profil laden…</value>
   </data>
   <data name="ProfileFileType" xml:space="preserve">
     <value>HallForge-Profil</value>
@@ -28,34 +22,28 @@
     <value>Suche nach Tastaturen…</value>
   </data>
   <data name="NoKeyboardFound" xml:space="preserve">
-    <value>Keine unterstützte Tastatur gefunden. Schließe die Tastatur per USB-Kabel an und wähle Aktualisieren.</value>
+    <value>Keine unterstützte Tastatur gefunden.</value>
   </data>
   <data name="ListFailed" xml:space="preserve">
     <value>HID-Geräte konnten nicht aufgelistet werden: {0} Prüfe die Geräteberechtigungen und wähle Aktualisieren.</value>
   </data>
-  <data name="KeyboardsHeading" xml:space="preserve">
-    <value>Tastatur</value>
-  </data>
-  <data name="ExperimentalBadge" xml:space="preserve">
-    <value>Experimentell: Diese Tastatur kann ihre Tasteneinstellungen nicht zurückmelden, Tastenänderungen sind daher nicht überprüfbar. Beleuchtungsänderungen werden zurückgelesen.</value>
-  </data>
   <data name="KeyboardViewName" xml:space="preserve">
-    <value>Tastaturlayout. Wähle Tasten aus, um sie zu bearbeiten.</value>
+    <value>Tastatur, wähle Tasten zum Bearbeiten aus</value>
   </data>
   <data name="KeyAccessibleValue" xml:space="preserve">
-    <value>Auslösepunkt {0} mm, Rapid Trigger {1}</value>
+    <value>Auslösepunkt {0} mm, Rückstellpunkt {1} mm, Rapid Trigger {2}</value>
   </data>
   <data name="On" xml:space="preserve">
-    <value>an</value>
+    <value>An</value>
   </data>
   <data name="Off" xml:space="preserve">
-    <value>aus</value>
+    <value>Aus</value>
   </data>
   <data name="Unknown" xml:space="preserve">
-    <value>unbekannt</value>
+    <value>Unbekannt</value>
   </data>
   <data name="Mixed" xml:space="preserve">
-    <value>gemischt</value>
+    <value>Gemischt</value>
   </data>
   <data name="PresetMovement" xml:space="preserve">
     <value>Bewegung</value>
@@ -64,34 +52,28 @@
     <value>Alle</value>
   </data>
   <data name="PresetNone" xml:space="preserve">
-    <value>Keine</value>
+    <value>Leeren</value>
   </data>
   <data name="SelectKeysHint" xml:space="preserve">
-    <value>Wähle Tasten auf der Tastatur aus, um sie zu bearbeiten.</value>
+    <value>Klicke eine Taste an oder nutze die Schnellauswahl. Strg-Klick fügt Tasten hinzu, Umschalt-Klick wählt einen Bereich; Tab wechselt die Taste, Leertaste schaltet sie um.</value>
   </data>
   <data name="Actuation" xml:space="preserve">
-    <value>Auslösepunkt (mm)</value>
+    <value>Auslösepunkt</value>
   </data>
   <data name="Release" xml:space="preserve">
-    <value>Rückstellpunkt (mm)</value>
+    <value>Rückstellpunkt</value>
   </data>
   <data name="RapidTrigger" xml:space="preserve">
     <value>Rapid Trigger</value>
   </data>
   <data name="RapidTriggerPress" xml:space="preserve">
-    <value>RT Drücken (mm)</value>
+    <value>RT-Empfindlichkeit Drücken</value>
   </data>
   <data name="RapidTriggerRelease" xml:space="preserve">
-    <value>RT Loslassen (mm)</value>
+    <value>RT-Empfindlichkeit Loslassen</value>
   </data>
   <data name="Deadzone" xml:space="preserve">
-    <value>Totzone (mm)</value>
-  </data>
-  <data name="Discard" xml:space="preserve">
-    <value>Verwerfen</value>
-  </data>
-  <data name="ApplyCount" xml:space="preserve">
-    <value>Anwenden ({0})</value>
+    <value>Totzone</value>
   </data>
   <data name="ImportBackup" xml:space="preserve">
     <value>Backup aus AKKO-Treiber erstellen</value>
@@ -99,14 +81,11 @@
   <data name="Connecting" xml:space="preserve">
     <value>Verbinde mit der Tastatur…</value>
   </data>
-  <data name="StateLoaded" xml:space="preserve">
-    <value>Onboard-Profil {0}: {1} Tasteneinstellungen bekannt. Mit ? markierte Tasten sind unbekannt, weil die Tastatur sie nicht melden kann.</value>
-  </data>
   <data name="NoBackupYet" xml:space="preserve">
-    <value>Onboard-Profil {0}: noch kein Backup. Erstelle ein Backup aus dem AKKO-Treiber, bevor du Änderungen anwendest.</value>
+    <value>Noch kein Backup. Importiere die aktuellen Einstellungen aus dem AKKO-Treiber, bevor du Änderungen anwendest.</value>
   </data>
   <data name="ConnectFailed" xml:space="preserve">
-    <value>Verbindung zur Tastatur fehlgeschlagen: {0} Schließe den AKKO-Treiber und wähle Aktualisieren.</value>
+    <value>Verbindung zur Tastatur fehlgeschlagen: {0} Schließe den AKKO-Treiber und suche erneut.</value>
   </data>
   <data name="BackupImported" xml:space="preserve">
     <value>Backup mit {0} Tasteneinstellungen erstellt: {1}</value>
@@ -126,35 +105,17 @@
   <data name="ProfileLoadFailed" xml:space="preserve">
     <value>Profil konnte nicht geladen werden: {0}</value>
   </data>
-  <data name="Sending" xml:space="preserve">
-    <value>Sende {0} von {1}…</value>
-  </data>
   <data name="Sent" xml:space="preserve">
     <value>{0} Tasteneinstellungen gesendet. Die Tastatur kann sie nicht bestätigen, teste daher die Tasten.</value>
   </data>
   <data name="ApplyFailed" xml:space="preserve">
-    <value>Anwenden abgebrochen: {0} {1} Tasten wurden gesendet und sind gespeichert. Stelle bei Bedarf ein Backup wieder her.</value>
+    <value>Senden abgebrochen: {0} {1} Tasten wurden gesendet und sind gespeichert. Die gerade geschriebene Taste kann den alten oder neuen Wert haben; ihr Entwurf bleibt erhalten.</value>
   </data>
   <data name="ProfileChanged" xml:space="preserve">
-    <value>Das aktive Onboard-Profil hat sich auf {0} geändert. Wähle Aktualisieren und versuche es erneut.</value>
-  </data>
-  <data name="TriggerSummary" xml:space="preserve">
-    <value>{0}/{1} mm, RT {2} {3}/{4}, TZ {5}</value>
-  </data>
-  <data name="ConfirmTitle" xml:space="preserve">
-    <value>Änderungen anwenden</value>
-  </data>
-  <data name="ConfirmHeading" xml:space="preserve">
-    <value>Diese Einstellungen an {0} senden?</value>
-  </data>
-  <data name="ConfirmExperimental" xml:space="preserve">
-    <value>Mir ist bewusst, dass diese Tastatur nicht verifiziert ist und HallForge die Einstellungen nicht zurücklesen kann.</value>
+    <value>Das aktive Onboard-Profil hat sich auf {0} geändert. Suche erneut und versuche es noch einmal.</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Abbrechen</value>
-  </data>
-  <data name="Apply" xml:space="preserve">
-    <value>Anwenden</value>
   </data>
   <data name="UpdateAvailable" xml:space="preserve">
     <value>HallForge {0} ist verfügbar.</value>
@@ -197,9 +158,6 @@
   </data>
   <data name="Close" xml:space="preserve">
     <value>Schließen</value>
-  </data>
-  <data name="TabKeys" xml:space="preserve">
-    <value>Tasten</value>
   </data>
   <data name="TabLighting" xml:space="preserve">
     <value>Beleuchtung</value>
@@ -335,5 +293,446 @@
   </data>
   <data name="LightingVariantClockwise" xml:space="preserve">
     <value>Im Uhrzeigersinn</value>
+  </data>
+  <data name="PresetNumbers" xml:space="preserve">
+    <value>1–5</value>
+  </data>
+  <data name="KeySelected" xml:space="preserve">
+    <value>Ausgewählt</value>
+  </data>
+  <data name="KeyModified" xml:space="preserve">
+    <value>geändert</value>
+  </data>
+  <data name="KeyUnknown" xml:space="preserve">
+    <value>Einstellungen unbekannt</value>
+  </data>
+  <data name="SendStopped" xml:space="preserve">
+    <value>Nach {0} Tasten gestoppt. Nicht gesendete Tasten behalten ihre Entwürfe.</value>
+  </data>
+  <data name="ActiveDevice" xml:space="preserve">
+    <value>Aktives Gerät. Gerätedetails anzeigen</value>
+  </data>
+  <data name="ActuationHelp" xml:space="preserve">
+    <value>Auslösepunkt: wie weit die Taste gedrückt wird, bevor sie auslöst. Die Grenzen stammen aus der Gerätedefinition.</value>
+  </data>
+  <data name="ReleaseHelp" xml:space="preserve">
+    <value>Rückstellpunkt: wo eine gedrückte Taste wieder loslässt. Nicht dasselbe wie die RT-Empfindlichkeit beim Loslassen.</value>
+  </data>
+  <data name="RapidTriggerPressHelp" xml:space="preserve">
+    <value>Mit Rapid Trigger: wie weit die Taste wieder nach unten muss, um erneut auszulösen.</value>
+  </data>
+  <data name="RapidTriggerReleaseHelp" xml:space="preserve">
+    <value>Mit Rapid Trigger: wie weit die Taste nach oben muss, um loszulassen.</value>
+  </data>
+  <data name="DeadzoneHelp" xml:space="preserve">
+    <value>Untere Totzone: Weg am unteren Ende, der ignoriert wird.</value>
+  </data>
+  <data name="RapidTriggerHelp" xml:space="preserve">
+    <value>Dynamisches Auslösen: Die Taste löst bei Richtungswechseln erneut aus und lässt los, statt an festen Punkten. Aggressive Werte können beim Tippen versehentliche Mehrfachanschläge auslösen.</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Erweitert</value>
+  </data>
+  <data name="Aggressive" xml:space="preserve">
+    <value>Aggressiv</value>
+  </data>
+  <data name="Backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="BackupAvailable" xml:space="preserve">
+    <value>Für das aktive Onboard-Profil gibt es ein Backup der Einstellungen vor dem ersten Schreiben.</value>
+  </data>
+  <data name="CalibrationUnavailable" xml:space="preserve">
+    <value>Kalibrierung – nicht verfügbar: braucht einen eigenen, bestätigten Ablauf.</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Einklappen</value>
+  </data>
+  <data name="ColumnChanges" xml:space="preserve">
+    <value>Änderungen</value>
+  </data>
+  <data name="ColumnKey" xml:space="preserve">
+    <value>Taste</value>
+  </data>
+  <data name="ColumnKeys" xml:space="preserve">
+    <value>Tasten</value>
+  </data>
+  <data name="ColumnRapidTriggerDistances" xml:space="preserve">
+    <value>RT Drücken / Loslassen</value>
+  </data>
+  <data name="ColumnSource" xml:space="preserve">
+    <value>Quelle</value>
+  </data>
+  <data name="ColumnStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ColumnUntouched" xml:space="preserve">
+    <value>Unverändert</value>
+  </data>
+  <data name="Connected" xml:space="preserve">
+    <value>Verbunden</value>
+  </data>
+  <data name="CoverageMap" xml:space="preserve">
+    <value>Tasten, die das Profil ändert</value>
+  </data>
+  <data name="CoveredByProfile" xml:space="preserve">
+    <value>Vom Profil gesetzt</value>
+  </data>
+  <data name="UntouchedByProfile" xml:space="preserve">
+    <value>Unverändert – behält den aktuellen Wert</value>
+  </data>
+  <data name="DecreaseField" xml:space="preserve">
+    <value>{0} um {1} mm verringern</value>
+  </data>
+  <data name="IncreaseField" xml:space="preserve">
+    <value>{0} um {1} mm erhöhen</value>
+  </data>
+  <data name="DeviceIntro" xml:space="preserve">
+    <value>Was HallForge über die angeschlossene Tastatur weiß.</value>
+  </data>
+  <data name="DeviceLayout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
+  <data name="DeviceLocked" xml:space="preserve">
+    <value>Während des Sendens ist das Gerät für andere Schreibvorgänge gesperrt.</value>
+  </data>
+  <data name="DeviceModel" xml:space="preserve">
+    <value>Modell</value>
+  </data>
+  <data name="DeviceModelIds" xml:space="preserve">
+    <value>Firmware-Modell-ID</value>
+  </data>
+  <data name="DeviceProfile" xml:space="preserve">
+    <value>Onboard-Profil</value>
+  </data>
+  <data name="DeviceSupport" xml:space="preserve">
+    <value>Unterstützung</value>
+  </data>
+  <data name="DeviceUsbId" xml:space="preserve">
+    <value>USB-ID</value>
+  </data>
+  <data name="DiscardAll" xml:space="preserve">
+    <value>Alle verwerfen</value>
+  </data>
+  <data name="Discovering" xml:space="preserve">
+    <value>Suche…</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Fertig</value>
+  </data>
+  <data name="DraftOnly" xml:space="preserve">
+    <value>Nur Entwurf – nichts wurde gesendet</value>
+  </data>
+  <data name="DraftSummary" xml:space="preserve">
+    <value>Geänderte Tasten: {0} · Geänderte Werte: {1}</value>
+  </data>
+  <data name="Experimental" xml:space="preserve">
+    <value>Experimentelle Unterstützung</value>
+  </data>
+  <data name="ExperimentalHelp" xml:space="preserve">
+    <value>Tasteneinstellungen werden über freigegebene Befehle gesendet, können aber nicht zurückgelesen werden. Beleuchtungsänderungen werden zurückgelesen und geprüft.</value>
+  </data>
+  <data name="FieldInactive" xml:space="preserve">
+    <value>Im Entwurf behalten · ohne Wirkung, solange Rapid Trigger aus ist</value>
+  </data>
+  <data name="FieldMixed" xml:space="preserve">
+    <value>Gemischt: {0} mm. Ein neuer Wert gilt für alle.</value>
+  </data>
+  <data name="FieldMixedUnknown" xml:space="preserve">
+    <value>Gemischt: {0} mm + {1} unbekannt. Ein neuer Wert gilt für alle.</value>
+  </data>
+  <data name="FieldRangeError" xml:space="preserve">
+    <value>Gib einen Wert von {0} bis {1} mm in Schritten von {2} mm ein, mit '.' als Dezimaltrennzeichen.</value>
+  </data>
+  <data name="FieldSame" xml:space="preserve">
+    <value>Gleich auf allen {0} Tasten</value>
+  </data>
+  <data name="FieldUnknown" xml:space="preserve">
+    <value>Unbekannt – nicht vom Gerät gelesen. Ein neuer Wert wird ausdrücklich gesendet.</value>
+  </data>
+  <data name="FixInput" xml:space="preserve">
+    <value>Korrigiere den markierten Wert, um fortzufahren</value>
+  </data>
+  <data name="HeaderCapabilities" xml:space="preserve">
+    <value>Tasteneinstellungen: kein Zurücklesen · Beleuchtung: geprüft</value>
+  </data>
+  <data name="ImportProfile" xml:space="preserve">
+    <value>Importieren…</value>
+  </data>
+  <data name="KeyLegend" xml:space="preserve">
+    <value>Legende der Tastenzustände</value>
+  </data>
+  <data name="KeysSelected" xml:space="preserve">
+    <value>{0} Tasten ausgewählt – {1}</value>
+  </data>
+  <data name="OneKeySelected" xml:space="preserve">
+    <value>{0} ausgewählt</value>
+  </data>
+  <data name="Later" xml:space="preserve">
+    <value>Später</value>
+  </data>
+  <data name="LayoutSummary" xml:space="preserve">
+    <value>{0} Tasten · Layout aus der Gerätedefinition</value>
+  </data>
+  <data name="LegendModified" xml:space="preserve">
+    <value>Geändert (Entwurf)</value>
+  </data>
+  <data name="LegendUnknown" xml:space="preserve">
+    <value>Unbekannt – kein Zurücklesen</value>
+  </data>
+  <data name="LightingAcknowledgeExperimental" xml:space="preserve">
+    <value>Mir ist bewusst, dass dieses Tastaturmodell nicht für Schreibzugriffe verifiziert ist.</value>
+  </data>
+  <data name="LightingIntro" xml:space="preserve">
+    <value>Effekte werden auf die Tastatur geschrieben und zurückgelesen, daher wird jede Änderung geprüft.</value>
+  </data>
+  <data name="LightingReviewNote" xml:space="preserve">
+    <value>Die Tastatur meldet ihre Beleuchtung, daher liest HallForge sie nach dem Schreiben zurück und meldet einen Fehler, wenn sie abweicht.</value>
+  </data>
+  <data name="LightingReviewSummary" xml:space="preserve">
+    <value>Eine Beleuchtungsänderung.</value>
+  </data>
+  <data name="LoadIntoDraft" xml:space="preserve">
+    <value>In Entwurf laden</value>
+  </data>
+  <data name="NavDevice" xml:space="preserve">
+    <value>Gerät</value>
+  </data>
+  <data name="NavKeyMapping" xml:space="preserve">
+    <value>Tastenbelegung</value>
+  </data>
+  <data name="NavKeyMappingLater" xml:space="preserve">
+    <value>Tastenbelegung – kommt später</value>
+  </data>
+  <data name="NavPerformance" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="NavProfiles" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="Navigation" xml:space="preserve">
+    <value>Hauptnavigation</value>
+  </data>
+  <data name="NoDevice" xml:space="preserve">
+    <value>Kein Gerät</value>
+  </data>
+  <data name="NoKeyboardHeading" xml:space="preserve">
+    <value>Keine Tastatur verbunden</value>
+  </data>
+  <data name="NoKeyboardIntro" xml:space="preserve">
+    <value>HallForge spricht nur mit Tastaturen, die es erkennt. Deine Profile bleiben erhalten, während du verbindest.</value>
+  </data>
+  <data name="NoKeyboardStep1" xml:space="preserve">
+    <value>Schließe die Tastatur per USB-Kabel an. Nutze ein Datenkabel, direkt oder über einen aktiven Hub.</value>
+  </data>
+  <data name="NoKeyboardStep2" xml:space="preserve">
+    <value>Unter Linux den Gerätezugriff erlauben: die udev-Regel von HallForge installieren und die Tastatur neu einstecken.</value>
+  </data>
+  <data name="NoKeyboardStep3" xml:space="preserve">
+    <value>Schließe andere Konfigurationssoftware. Herstellertreiber können das Gerät belegen.</value>
+  </data>
+  <data name="NoKeysSelected" xml:space="preserve">
+    <value>Keine Tasten ausgewählt</value>
+  </data>
+  <data name="NotConnected" xml:space="preserve">
+    <value>Die Tastatur ist nicht verbunden. Suche erneut.</value>
+  </data>
+  <data name="NothingToApply" xml:space="preserve">
+    <value>Der Entwurf entspricht den aktuellen Einstellungen; nichts anzuwenden.</value>
+  </data>
+  <data name="OnboardProfile" xml:space="preserve">
+    <value>Onboard-Profil {0} (aktiv)</value>
+  </data>
+  <data name="OnboardProfileHelp" xml:space="preserve">
+    <value>Änderungen gehen an das aktive Onboard-Profil der Tastatur.</value>
+  </data>
+  <data name="OnboardProfileUnknown" xml:space="preserve">
+    <value>Onboard-Profil unbekannt</value>
+  </data>
+  <data name="OpenPerformance" xml:space="preserve">
+    <value>In Performance öffnen</value>
+  </data>
+  <data name="PendingChanges" xml:space="preserve">
+    <value>Offene Änderungen</value>
+  </data>
+  <data name="PerformanceIntro" xml:space="preserve">
+    <value>Tasten auswählen, Auslösewege einstellen, dann prüfen. Erst beim Anwenden erreicht etwas die Tastatur.</value>
+  </data>
+  <data name="ProfileCoverage" xml:space="preserve">
+    <value>{0} Tasten · Auslösepunkt, Rückstellpunkt, Rapid Trigger</value>
+  </data>
+  <data name="ProfileImported" xml:space="preserve">
+    <value>Importiert</value>
+  </data>
+  <data name="ProfileTemplate" xml:space="preserve">
+    <value>Vorlage</value>
+  </data>
+  <data name="ProfileLoadedIntoDraft" xml:space="preserve">
+    <value>{0} Tasten in den Entwurf geladen – nichts gesendet</value>
+  </data>
+  <data name="ProfilesIntro" xml:space="preserve">
+    <value>Ein Profil zu laden füllt nur deinen Entwurf. Prüfen und Anwenden erfolgen getrennt.</value>
+  </data>
+  <data name="QuickSelect" xml:space="preserve">
+    <value>Schnellauswahl</value>
+  </data>
+  <data name="RapidTriggerMixed" xml:space="preserve">
+    <value>Gemischt: {0} an · {1} aus · {2} unbekannt. Eine Auswahl setzt alle gewählten Tasten.</value>
+  </data>
+  <data name="RapidTriggerOffName" xml:space="preserve">
+    <value>Rapid Trigger aus</value>
+  </data>
+  <data name="RapidTriggerOnName" xml:space="preserve">
+    <value>Rapid Trigger an</value>
+  </data>
+  <data name="RapidTriggerOffNote" xml:space="preserve">
+    <value>Feste Auslöse- und Rückstellpunkte. Die RT-Empfindlichkeiten bleiben erhalten.</value>
+  </data>
+  <data name="RapidTriggerOnNote" xml:space="preserve">
+    <value>Dynamisches Auslösen: Erneutes Auslösen und Loslassen folgen der Tastenrichtung.</value>
+  </data>
+  <data name="RefreshBlockedByPending" xml:space="preserve">
+    <value>Wende den Entwurf an oder verwirf ihn, bevor du erneut suchst, damit keine Änderungen verloren gehen.</value>
+  </data>
+  <data name="ResetSelection" xml:space="preserve">
+    <value>Entwürfe der Auswahl zurücksetzen</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Erneut versuchen</value>
+  </data>
+  <data name="ReviewAcknowledge" xml:space="preserve">
+    <value>Mir ist bewusst, dass diese Änderungen ohne Prüfung gesendet werden.</value>
+  </data>
+  <data name="ReviewAcknowledgeExperimental" xml:space="preserve">
+    <value>Mir ist bewusst, dass diese Änderungen ohne Prüfung gesendet werden und dass dieses Tastaturmodell nicht für Schreibzugriffe verifiziert ist.</value>
+  </data>
+  <data name="ReviewApply" xml:space="preserve">
+    <value>Prüfen &amp; Anwenden</value>
+  </data>
+  <data name="ReviewBackup" xml:space="preserve">
+    <value>Backup: für das aktive Onboard-Profil vorhanden.</value>
+  </data>
+  <data name="ReviewDoneHeading" xml:space="preserve">
+    <value>Angewendet</value>
+  </data>
+  <data name="ReviewHeading" xml:space="preserve">
+    <value>Prüfen &amp; anwenden</value>
+  </data>
+  <data name="ReviewNoReadback" xml:space="preserve">
+    <value>Kein Zurücklesen. Die Tastatur kann Einstellungen nicht melden. Nach dem Senden gelten Tasten als gesendet – nie als geprüft.</value>
+  </data>
+  <data name="ReviewProblemHeading" xml:space="preserve">
+    <value>Mit Problemen angewendet</value>
+  </data>
+  <data name="ReviewProgress" xml:space="preserve">
+    <value>{0} von {1} gesendet</value>
+  </data>
+  <data name="ReviewSend" xml:space="preserve">
+    <value>{0} Änderungen an die Tastatur senden</value>
+  </data>
+  <data name="ReviewSendingHeading" xml:space="preserve">
+    <value>Sende an die Tastatur…</value>
+  </data>
+  <data name="ReviewSummary" xml:space="preserve">
+    <value>Tasten: {0} · Geänderte Werte: {1}. Nur diese Werte ändern sich; alles andere an diesen Tasten bleibt, wie es ist.</value>
+  </data>
+  <data name="ReviewTarget" xml:space="preserve">
+    <value>{0} · Onboard-Profil {1}</value>
+  </data>
+  <data name="ReviewUnknownKeys" xml:space="preserve">
+    <value>Einige Tasten hatten unbekannte Einstellungen, daher kann das Backup sie nicht wiederherstellen.</value>
+  </data>
+  <data name="RiskWarning" xml:space="preserve">
+    <value>Aggressive Einstellungen auf {0} Tasten. Kurze Wege können versehentliche oder wiederholte Anschläge auslösen, besonders beim Tippen.</value>
+  </data>
+  <data name="RowNotSent" xml:space="preserve">
+    <value>Nicht gesendet</value>
+  </data>
+  <data name="RowQueued" xml:space="preserve">
+    <value>Wartet</value>
+  </data>
+  <data name="RowSending" xml:space="preserve">
+    <value>Sende…</value>
+  </data>
+  <data name="RowSent" xml:space="preserve">
+    <value>Gesendet · nicht geprüft</value>
+  </data>
+  <data name="RowUncertain" xml:space="preserve">
+    <value>Unsicher – unterbrochen</value>
+  </data>
+  <data name="RowVerified" xml:space="preserve">
+    <value>Angewendet und geprüft</value>
+  </data>
+  <data name="SearchAgain" xml:space="preserve">
+    <value>Erneut nach Tastaturen suchen</value>
+  </data>
+  <data name="SelectKeysToEdit" xml:space="preserve">
+    <value>Tasten zum Bearbeiten auswählen</value>
+  </data>
+  <data name="SelectionCounts" xml:space="preserve">
+    <value>{0} unbekannt</value>
+  </data>
+  <data name="SelectionHint" xml:space="preserve">
+    <value>Klick wählt · Strg-Klick schaltet um · Umschalt-Klick erweitert</value>
+  </data>
+  <data name="SelectionScope" xml:space="preserve">
+    <value>Gilt für {0} ausgewählte Tasten · nur geänderte Werte werden gesetzt</value>
+  </data>
+  <data name="ShowValues" xml:space="preserve">
+    <value>Werte auf Tasten zeigen</value>
+  </data>
+  <data name="SourceAppState" xml:space="preserve">
+    <value>App-Stand</value>
+  </data>
+  <data name="SourceAppStateHelp" xml:space="preserve">
+    <value>Letzte Werte, die HallForge aus dem eigenen Stand oder einem Import kennt. Nicht von der Tastatur zurückgelesen.</value>
+  </data>
+  <data name="SourceDraft" xml:space="preserve">
+    <value>Entwurf</value>
+  </data>
+  <data name="SourceDraftHelp" xml:space="preserve">
+    <value>Lokal geändert. Nicht gesendet.</value>
+  </data>
+  <data name="SourceUnknown" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="SourceUnknownHelp" xml:space="preserve">
+    <value>Nie von HallForge gesetzt, und die Tastatur kann es nicht melden.</value>
+  </data>
+  <data name="StopAfterCurrent" xml:space="preserve">
+    <value>Nach aktueller Taste stoppen</value>
+  </data>
+  <data name="TemplateComfort" xml:space="preserve">
+    <value>Komfort</value>
+  </data>
+  <data name="TemplateSensitive" xml:space="preserve">
+    <value>Empfindlich</value>
+  </data>
+  <data name="TemplateGaming" xml:space="preserve">
+    <value>Gaming</value>
+  </data>
+  <data name="TemplateHelp" xml:space="preserve">
+    <value>Lädt nur für die Auswahl in den Entwurf</value>
+  </data>
+  <data name="TemplatesHeading" xml:space="preserve">
+    <value>Lokale Vorlagen · in Entwurf laden</value>
+  </data>
+  <data name="ToggleNavigation" xml:space="preserve">
+    <value>Navigation ein- oder ausklappen</value>
+  </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Zwischen hellem und dunklem Design wechseln</value>
+  </data>
+  <data name="TriggerSettings" xml:space="preserve">
+    <value>Auslöseeinstellungen</value>
+  </data>
+  <data name="Unchanged" xml:space="preserve">
+    <value>unverändert</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Rückgängig</value>
+  </data>
+  <data name="UndoHelp" xml:space="preserve">
+    <value>Letzte Entwurfsänderung rückgängig machen</value>
   </data>
 </root>

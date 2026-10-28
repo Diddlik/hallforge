@@ -15,14 +15,8 @@
   <data name="WindowTitle" xml:space="preserve">
     <value>HallForge {0}</value>
   </data>
-  <data name="Refresh" xml:space="preserve">
-    <value>Refresh</value>
-  </data>
   <data name="About" xml:space="preserve">
     <value>About</value>
-  </data>
-  <data name="LoadProfile" xml:space="preserve">
-    <value>Load profile…</value>
   </data>
   <data name="ProfileFileType" xml:space="preserve">
     <value>HallForge profile</value>
@@ -31,37 +25,28 @@
     <value>Searching for keyboards…</value>
   </data>
   <data name="NoKeyboardFound" xml:space="preserve">
-    <value>No supported keyboard found. Connect the keyboard with a USB cable and select Refresh.</value>
+    <value>No supported keyboard found.</value>
   </data>
   <data name="ListFailed" xml:space="preserve">
     <value>Could not list HID devices: {0} Check the device permissions and select Refresh.</value>
   </data>
-  <data name="KeyboardsHeading" xml:space="preserve">
-    <value>Keyboard</value>
-  </data>
-  <data name="ExperimentalBadge" xml:space="preserve">
-    <value>Experimental: this keyboard cannot report its key settings, so key changes are not verified. Lighting changes are read back.</value>
-  </data>
   <data name="KeyboardViewName" xml:space="preserve">
-    <value>Keyboard layout. Select keys to edit them.</value>
-  </data>
-  <data name="KeyAccessibleName" xml:space="preserve">
-    <value>{0}, {1}</value>
+    <value>Keyboard, select keys to edit them</value>
   </data>
   <data name="KeyAccessibleValue" xml:space="preserve">
-    <value>actuation {0} mm, rapid trigger {1}</value>
+    <value>actuation {0} mm, release {1} mm, rapid trigger {2}</value>
   </data>
   <data name="On" xml:space="preserve">
-    <value>on</value>
+    <value>On</value>
   </data>
   <data name="Off" xml:space="preserve">
-    <value>off</value>
+    <value>Off</value>
   </data>
   <data name="Unknown" xml:space="preserve">
-    <value>unknown</value>
+    <value>Unknown</value>
   </data>
   <data name="Mixed" xml:space="preserve">
-    <value>mixed</value>
+    <value>Mixed</value>
   </data>
   <data name="PresetWasd" xml:space="preserve">
     <value>WASD</value>
@@ -79,34 +64,28 @@
     <value>All</value>
   </data>
   <data name="PresetNone" xml:space="preserve">
-    <value>None</value>
+    <value>Clear</value>
   </data>
   <data name="SelectKeysHint" xml:space="preserve">
-    <value>Select keys on the keyboard to edit them.</value>
+    <value>Click a key or use Quick select. Ctrl-click adds keys, Shift-click selects a range; Tab moves through the keyboard, Space toggles.</value>
   </data>
   <data name="Actuation" xml:space="preserve">
-    <value>Actuation (mm)</value>
+    <value>Actuation</value>
   </data>
   <data name="Release" xml:space="preserve">
-    <value>Release (mm)</value>
+    <value>Release</value>
   </data>
   <data name="RapidTrigger" xml:space="preserve">
-    <value>Rapid trigger</value>
+    <value>Rapid Trigger</value>
   </data>
   <data name="RapidTriggerPress" xml:space="preserve">
-    <value>RT press (mm)</value>
+    <value>RT press sensitivity</value>
   </data>
   <data name="RapidTriggerRelease" xml:space="preserve">
-    <value>RT release (mm)</value>
+    <value>RT release sensitivity</value>
   </data>
   <data name="Deadzone" xml:space="preserve">
-    <value>Deadzone (mm)</value>
-  </data>
-  <data name="Discard" xml:space="preserve">
-    <value>Discard</value>
-  </data>
-  <data name="ApplyCount" xml:space="preserve">
-    <value>Apply ({0})</value>
+    <value>Deadzone</value>
   </data>
   <data name="ImportBackup" xml:space="preserve">
     <value>Create backup from AKKO driver</value>
@@ -114,14 +93,11 @@
   <data name="Connecting" xml:space="preserve">
     <value>Connecting to the keyboard…</value>
   </data>
-  <data name="StateLoaded" xml:space="preserve">
-    <value>Onboard profile {0}: {1} key settings known. Keys marked ? are unknown because the keyboard cannot report them.</value>
-  </data>
   <data name="NoBackupYet" xml:space="preserve">
-    <value>Onboard profile {0}: no backup yet. Create a backup from the AKKO driver before applying changes.</value>
+    <value>No backup yet. Import the current settings from the AKKO driver before applying changes.</value>
   </data>
   <data name="ConnectFailed" xml:space="preserve">
-    <value>Could not connect to the keyboard: {0} Close the AKKO driver and select Refresh.</value>
+    <value>Could not connect to the keyboard: {0} Close the AKKO driver and search again.</value>
   </data>
   <data name="BackupImported" xml:space="preserve">
     <value>Backup created with {0} key settings: {1}</value>
@@ -141,35 +117,17 @@
   <data name="ProfileLoadFailed" xml:space="preserve">
     <value>Could not load the profile: {0}</value>
   </data>
-  <data name="Sending" xml:space="preserve">
-    <value>Sending {0} of {1}…</value>
-  </data>
   <data name="Sent" xml:space="preserve">
     <value>Sent {0} key settings. The keyboard cannot confirm them, so test the keys.</value>
   </data>
   <data name="ApplyFailed" xml:space="preserve">
-    <value>Applying stopped: {0} {1} keys were sent and are recorded. Restore a backup if needed.</value>
+    <value>Sending stopped: {0} {1} keys were sent and are recorded. The key that was being written may hold its old or new value; its draft is kept so you can retry.</value>
   </data>
   <data name="ProfileChanged" xml:space="preserve">
-    <value>The active onboard profile changed to {0}. Select Refresh and try again.</value>
-  </data>
-  <data name="TriggerSummary" xml:space="preserve">
-    <value>{0}/{1} mm, RT {2} {3}/{4}, DZ {5}</value>
-  </data>
-  <data name="ConfirmTitle" xml:space="preserve">
-    <value>Apply changes</value>
-  </data>
-  <data name="ConfirmHeading" xml:space="preserve">
-    <value>Send these settings to {0}?</value>
-  </data>
-  <data name="ConfirmExperimental" xml:space="preserve">
-    <value>I understand that this keyboard is not verified and that HallForge cannot read the settings back.</value>
+    <value>The active onboard profile changed to {0}. Search again and retry.</value>
   </data>
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
-  </data>
-  <data name="Apply" xml:space="preserve">
-    <value>Apply</value>
   </data>
   <data name="UpdateAvailable" xml:space="preserve">
     <value>HallForge {0} is available.</value>
@@ -215,9 +173,6 @@
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
-  </data>
-  <data name="TabKeys" xml:space="preserve">
-    <value>Keys</value>
   </data>
   <data name="TabLighting" xml:space="preserve">
     <value>Lighting</value>
@@ -353,5 +308,443 @@
   </data>
   <data name="LightingVariantClockwise" xml:space="preserve">
     <value>Clockwise</value>
+  </data>
+  <data name="KeySelected" xml:space="preserve">
+    <value>Selected</value>
+  </data>
+  <data name="KeyModified" xml:space="preserve">
+    <value>modified</value>
+  </data>
+  <data name="KeyUnknown" xml:space="preserve">
+    <value>settings unknown</value>
+  </data>
+  <data name="SendStopped" xml:space="preserve">
+    <value>Stopped after {0} keys. The keys that were not sent keep their drafts.</value>
+  </data>
+  <data name="ActiveDevice" xml:space="preserve">
+    <value>Active device. Show device details</value>
+  </data>
+  <data name="ActuationHelp" xml:space="preserve">
+    <value>Press point: how far the key travels before it registers. Bounds come from the device definition.</value>
+  </data>
+  <data name="ReleaseHelp" xml:space="preserve">
+    <value>Reset point: where a pressed key releases. Not the same as Rapid Trigger release sensitivity.</value>
+  </data>
+  <data name="RapidTriggerPressHelp" xml:space="preserve">
+    <value>With Rapid Trigger on: how far the key must travel down again to re-press.</value>
+  </data>
+  <data name="RapidTriggerReleaseHelp" xml:space="preserve">
+    <value>With Rapid Trigger on: how far the key must travel up to release.</value>
+  </data>
+  <data name="DeadzoneHelp" xml:space="preserve">
+    <value>Bottom deadzone: travel near the bottom that is ignored.</value>
+  </data>
+  <data name="RapidTriggerHelp" xml:space="preserve">
+    <value>Dynamic actuation: the key re-presses and releases on direction changes instead of fixed points. Aggressive values can cause repeated accidental presses while typing.</value>
+  </data>
+  <data name="Advanced" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="Aggressive" xml:space="preserve">
+    <value>Aggressive</value>
+  </data>
+  <data name="Backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="BackupAvailable" xml:space="preserve">
+    <value>A backup of the settings before the first write exists for the active onboard profile.</value>
+  </data>
+  <data name="CalibrationUnavailable" xml:space="preserve">
+    <value>Calibration — unavailable: needs its own confirmed workflow.</value>
+  </data>
+  <data name="Collapse" xml:space="preserve">
+    <value>Collapse</value>
+  </data>
+  <data name="ColumnChanges" xml:space="preserve">
+    <value>Changes</value>
+  </data>
+  <data name="ColumnKey" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="ColumnKeys" xml:space="preserve">
+    <value>Keys</value>
+  </data>
+  <data name="ColumnRapidTriggerDistances" xml:space="preserve">
+    <value>RT press / release</value>
+  </data>
+  <data name="ColumnSource" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="ColumnStatus" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ColumnUntouched" xml:space="preserve">
+    <value>Untouched</value>
+  </data>
+  <data name="Connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="CoverageMap" xml:space="preserve">
+    <value>Keys the profile changes</value>
+  </data>
+  <data name="CoveredByProfile" xml:space="preserve">
+    <value>Covered by profile</value>
+  </data>
+  <data name="UntouchedByProfile" xml:space="preserve">
+    <value>Untouched — keeps its current value</value>
+  </data>
+  <data name="DecreaseField" xml:space="preserve">
+    <value>Decrease {0} by {1} mm</value>
+  </data>
+  <data name="IncreaseField" xml:space="preserve">
+    <value>Increase {0} by {1} mm</value>
+  </data>
+  <data name="DeviceIntro" xml:space="preserve">
+    <value>What HallForge knows about the connected keyboard.</value>
+  </data>
+  <data name="DeviceLayout" xml:space="preserve">
+    <value>Layout</value>
+  </data>
+  <data name="DeviceLocked" xml:space="preserve">
+    <value>The device is locked for other writes while sending.</value>
+  </data>
+  <data name="DeviceModel" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="DeviceModelIds" xml:space="preserve">
+    <value>Firmware model id</value>
+  </data>
+  <data name="DeviceProfile" xml:space="preserve">
+    <value>Onboard profile</value>
+  </data>
+  <data name="DeviceSupport" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="DeviceUsbId" xml:space="preserve">
+    <value>USB ID</value>
+  </data>
+  <data name="DiscardAll" xml:space="preserve">
+    <value>Discard all</value>
+  </data>
+  <data name="Discovering" xml:space="preserve">
+    <value>Discovering…</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="DraftOnly" xml:space="preserve">
+    <value>Draft only — nothing has been sent</value>
+  </data>
+  <data name="DraftSummary" xml:space="preserve">
+    <value>Modified keys: {0} · Field changes: {1}</value>
+  </data>
+  <data name="Experimental" xml:space="preserve">
+    <value>Experimental support</value>
+  </data>
+  <data name="ExperimentalHelp" xml:space="preserve">
+    <value>Key settings are sent through allowlisted commands but cannot be read back. Lighting changes are read back and verified.</value>
+  </data>
+  <data name="FieldInactive" xml:space="preserve">
+    <value>Kept in draft · inactive while Rapid Trigger is off</value>
+  </data>
+  <data name="FieldMixed" xml:space="preserve">
+    <value>Mixed: {0} mm. A new value applies to all.</value>
+  </data>
+  <data name="FieldMixedUnknown" xml:space="preserve">
+    <value>Mixed: {0} mm + {1} unknown. A new value applies to all.</value>
+  </data>
+  <data name="FieldRangeError" xml:space="preserve">
+    <value>Enter a value from {0} to {1} mm in steps of {2} mm, with '.' as decimal separator.</value>
+  </data>
+  <data name="FieldSame" xml:space="preserve">
+    <value>Same on all {0} keys</value>
+  </data>
+  <data name="FieldUnknown" xml:space="preserve">
+    <value>Unknown — not read from the device. A new value is sent explicitly.</value>
+  </data>
+  <data name="FixInput" xml:space="preserve">
+    <value>Fix the highlighted value to continue</value>
+  </data>
+  <data name="HeaderCapabilities" xml:space="preserve">
+    <value>Key settings: no readback · Lighting: verified</value>
+  </data>
+  <data name="ImportProfile" xml:space="preserve">
+    <value>Import…</value>
+  </data>
+  <data name="KeyLegend" xml:space="preserve">
+    <value>Key state legend</value>
+  </data>
+  <data name="KeysSelected" xml:space="preserve">
+    <value>{0} keys selected — {1}</value>
+  </data>
+  <data name="OneKeySelected" xml:space="preserve">
+    <value>{0} selected</value>
+  </data>
+  <data name="Later" xml:space="preserve">
+    <value>Later</value>
+  </data>
+  <data name="LayoutSummary" xml:space="preserve">
+    <value>{0} keys · layout from device definition</value>
+  </data>
+  <data name="LegendModified" xml:space="preserve">
+    <value>Modified (draft)</value>
+  </data>
+  <data name="LegendUnknown" xml:space="preserve">
+    <value>Unknown — no readback</value>
+  </data>
+  <data name="LightingAcknowledgeExperimental" xml:space="preserve">
+    <value>I understand that this keyboard model is not verified for writing.</value>
+  </data>
+  <data name="LightingIntro" xml:space="preserve">
+    <value>Effects are written to the keyboard and read back, so every change is verified.</value>
+  </data>
+  <data name="LightingReviewNote" xml:space="preserve">
+    <value>The keyboard reports its lighting, so HallForge reads it back after writing and fails if it differs.</value>
+  </data>
+  <data name="LightingReviewSummary" xml:space="preserve">
+    <value>One lighting change.</value>
+  </data>
+  <data name="LoadIntoDraft" xml:space="preserve">
+    <value>Load into draft</value>
+  </data>
+  <data name="NavDevice" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="NavKeyMapping" xml:space="preserve">
+    <value>Key Mapping</value>
+  </data>
+  <data name="NavKeyMappingLater" xml:space="preserve">
+    <value>Key Mapping — coming later</value>
+  </data>
+  <data name="NavPerformance" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="NavProfiles" xml:space="preserve">
+    <value>Profiles</value>
+  </data>
+  <data name="Navigation" xml:space="preserve">
+    <value>Main navigation</value>
+  </data>
+  <data name="NoDevice" xml:space="preserve">
+    <value>No device</value>
+  </data>
+  <data name="NoKeyboardHeading" xml:space="preserve">
+    <value>No keyboard connected</value>
+  </data>
+  <data name="NoKeyboardIntro" xml:space="preserve">
+    <value>HallForge only talks to keyboards it recognizes. Your profiles are kept while you connect.</value>
+  </data>
+  <data name="NoKeyboardStep1" xml:space="preserve">
+    <value>Connect the keyboard with a USB cable. Use a data cable, directly or through a powered hub.</value>
+  </data>
+  <data name="NoKeyboardStep2" xml:space="preserve">
+    <value>On Linux, allow device access: install HallForge's udev rule, then replug the keyboard.</value>
+  </data>
+  <data name="NoKeyboardStep3" xml:space="preserve">
+    <value>Close other configuration software. Vendor drivers can hold the device open.</value>
+  </data>
+  <data name="NoKeysSelected" xml:space="preserve">
+    <value>No keys selected</value>
+  </data>
+  <data name="NotConnected" xml:space="preserve">
+    <value>The keyboard is not connected. Search again.</value>
+  </data>
+  <data name="NothingToApply" xml:space="preserve">
+    <value>The draft matches the current settings; nothing to apply.</value>
+  </data>
+  <data name="OnboardProfile" xml:space="preserve">
+    <value>Onboard profile {0} (active)</value>
+  </data>
+  <data name="OnboardProfileHelp" xml:space="preserve">
+    <value>Changes go to the keyboard's active onboard profile.</value>
+  </data>
+  <data name="OnboardProfileUnknown" xml:space="preserve">
+    <value>Onboard profile unknown</value>
+  </data>
+  <data name="OpenPerformance" xml:space="preserve">
+    <value>Open in Performance</value>
+  </data>
+  <data name="PendingChanges" xml:space="preserve">
+    <value>Pending changes</value>
+  </data>
+  <data name="PerformanceIntro" xml:space="preserve">
+    <value>Select keys, tune trigger distances, then review. Nothing reaches the keyboard until you apply.</value>
+  </data>
+  <data name="ProfileCoverage" xml:space="preserve">
+    <value>{0} keys · Actuation, Release, Rapid Trigger</value>
+  </data>
+  <data name="ProfileImported" xml:space="preserve">
+    <value>Imported</value>
+  </data>
+  <data name="ProfileTemplate" xml:space="preserve">
+    <value>Template</value>
+  </data>
+  <data name="ProfileLoadedIntoDraft" xml:space="preserve">
+    <value>{0} keys loaded into draft — nothing sent</value>
+  </data>
+  <data name="ProfilesIntro" xml:space="preserve">
+    <value>Loading a profile only fills your draft. You review and apply separately.</value>
+  </data>
+  <data name="QuickSelect" xml:space="preserve">
+    <value>Quick select</value>
+  </data>
+  <data name="RapidTriggerMixed" xml:space="preserve">
+    <value>Mixed: {0} on · {1} off · {2} unknown. Choosing sets all selected keys.</value>
+  </data>
+  <data name="RapidTriggerOffName" xml:space="preserve">
+    <value>Rapid Trigger off</value>
+  </data>
+  <data name="RapidTriggerOnName" xml:space="preserve">
+    <value>Rapid Trigger on</value>
+  </data>
+  <data name="RapidTriggerOffNote" xml:space="preserve">
+    <value>Fixed actuation and release points. RT sensitivities are kept.</value>
+  </data>
+  <data name="RapidTriggerOnNote" xml:space="preserve">
+    <value>Dynamic actuation: re-press and release follow key direction.</value>
+  </data>
+  <data name="RefreshBlockedByPending" xml:space="preserve">
+    <value>Apply or discard the draft before searching again, so no changes are lost.</value>
+  </data>
+  <data name="ResetSelection" xml:space="preserve">
+    <value>Reset drafts for selection</value>
+  </data>
+  <data name="Retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="ReviewAcknowledge" xml:space="preserve">
+    <value>I understand these changes are sent without verification.</value>
+  </data>
+  <data name="ReviewAcknowledgeExperimental" xml:space="preserve">
+    <value>I understand these changes are sent without verification and that this keyboard model is not verified for writing.</value>
+  </data>
+  <data name="ReviewApply" xml:space="preserve">
+    <value>Review &amp; Apply</value>
+  </data>
+  <data name="ReviewBackup" xml:space="preserve">
+    <value>Backup: available for the active onboard profile.</value>
+  </data>
+  <data name="ReviewDoneHeading" xml:space="preserve">
+    <value>Applied</value>
+  </data>
+  <data name="ReviewHeading" xml:space="preserve">
+    <value>Review &amp; apply</value>
+  </data>
+  <data name="ReviewNoReadback" xml:space="preserve">
+    <value>No readback. The keyboard cannot report settings back. After sending, keys are marked Sent — never Verified.</value>
+  </data>
+  <data name="ReviewProblemHeading" xml:space="preserve">
+    <value>Applied with problems</value>
+  </data>
+  <data name="ReviewProgress" xml:space="preserve">
+    <value>{0} of {1} sent</value>
+  </data>
+  <data name="ReviewSend" xml:space="preserve">
+    <value>Send {0} changes to keyboard</value>
+  </data>
+  <data name="ReviewSendingHeading" xml:space="preserve">
+    <value>Sending to keyboard…</value>
+  </data>
+  <data name="ReviewSummary" xml:space="preserve">
+    <value>Keys: {0} · Field changes: {1}. Only these fields change; everything else on these keys stays as it is.</value>
+  </data>
+  <data name="ReviewTarget" xml:space="preserve">
+    <value>{0} · onboard profile {1}</value>
+  </data>
+  <data name="ReviewUnknownKeys" xml:space="preserve">
+    <value>Some keys had unknown settings, so the backup cannot restore them.</value>
+  </data>
+  <data name="RiskWarning" xml:space="preserve">
+    <value>Aggressive settings on {0} keys. Short distances can register accidental or repeated presses, especially while typing.</value>
+  </data>
+  <data name="RowNotSent" xml:space="preserve">
+    <value>Not sent</value>
+  </data>
+  <data name="RowQueued" xml:space="preserve">
+    <value>Queued</value>
+  </data>
+  <data name="RowSending" xml:space="preserve">
+    <value>Sending…</value>
+  </data>
+  <data name="RowSent" xml:space="preserve">
+    <value>Sent · not verified</value>
+  </data>
+  <data name="RowUncertain" xml:space="preserve">
+    <value>Uncertain — interrupted</value>
+  </data>
+  <data name="RowVerified" xml:space="preserve">
+    <value>Applied and verified</value>
+  </data>
+  <data name="SearchAgain" xml:space="preserve">
+    <value>Search for keyboards again</value>
+  </data>
+  <data name="SelectKeysToEdit" xml:space="preserve">
+    <value>Select keys to edit</value>
+  </data>
+  <data name="SelectionCounts" xml:space="preserve">
+    <value>{0} unknown</value>
+  </data>
+  <data name="SelectionHint" xml:space="preserve">
+    <value>Click selects · Ctrl-click toggles · Shift-click extends</value>
+  </data>
+  <data name="SelectionScope" xml:space="preserve">
+    <value>Applies to {0} selected keys · only changed fields are patched</value>
+  </data>
+  <data name="ShowValues" xml:space="preserve">
+    <value>Show values on keys</value>
+  </data>
+  <data name="SourceAppState" xml:space="preserve">
+    <value>App state</value>
+  </data>
+  <data name="SourceAppStateHelp" xml:space="preserve">
+    <value>Last values HallForge knows from its own state or an import. Not read back from the keyboard.</value>
+  </data>
+  <data name="SourceDraft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="SourceDraftHelp" xml:space="preserve">
+    <value>Changed locally. Not sent.</value>
+  </data>
+  <data name="SourceUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="SourceUnknownHelp" xml:space="preserve">
+    <value>Never set by HallForge and the keyboard cannot report it.</value>
+  </data>
+  <data name="StopAfterCurrent" xml:space="preserve">
+    <value>Stop after current key</value>
+  </data>
+  <data name="TemplateComfort" xml:space="preserve">
+    <value>Comfort</value>
+  </data>
+  <data name="TemplateSensitive" xml:space="preserve">
+    <value>Sensitive</value>
+  </data>
+  <data name="TemplateGaming" xml:space="preserve">
+    <value>Gaming</value>
+  </data>
+  <data name="TemplateHelp" xml:space="preserve">
+    <value>Loads into the draft for the selection only</value>
+  </data>
+  <data name="TemplatesHeading" xml:space="preserve">
+    <value>Local templates · load into draft</value>
+  </data>
+  <data name="ToggleNavigation" xml:space="preserve">
+    <value>Collapse or expand navigation</value>
+  </data>
+  <data name="ToggleTheme" xml:space="preserve">
+    <value>Switch between light and dark theme</value>
+  </data>
+  <data name="TriggerSettings" xml:space="preserve">
+    <value>Trigger settings</value>
+  </data>
+  <data name="Unchanged" xml:space="preserve">
+    <value>unchanged</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="UndoHelp" xml:space="preserve">
+    <value>Undo last draft change</value>
   </data>
 </root>

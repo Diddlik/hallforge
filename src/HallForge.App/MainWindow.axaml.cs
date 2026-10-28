@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 
 namespace HallForge.App;
 
@@ -18,6 +18,8 @@ public partial class MainWindow : Window
     {
         _settings = settings;
         InitializeComponent();
+        if (Application.Current is { } app && settings.Theme is { } theme)
+            app.RequestedThemeVariant = theme == nameof(ThemeVariant.Light) ? ThemeVariant.Light : ThemeVariant.Dark;
         RestorePlacement();
         Closing += (_, _) => SavePlacement();
     }
@@ -26,23 +28,20 @@ public partial class MainWindow : Window
     {
         base.OnDataContextChanged(e);
         if (DataContext is MainViewModel viewModel)
-            viewModel.ConfirmApply = request => new ApplyDialog(request).ShowDialog<bool>(this);
+            viewModel.ShowReview = review => new ReviewDialog { DataContext = review }.ShowDialog(this);
     }
 
     private void OnAbout(object? sender, RoutedEventArgs e) =>
         new AboutWindow { DataContext = DataContext }.ShowDialog(this);
 
-    private async void OnLoadProfile(object? sender, RoutedEventArgs e)
+    // The system setting is followed until the user picks a theme; the choice is then remembered.
+    private void OnToggleTheme(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not MainViewModel { Keyboard: { } keyboard })
+        if (Application.Current is not { } app)
             return;
-        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            FileTypeFilter = [new FilePickerFileType(Strings.ProfileFileType) { Patterns = ["*.json"] }],
-        });
-        if (files.Count == 1 && files[0].TryGetLocalPath() is { } path)
-            keyboard.LoadProfile(path);
+        var light = app.ActualThemeVariant != ThemeVariant.Light;
+        app.RequestedThemeVariant = light ? ThemeVariant.Light : ThemeVariant.Dark;
+        _settings.Theme = light ? nameof(ThemeVariant.Light) : nameof(ThemeVariant.Dark);
     }
 
     private void RestorePlacement()

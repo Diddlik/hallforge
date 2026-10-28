@@ -33,40 +33,120 @@ public sealed class KeyboardEditorViewModelTests : IDisposable
         var hid = new HidInterfaceInfo("path", 0x3151, 0x4035, 0x0103, null, null, 0xFFFF, 0x02, 2, 0, 0, 65);
         var editor = new KeyboardEditorViewModel(
             new KeyboardCandidate(hid, Definition), new KeyLegends("test", "Test", new Dictionary<string, string>()),
-            new NoDevice(), new StateStore(_root), _ => Task.FromResult(false));
+            new NoDevice(), new StateStore(_root), _ => Task.CompletedTask);
         foreach (var key in editor.Keys.Where(k => k.KeyId != "KeyQ"))
             key.Known = Fast;
         return editor;
     }
 
+    private static KeyViewModel Key(KeyboardEditorViewModel editor, string id) => editor.Keys.Single(k => k.KeyId == id);
+
     [Fact]
     public void Selection_ShowsCommonValuesAndMixedOnes()
     {
         var editor = Editor();
-        editor.Keys.Single(k => k.KeyId == "KeyW").Known = Fast with { ReleaseMm = 0.6m };
+        Key(editor, "KeyW").Known = Fast with { ReleaseMm = 0.6m };
 
         editor.SelectCommand.Execute("All");
 
-        Assert.Null(editor.Actuation); // KeyQ is unknown
-        editor.Keys.Single(k => k.KeyId == "KeyQ").IsSelected = false;
-        Assert.Equal(0.4m, editor.Actuation);
-        Assert.Null(editor.Release);
+        Assert.Null(editor.Actuation.Value); // KeyQ is unknown
+        Assert.True(editor.Actuation.IsWarning);
+        Key(editor, "KeyQ").IsSelected = false;
+        Assert.Equal(0.4m, editor.Actuation.Value);
+        Assert.Equal("0.40", editor.Actuation.Input);
+        Assert.Null(editor.Release.Value);
+        Assert.Equal(Strings.Mixed, editor.Release.Placeholder);
         Assert.True(editor.RapidTrigger);
     }
 
     [Fact]
-    public void EditingAField_PatchesOnlyThatFieldOfSelectedKeys()
+    public void TypingAValue_PatchesOnlyThatFieldOfSelectedKeys()
     {
         var editor = Editor();
-        editor.Keys.Single(k => k.KeyId == "KeyW").IsSelected = true;
+        Key(editor, "KeyW").IsSelected = true;
 
-        editor.Actuation = 1.0m;
+        editor.Actuation.Input = "1.0";
 
-        var w = editor.Keys.Single(k => k.KeyId == "KeyW");
+        var w = Key(editor, "KeyW");
         Assert.Equal(new TriggerPatch(ActuationMm: 1.0m), w.Pending);
         Assert.Equal(Fast with { ActuationMm = 1.0m }, w.Effective);
         Assert.Equal(1, editor.PendingCount);
-        Assert.Null(editor.Keys.Single(k => k.KeyId == "KeyA").Pending);
+        Assert.Equal(1, editor.FieldChangeCount);
+        Assert.Null(Key(editor, "KeyA").Pending);
+    }
+
+    [Theory]
+    [InlineData("1,0")]
+    [InlineData("9.9")]
+    [InlineData("1.05")]
+    public void InvalidInput_IsReportedAndNotApplied(string text)
+    {
+        var editor = Editor();
+        Key(editor, "KeyW").IsSelected = true;
+
+        editor.Actuation.Input = text;
+
+        Assert.True(editor.Actuation.HasError);
+        Assert.True(editor.HasInputError);
+        Assert.Equal(0, editor.PendingCount);
+    }
+
+    [Fact]
+    public void SettingTheKnownValueAgain_LeavesNoDraft()
+    {
+        var editor = Editor();
+        Key(editor, "KeyW").IsSelected = true;
+        editor.Actuation.Input = "1.0";
+
+        editor.Actuation.Input = "0.4";
+
+        Assert.Null(Key(editor, "KeyW").Pending);
+        Assert.Equal(0, editor.PendingCount);
+    }
+
+    [Fact]
+    public void Undo_RevertsSliderDragAsOneStep()
+    {
+        var editor = Editor();
+        Key(editor, "KeyW").IsSelected = true;
+        editor.RapidTriggerOffCommand.Execute(null);
+
+        editor.Actuation.SliderValue = 1.0;
+        editor.Actuation.SliderValue = 1.5;
+        editor.Actuation.SliderValue = 2.0;
+        editor.UndoCommand.Execute(null);
+
+        Assert.Equal(new TriggerPatch(RapidTriggerEnabled: false), Key(editor, "KeyW").Pending);
+        editor.UndoCommand.Execute(null);
+        Assert.Null(Key(editor, "KeyW").Pending);
+        Assert.False(editor.UndoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void StepButtons_MoveByTheDeviceStep()
+    {
+        var editor = Editor();
+        Key(editor, "KeyW").IsSelected = true;
+
+        editor.Release.IncreaseCommand.Execute(null);
+
+        Assert.Equal(0.5m, Key(editor, "KeyW").Pending?.ReleaseMm);
+    }
+
+    [Fact]
+    public void Pick_SelectsTogglesAndExtends()
+    {
+        var editor = Editor();
+
+        editor.Pick(Key(editor, "KeyQ"), toggle: false, extend: false);
+        editor.Pick(Key(editor, "KeyA"), toggle: false, extend: true);
+        Assert.All(editor.Keys, k => Assert.True(k.IsSelected));
+
+        editor.Pick(Key(editor, "KeyW"), toggle: true, extend: false);
+        Assert.False(Key(editor, "KeyW").IsSelected);
+
+        editor.Pick(Key(editor, "KeyW"), toggle: false, extend: false);
+        Assert.Equal(["KeyW"], editor.Keys.Where(k => k.IsSelected).Select(k => k.KeyId));
     }
 
     [Fact]
@@ -81,16 +161,29 @@ public sealed class KeyboardEditorViewModelTests : IDisposable
     }
 
     [Fact]
-    public void Discard_ClearsAllPendingChanges()
+    public void RiskNote_FlagsShortDistances()
+    {
+        var editor = Editor();
+        Key(editor, "KeyW").IsSelected = true;
+
+        Assert.True(editor.HasRisk); // Fast uses 0.4 mm actuation
+        editor.ApplyTemplateCommand.Execute("Comfort");
+        Assert.False(editor.HasRisk);
+    }
+
+    [Fact]
+    public void Discard_ClearsAllPendingChangesAndCanBeUndone()
     {
         var editor = Editor();
         editor.SelectCommand.Execute("All");
-        editor.Deadzone = 3.0m;
+        editor.Deadzone.Input = "3.0";
 
         editor.DiscardCommand.Execute(null);
-
         Assert.Equal(0, editor.PendingCount);
         Assert.All(editor.Keys, k => Assert.Null(k.Pending));
+
+        editor.UndoCommand.Execute(null);
+        Assert.Equal(3, editor.PendingCount);
     }
 
     [Fact]
@@ -103,9 +196,21 @@ public sealed class KeyboardEditorViewModelTests : IDisposable
             { "schemaVersion": 1, "name": "x", "groups": [ { "keyIds": ["KeyW", "Digit9"], "settings": { "actuationMm": 0.2 } } ] }
             """);
 
-        editor.LoadProfile(path);
+        Assert.Equal(1, editor.LoadProfile(path));
 
         Assert.Equal(1, editor.PendingCount);
         Assert.Contains("Digit9", editor.Status, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Review_IsBlockedUntilConnected()
+    {
+        var editor = Editor();
+        Key(editor, "KeyW").IsSelected = true;
+        editor.Actuation.Input = "1.0";
+
+        editor.ReviewCommand.Execute(null);
+
+        Assert.Equal(Strings.NotConnected, editor.Status);
     }
 }

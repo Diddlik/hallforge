@@ -97,7 +97,7 @@ public class ProfileTests
             """, State(("KeyQ", Known)));
 
         Assert.Equal(2, plan.Errors.Count);
-        Assert.Throws<InvalidOperationException>(() => plan.Execute(_ => { }, _ => { }));
+        Assert.Throws<InvalidOperationException>(() => plan.Execute(_ => { }, _ => { }, TestContext.Current.CancellationToken));
     }
 
     [Fact]
@@ -109,10 +109,24 @@ public class ProfileTests
 
         var ex = Assert.Throws<IOException>(() => plan.Execute(
             change => { if (change.KeyId == "KeyW") throw new IOException("unplugged"); log.Add($"sent {change.KeyId}"); },
-            change => log.Add($"recorded {change.KeyId}")));
+            change => log.Add($"recorded {change.KeyId}"), TestContext.Current.CancellationToken));
 
         Assert.Equal(["sent KeyQ", "recorded KeyQ"], log);
         Assert.Equal("unplugged", ex.Message);
+    }
+
+    [Fact]
+    public void Execute_StopsBeforeTheNextKeyWhenCancelled()
+    {
+        var plan = Plan("""{ "schemaVersion": 1, "name": "x", "groups": [ { "keyIds": ["KeyQ", "KeyW"], "settings": { "actuationMm": 1.0 } } ] }""",
+            State(("KeyQ", Known), ("KeyW", Known)));
+        using var cancellation = new CancellationTokenSource();
+        var sent = new List<string>();
+
+        Assert.Throws<OperationCanceledException>(() => plan.Execute(
+            change => sent.Add(change.KeyId), _ => cancellation.Cancel(), cancellation.Token));
+
+        Assert.Equal(["KeyQ"], sent);
     }
 
     [Theory]

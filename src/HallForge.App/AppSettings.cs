@@ -14,6 +14,10 @@ public sealed class AppSettings
 
     public bool AutoCheckForUpdates { get; set; } = true;
     public WindowPlacement? Window { get; set; }
+    public bool NavigationCollapsed { get; set; }
+
+    /// <summary>"Light" or "Dark"; null follows the system setting.</summary>
+    public string? Theme { get; set; }
 
     // Missing or corrupt settings must never prevent the app from starting; defaults are used instead.
     public static AppSettings Load()

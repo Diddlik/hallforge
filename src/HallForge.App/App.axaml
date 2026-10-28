@@ -3,7 +3,201 @@
              x:Class="HallForge.App.App"
              RequestedThemeVariant="Default">
 
+    <!-- Design tokens from docs/design/ui-redesign/README.md. -->
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="HfBg" Color="#0B0F17" />
+                    <SolidColorBrush x:Key="HfSurface1" Color="#131A27" />
+                    <SolidColorBrush x:Key="HfSurface2" Color="#1B2434" />
+                    <SolidColorBrush x:Key="HfBorder" Color="#2A3446" />
+                    <SolidColorBrush x:Key="HfText" Color="#F3F6FC" />
+                    <SolidColorBrush x:Key="HfText2" Color="#B4C0D2" />
+                    <SolidColorBrush x:Key="HfText3" Color="#8C99AE" />
+                    <SolidColorBrush x:Key="HfAccent" Color="#A78BFA" />
+                    <SolidColorBrush x:Key="HfAccentInk" Color="#160F2E" />
+                    <SolidColorBrush x:Key="HfAccentSoft" Color="#2E2552" />
+                    <SolidColorBrush x:Key="HfCyan" Color="#22D3EE" />
+                    <SolidColorBrush x:Key="HfCyanSoft" Color="#2E22D3EE" />
+                    <SolidColorBrush x:Key="HfSuccess" Color="#34D399" />
+                    <SolidColorBrush x:Key="HfSuccessSoft" Color="#1F34D399" />
+                    <SolidColorBrush x:Key="HfWarn" Color="#FBBF24" />
+                    <SolidColorBrush x:Key="HfWarnSoft" Color="#21FBBF24" />
+                    <SolidColorBrush x:Key="HfErr" Color="#FB7185" />
+                    <SolidColorBrush x:Key="HfErrSoft" Color="#26FB7185" />
+                    <SolidColorBrush x:Key="HfKeyBg" Color="#1E2738" />
+                    <SolidColorBrush x:Key="HfKeyBorder" Color="#313D53" />
+                    <SolidColorBrush x:Key="HfKeyText" Color="#E8EDF6" />
+                    <SolidColorBrush x:Key="HfKeySelBg" Color="#35295F" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="HfBg" Color="#F5F7FB" />
+                    <SolidColorBrush x:Key="HfSurface1" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HfSurface2" Color="#E9EDF4" />
+                    <SolidColorBrush x:Key="HfBorder" Color="#CDD5E1" />
+                    <SolidColorBrush x:Key="HfText" Color="#172033" />
+                    <SolidColorBrush x:Key="HfText2" Color="#48566A" />
+                    <SolidColorBrush x:Key="HfText3" Color="#5B687C" />
+                    <SolidColorBrush x:Key="HfAccent" Color="#6D28D9" />
+                    <SolidColorBrush x:Key="HfAccentInk" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HfAccentSoft" Color="#EDE5FB" />
+                    <SolidColorBrush x:Key="HfCyan" Color="#087F98" />
+                    <SolidColorBrush x:Key="HfCyanSoft" Color="#26087F98" />
+                    <SolidColorBrush x:Key="HfSuccess" Color="#047857" />
+                    <SolidColorBrush x:Key="HfSuccessSoft" Color="#DDF4EA" />
+                    <SolidColorBrush x:Key="HfWarn" Color="#92400E" />
+                    <SolidColorBrush x:Key="HfWarnSoft" Color="#FEF3C7" />
+                    <SolidColorBrush x:Key="HfErr" Color="#BE123C" />
+                    <SolidColorBrush x:Key="HfErrSoft" Color="#FFE4E8" />
+                    <SolidColorBrush x:Key="HfKeyBg" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HfKeyBorder" Color="#BFC9D7" />
+                    <SolidColorBrush x:Key="HfKeyText" Color="#172033" />
+                    <SolidColorBrush x:Key="HfKeySelBg" Color="#E6DCFC" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>
+            <CornerRadius x:Key="OverlayCornerRadius">14</CornerRadius>
+
+            <StreamGeometry x:Key="IconPerformance">M12 14l4-4M3.34 19a10 10 0 1 1 17.32 0</StreamGeometry>
+            <StreamGeometry x:Key="IconKeyboard">M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10</StreamGeometry>
+            <StreamGeometry x:Key="IconLighting">M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z</StreamGeometry>
+            <StreamGeometry x:Key="IconProfiles">M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5</StreamGeometry>
+            <StreamGeometry x:Key="IconDevice">M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3</StreamGeometry>
+            <StreamGeometry x:Key="IconInfo">M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01</StreamGeometry>
+            <StreamGeometry x:Key="IconHelp">M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01</StreamGeometry>
+            <StreamGeometry x:Key="IconWarning">M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01</StreamGeometry>
+            <StreamGeometry x:Key="IconCollapse">M11 17l-5-5 5-5M18 17l-5-5 5-5</StreamGeometry>
+            <StreamGeometry x:Key="IconExpand">M13 17l5-5-5-5M6 17l5-5-5-5</StreamGeometry>
+            <StreamGeometry x:Key="IconTheme">M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z</StreamGeometry>
+            <StreamGeometry x:Key="IconUndo">M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3</StreamGeometry>
+            <StreamGeometry x:Key="IconLock">M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4</StreamGeometry>
+            <StreamGeometry x:Key="IconChevron">M6 9l6 6 6-6</StreamGeometry>
+            <StreamGeometry x:Key="IconRefresh">M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6</StreamGeometry>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Dark" Accent="#A78BFA" RegionColor="#0B0F17" />
+                <ColorPaletteResources x:Key="Light" Accent="#6D28D9" RegionColor="#F5F7FB" />
+            </FluentTheme.Palettes>
+        </FluentTheme>
+
+        <Style Selector="Path.icon">
+            <Setter Property="Stroke" Value="{Binding $parent[TemplatedControl].Foreground}" />
+            <Setter Property="StrokeThickness" Value="1.8" />
+            <Setter Property="StrokeLineCap" Value="Round" />
+            <Setter Property="StrokeJoin" Value="Round" />
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Stretch" Value="Uniform" />
+        </Style>
+        <Style Selector="Path.icon.small">
+            <Setter Property="Width" Value="15" />
+            <Setter Property="Height" Value="15" />
+        </Style>
+
+        <Style Selector="TextBlock.h1">
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="TextBlock.h2">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="TextBlock.secondary">
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+        </Style>
+        <Style Selector="TextBlock.caption">
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="TextBlock.warn">
+            <Setter Property="Foreground" Value="{DynamicResource HfWarn}" />
+        </Style>
+        <Style Selector="TextBlock.error">
+            <Setter Property="Foreground" Value="{DynamicResource HfErr}" />
+        </Style>
+        <Style Selector="TextBlock.draft">
+            <Setter Property="Foreground" Value="{DynamicResource HfCyan}" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <Style Selector="Border.panel">
+            <Setter Property="Background" Value="{DynamicResource HfSurface1}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Padding" Value="20,16" />
+        </Style>
+        <Style Selector="Border.note">
+            <Setter Property="Background" Value="{DynamicResource HfSurface2}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,10" />
+        </Style>
+        <Style Selector="Border.note.warn">
+            <Setter Property="Background" Value="{DynamicResource HfWarnSoft}" />
+        </Style>
+        <Style Selector="Border.divider">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource HfBorder}" />
+        </Style>
+
+        <!-- Status pills in the header and tables -->
+        <Style Selector="Border.pill">
+            <Setter Property="CornerRadius" Value="999" />
+            <Setter Property="Padding" Value="10,3" />
+            <Setter Property="Background" Value="{DynamicResource HfSurface2}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="TextElement.FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Border.pill.success">
+            <Setter Property="Background" Value="{DynamicResource HfSuccessSoft}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfSuccess}" />
+        </Style>
+        <Style Selector="Border.pill.warn">
+            <Setter Property="Background" Value="{DynamicResource HfWarnSoft}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfWarn}" />
+        </Style>
+        <Style Selector="Border.pill.draft">
+            <Setter Property="Background" Value="{DynamicResource HfCyanSoft}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfCyan}" />
+        </Style>
+        <Style Selector="Border.pill.error">
+            <Setter Property="Background" Value="{DynamicResource HfErrSoft}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource HfErr}" />
+        </Style>
+
+        <!-- Secondary buttons: outlined, subordinate to the single accent action -->
+        <Style Selector="Button.outline">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.chip, ToggleButton.chip">
+            <Setter Property="Background" Value="{DynamicResource HfSurface2}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Padding" Value="12,4" />
+        </Style>
+        <Style Selector="Button.chip.on">
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfAccent}" />
+        </Style>
+        <Style Selector="Button.icon">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HfBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
     </Application.Styles>
 </Application>

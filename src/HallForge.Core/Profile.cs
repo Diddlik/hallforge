@@ -143,14 +143,15 @@ public sealed record ApplyPlan(IReadOnlyList<KeyChange> Changes, IReadOnlyList<s
 
     /// <summary>
     /// Writes changes one by one and records each in the state right after it is sent, so an interruption leaves the
-    /// state matching what was actually sent.
+    /// state matching what was actually sent. Cancellation stops before the next key, never in the middle of one.
     /// </summary>
-    public void Execute(Action<KeyChange> write, Action<KeyChange> recorded)
+    public void Execute(Action<KeyChange> write, Action<KeyChange> recorded, CancellationToken cancellation = default)
     {
         if (!CanApply)
             throw new InvalidOperationException("The plan has errors.");
         foreach (var change in Changes)
         {
+            cancellation.ThrowIfCancellationRequested();
             write(change);
             recorded(change);
         }

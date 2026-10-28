@@ -3,210 +3,209 @@
         xmlns:app="using:HallForge.App"
         x:Class="HallForge.App.MainWindow"
         x:DataType="app:MainViewModel"
-        Width="1100" Height="720" MinWidth="720" MinHeight="520"
+        Width="1280" Height="820" MinWidth="960" MinHeight="640"
+        Background="{DynamicResource HfBg}"
         Title="{x:Static app:MainViewModel.Title}">
     <Window.Styles>
-        <Style Selector="ToggleButton.key">
-            <Setter Property="Padding" Value="6,4" />
+        <Style Selector="Border#Rail">
+            <Setter Property="Width" Value="208" />
+        </Style>
+        <Style Selector="Border#Rail.collapsed">
+            <Setter Property="Width" Value="64" />
+        </Style>
+        <Style Selector="ListBox.nav">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem, Button.nav">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="11,0" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
         </Style>
-        <Style Selector="ToggleButton.key.pending">
-            <Setter Property="BorderBrush" Value="{DynamicResource SystemFillColorCautionBrush}" />
+        <Style Selector="ListBox.nav ListBoxItem:selected">
+            <Setter Property="Foreground" Value="{DynamicResource HfText}" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
-        <Style Selector="TextBlock.secondary">
-            <Setter Property="Opacity" Value="0.75" />
+        <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+            <Setter Property="Foreground" Value="{DynamicResource HfText}" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:disabled">
+            <Setter Property="Opacity" Value="0.6" />
         </Style>
     </Window.Styles>
 
-    <DockPanel Margin="16">
-        <!-- Header: device and secondary actions -->
-        <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,8">
-            <StackPanel VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="{Binding Keyboard.DeviceName, FallbackValue={x:Static app:Strings.KeyboardsHeading}}" FontSize="20" FontWeight="SemiBold" />
-                <TextBlock Text="{x:Static app:Strings.ExperimentalBadge}" Classes="secondary" TextWrapping="Wrap"
-                           IsVisible="{Binding Keyboard.IsExperimental, FallbackValue=False}" />
-            </StackPanel>
-            <Button Grid.Column="1" Content="{x:Static app:Strings.LoadProfile}" Click="OnLoadProfile" IsEnabled="{Binding Keyboard, Converter={x:Static ObjectConverters.IsNotNull}}" />
-            <Button Grid.Column="2" Content="{x:Static app:Strings.Refresh}" Command="{Binding RefreshCommand}" />
-            <Button Grid.Column="3" Content="{x:Static app:Strings.About}" Click="OnAbout" />
-        </Grid>
-
-        <!-- Update notice -->
-        <Border DockPanel.Dock="Top" IsVisible="{Binding IsUpdateReady}" Padding="12" Margin="0,0,0,8" CornerRadius="4"
-                Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}">
-            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                <TextBlock Text="{Binding UpdateMessage}" VerticalAlignment="Center" TextWrapping="Wrap" />
-                <Button Grid.Column="1" Content="{x:Static app:Strings.UpdateInstall}" Command="{Binding InstallUpdateCommand}" />
-                <Button Grid.Column="2" Content="{x:Static app:Strings.UpdateLater}" Command="{Binding PostponeUpdateCommand}" />
-            </Grid>
-        </Border>
-
-        <!-- Empty or error state when no keyboard is shown -->
-        <TextBlock DockPanel.Dock="Top" Text="{Binding Status}" TextWrapping="Wrap" Margin="0,8"
-                   IsVisible="{Binding Keyboard, Converter={x:Static ObjectConverters.IsNull}}" />
-
-        <ContentControl Content="{Binding Keyboard}">
-            <ContentControl.DataTemplates>
-                <DataTemplate DataType="app:KeyboardEditorViewModel">
-                    <TabControl>
-                    <TabItem Header="{x:Static app:Strings.TabKeys}">
-                    <DockPanel>
-                        <!-- Footer: status and the single primary action -->
-                        <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,16,0,0">
-                            <TextBlock Text="{Binding Status}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                            <ProgressBar Grid.Column="1" IsIndeterminate="True" Width="80" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
-                            <Button Grid.Column="2" Content="{x:Static app:Strings.ImportBackup}" Command="{Binding ImportBackupCommand}" IsVisible="{Binding NeedsBackup}" />
-                            <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="8">
-                                <Button Content="{x:Static app:Strings.Discard}" Command="{Binding DiscardCommand}" />
-                                <Button Content="{Binding ApplyText}" Command="{Binding ApplyCommand}" Classes="accent" />
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- Editor for the selected keys -->
-                        <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,16,0,0">
-                            <WrapPanel ItemSpacing="8" LineSpacing="8">
-                                <Button Content="{x:Static app:Strings.PresetWasd}" Command="{Binding SelectCommand}" CommandParameter="WASD" />
-                                <Button Content="{x:Static app:Strings.PresetMovement}" Command="{Binding SelectCommand}" CommandParameter="Movement" />
-                                <Button Content="{x:Static app:Strings.PresetActions}" Command="{Binding SelectCommand}" CommandParameter="Actions" />
-                                <Button Content="{x:Static app:Strings.PresetNumbers}" Command="{Binding SelectCommand}" CommandParameter="Numbers" />
-                                <Button Content="{x:Static app:Strings.PresetAll}" Command="{Binding SelectCommand}" CommandParameter="All" />
-                                <Button Content="{x:Static app:Strings.PresetNone}" Command="{Binding SelectCommand}" CommandParameter="None" />
-                            </WrapPanel>
-                            <TextBlock Text="{x:Static app:Strings.SelectKeysHint}" Classes="secondary" IsVisible="{Binding !HasSelection}" />
-                            <WrapPanel ItemSpacing="16" LineSpacing="8" IsEnabled="{Binding HasSelection}">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.Actuation}" />
-                                    <NumericUpDown Value="{Binding Actuation}" Minimum="{Binding Limits.Travel.MinMm}" Maximum="{Binding Limits.Travel.MaxMm}"
-                                                   Increment="{Binding Limits.Travel.StepMm}" FormatString="0.0" Width="140"
-                                                   PlaceholderText="{x:Static app:Strings.Mixed}" AutomationProperties.Name="{x:Static app:Strings.Actuation}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.Release}" />
-                                    <NumericUpDown Value="{Binding Release}" Minimum="{Binding Limits.Travel.MinMm}" Maximum="{Binding Limits.Travel.MaxMm}"
-                                                   Increment="{Binding Limits.Travel.StepMm}" FormatString="0.0" Width="140"
-                                                   PlaceholderText="{x:Static app:Strings.Mixed}" AutomationProperties.Name="{x:Static app:Strings.Release}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.RapidTrigger}" />
-                                    <CheckBox IsChecked="{Binding RapidTrigger}" IsThreeState="False" Margin="0,4,0,0"
-                                              AutomationProperties.Name="{x:Static app:Strings.RapidTrigger}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.RapidTriggerPress}" />
-                                    <NumericUpDown Value="{Binding RapidTriggerPress}" Minimum="{Binding Limits.RapidTrigger.MinMm}" Maximum="{Binding Limits.RapidTrigger.MaxMm}"
-                                                   Increment="{Binding Limits.RapidTrigger.StepMm}" FormatString="0.0" Width="140"
-                                                   PlaceholderText="{x:Static app:Strings.Mixed}" AutomationProperties.Name="{x:Static app:Strings.RapidTriggerPress}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.RapidTriggerRelease}" />
-                                    <NumericUpDown Value="{Binding RapidTriggerRelease}" Minimum="{Binding Limits.RapidTrigger.MinMm}" Maximum="{Binding Limits.RapidTrigger.MaxMm}"
-                                                   Increment="{Binding Limits.RapidTrigger.StepMm}" FormatString="0.0" Width="140"
-                                                   PlaceholderText="{x:Static app:Strings.Mixed}" AutomationProperties.Name="{x:Static app:Strings.RapidTriggerRelease}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.Deadzone}" />
-                                    <NumericUpDown Value="{Binding Deadzone}" Minimum="{Binding Limits.Deadzone.MinMm}" Maximum="{Binding Limits.Deadzone.MaxMm}"
-                                                   Increment="{Binding Limits.Deadzone.StepMm}" FormatString="0.0" Width="140"
-                                                   PlaceholderText="{x:Static app:Strings.Mixed}" AutomationProperties.Name="{x:Static app:Strings.Deadzone}" />
-                                </StackPanel>
-                            </WrapPanel>
+    <Grid ColumnDefinitions="Auto,*">
+        <!-- Navigation rail -->
+        <Border x:Name="Rail" Classes.collapsed="{Binding IsNavigationCollapsed}" Padding="12,16"
+                Background="{DynamicResource HfSurface1}" BorderBrush="{DynamicResource HfBorder}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Height="40" Margin="6,0,0,16">
+                    <Border Width="28" Height="28" CornerRadius="8" Background="{DynamicResource HfAccent}">
+                        <Path Data="M9.5 8.5v11M18.5 8.5v11M9.5 14h9" Stroke="{DynamicResource HfAccentInk}" StrokeThickness="2.6"
+                              StrokeLineCap="Round" Width="14" Height="14" Stretch="Uniform" />
+                    </Border>
+                    <TextBlock Text="HallForge" FontSize="17" FontWeight="Bold" VerticalAlignment="Center" IsVisible="{Binding !IsNavigationCollapsed}" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Button Classes="nav" Click="OnAbout" ToolTip.Tip="{x:Static app:Strings.About}" AutomationProperties.Name="{x:Static app:Strings.About}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Path Classes="icon" Data="{StaticResource IconInfo}" />
+                            <TextBlock Text="{x:Static app:Strings.About}" IsVisible="{Binding !IsNavigationCollapsed}" />
                         </StackPanel>
-
-                        <!-- Keyboard: real key geometry, scaled to the available space -->
-                        <Viewbox Stretch="Uniform" StretchDirection="Both">
-                            <ItemsControl ItemsSource="{Binding Keys}" Width="{Binding CanvasWidth}" Height="{Binding CanvasHeight}"
-                                          AutomationProperties.Name="{x:Static app:Strings.KeyboardViewName}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.Styles>
-                                    <Style Selector="ContentPresenter" x:DataType="app:KeyViewModel">
-                                        <Setter Property="Canvas.Left" Value="{Binding Left}" />
-                                        <Setter Property="Canvas.Top" Value="{Binding Top}" />
-                                    </Style>
-                                </ItemsControl.Styles>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="app:KeyViewModel">
-                                        <ToggleButton Classes="key" Classes.pending="{Binding IsPending}"
-                                                      Width="{Binding Width}" Height="{Binding Height}"
-                                                      IsChecked="{Binding IsSelected}"
-                                                      AutomationProperties.Name="{Binding AccessibleName}"
-                                                      ToolTip.Tip="{Binding AccessibleName}">
-                                            <Grid RowDefinitions="*,Auto">
-                                                <TextBlock Text="{Binding Legend}" FontSize="12" />
-                                                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
-                                                    <TextBlock Text="RT" FontSize="9" FontWeight="Bold" IsVisible="{Binding IsRapidTrigger}" VerticalAlignment="Bottom" />
-                                                    <TextBlock Text="{Binding ValueText}" FontSize="10" Classes="secondary" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </ToggleButton>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Viewbox>
-                    </DockPanel>
-                    </TabItem>
-                    <TabItem Header="{x:Static app:Strings.TabLighting}" DataContext="{Binding Lighting}">
-                        <DockPanel x:DataType="app:LightingViewModel" Margin="0,16,0,0">
-                            <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,16,0,0">
-                                <TextBlock Text="{Binding Status}" TextWrapping="Wrap" VerticalAlignment="Center" />
-                                <ProgressBar Grid.Column="1" IsIndeterminate="True" Width="80" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
-                                <Button Grid.Column="2" Content="{x:Static app:Strings.ApplyLighting}" Command="{Binding ApplyCommand}" Classes="accent" />
-                            </Grid>
-                            <StackPanel Spacing="16" MaxWidth="480" HorizontalAlignment="Left" IsEnabled="{Binding IsLoaded}">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.LightingEffect}" />
-                                    <ComboBox ItemsSource="{Binding Modes}" SelectedItem="{Binding Mode}" MinWidth="240"
-                                              AutomationProperties.Name="{x:Static app:Strings.LightingEffect}">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate DataType="app:LightingModeItem">
-                                                <TextBlock Text="{Binding Name}" />
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.LightingBrightness}" />
-                                    <Slider Value="{Binding Brightness}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
-                                            AutomationProperties.Name="{x:Static app:Strings.LightingBrightness}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="{x:Static app:Strings.LightingSpeed}" />
-                                    <Slider Value="{Binding Speed}" Minimum="0" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
-                                            AutomationProperties.Name="{x:Static app:Strings.LightingSpeed}" />
-                                </StackPanel>
-                                <StackPanel Spacing="4" IsVisible="{Binding HasVariants}">
-                                    <TextBlock Text="{x:Static app:Strings.LightingVariant}" />
-                                    <ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding Variant}" MinWidth="240"
-                                              AutomationProperties.Name="{x:Static app:Strings.LightingVariant}">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate DataType="app:LightingVariantItem">
-                                                <TextBlock Text="{Binding Name}" />
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                                <CheckBox Content="{x:Static app:Strings.LightingRainbow}" IsChecked="{Binding Rainbow}" />
-                                <StackPanel Spacing="4" IsEnabled="{Binding !Rainbow}">
-                                    <TextBlock Text="{x:Static app:Strings.LightingColor}" />
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBox Text="{Binding ColorHex}" Width="140" MaxLength="6"
-                                                 AutomationProperties.Name="{x:Static app:Strings.LightingColor}" />
-                                        <Border Width="32" Height="32" CornerRadius="4" BorderThickness="1"
-                                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                Background="{Binding ColorPreview, FallbackValue=Transparent}" />
-                                    </StackPanel>
-                                </StackPanel>
+                    </Button>
+                    <Button Classes="nav" Command="{Binding ToggleNavigationCommand}" ToolTip.Tip="{x:Static app:Strings.ToggleNavigation}"
+                            AutomationProperties.Name="{x:Static app:Strings.ToggleNavigation}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Panel>
+                                <Path Classes="icon" Data="{StaticResource IconCollapse}" IsVisible="{Binding !IsNavigationCollapsed}" />
+                                <Path Classes="icon" Data="{StaticResource IconExpand}" IsVisible="{Binding IsNavigationCollapsed}" />
+                            </Panel>
+                            <TextBlock Text="{x:Static app:Strings.Collapse}" IsVisible="{Binding !IsNavigationCollapsed}" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <ListBox Classes="nav" SelectedIndex="{Binding PageIndex}" AutomationProperties.Name="{x:Static app:Strings.Navigation}">
+                    <ListBoxItem ToolTip.Tip="{x:Static app:Strings.NavPerformance}" AutomationProperties.Name="{x:Static app:Strings.NavPerformance}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Path Classes="icon" Data="{StaticResource IconPerformance}" />
+                            <TextBlock Text="{x:Static app:Strings.NavPerformance}" IsVisible="{Binding !IsNavigationCollapsed}" />
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem IsEnabled="False" ToolTip.Tip="{x:Static app:Strings.NavKeyMappingLater}" AutomationProperties.Name="{x:Static app:Strings.NavKeyMappingLater}">
+                        <DockPanel>
+                            <Border DockPanel.Dock="Right" Classes="pill" Padding="7,1" VerticalAlignment="Center" IsVisible="{Binding !IsNavigationCollapsed}">
+                                <TextBlock Text="{x:Static app:Strings.Later}" FontSize="11" />
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <Path Classes="icon" Data="{StaticResource IconKeyboard}" />
+                                <TextBlock Text="{x:Static app:Strings.NavKeyMapping}" IsVisible="{Binding !IsNavigationCollapsed}" />
                             </StackPanel>
                         </DockPanel>
-                    </TabItem>
-                    </TabControl>
-                </DataTemplate>
-            </ContentControl.DataTemplates>
-        </ContentControl>
-    </DockPanel>
+                    </ListBoxItem>
+                    <ListBoxItem ToolTip.Tip="{x:Static app:Strings.TabLighting}" AutomationProperties.Name="{x:Static app:Strings.TabLighting}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Path Classes="icon" Data="{StaticResource IconLighting}" />
+                            <TextBlock Text="{x:Static app:Strings.TabLighting}" IsVisible="{Binding !IsNavigationCollapsed}" />
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem ToolTip.Tip="{x:Static app:Strings.NavProfiles}" AutomationProperties.Name="{x:Static app:Strings.NavProfiles}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Path Classes="icon" Data="{StaticResource IconProfiles}" />
+                            <TextBlock Text="{x:Static app:Strings.NavProfiles}" IsVisible="{Binding !IsNavigationCollapsed}" />
+                        </StackPanel>
+                    </ListBoxItem>
+                    <ListBoxItem ToolTip.Tip="{x:Static app:Strings.NavDevice}" AutomationProperties.Name="{x:Static app:Strings.NavDevice}">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Path Classes="icon" Data="{StaticResource IconDevice}" />
+                            <TextBlock Text="{x:Static app:Strings.NavDevice}" IsVisible="{Binding !IsNavigationCollapsed}" />
+                        </StackPanel>
+                    </ListBoxItem>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <DockPanel Grid.Column="1">
+            <!-- Header: active device and its support level -->
+            <Border DockPanel.Dock="Top" Height="56" Padding="24,0" BorderBrush="{DynamicResource HfBorder}" BorderThickness="0,0,0,1">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnSpacing="12">
+                    <Button Classes="outline" Command="{Binding ShowDeviceCommand}" Height="36"
+                            AutomationProperties.Name="{x:Static app:Strings.ActiveDevice}" Background="{DynamicResource HfSurface1}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Path Classes="icon" Data="{StaticResource IconKeyboard}" />
+                            <TextBlock FontWeight="SemiBold" VerticalAlignment="Center"
+                                       Text="{Binding Keyboard.DeviceName, FallbackValue={x:Static app:Strings.NoDevice}}" />
+                        </StackPanel>
+                    </Button>
+                    <Panel Grid.Column="1" VerticalAlignment="Center">
+                        <Border Classes="pill success" IsVisible="{Binding HasKeyboard}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource HfSuccess}" VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Static app:Strings.Connected}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="pill draft" IsVisible="{Binding IsSearching}">
+                            <TextBlock Text="{x:Static app:Strings.Discovering}" />
+                        </Border>
+                        <Border Classes="pill" IsVisible="{Binding IsNoDevice}">
+                            <TextBlock Text="{x:Static app:Strings.NoDevice}" />
+                        </Border>
+                    </Panel>
+                    <Border Grid.Column="2" Classes="pill warn" VerticalAlignment="Center" IsVisible="{Binding Keyboard.IsExperimental, FallbackValue=False}"
+                            ToolTip.Tip="{x:Static app:Strings.ExperimentalHelp}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Classes="icon small" Data="{StaticResource IconWarning}" Stroke="{DynamicResource HfWarn}" />
+                            <TextBlock Text="{x:Static app:Strings.Experimental}" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Grid.Column="3" Classes="secondary" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Text="{Binding Keyboard.HeaderInfo, FallbackValue=''}" />
+                    <Button Grid.Column="4" Classes="icon" Command="{Binding RefreshCommand}"
+                            ToolTip.Tip="{x:Static app:Strings.SearchAgain}" AutomationProperties.Name="{x:Static app:Strings.SearchAgain}">
+                        <Path Classes="icon" Data="{StaticResource IconRefresh}" />
+                    </Button>
+                    <Button Grid.Column="5" Classes="icon" Click="OnToggleTheme"
+                            ToolTip.Tip="{x:Static app:Strings.ToggleTheme}" AutomationProperties.Name="{x:Static app:Strings.ToggleTheme}">
+                        <Path Classes="icon" Data="{StaticResource IconTheme}" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Update notice -->
+            <Border DockPanel.Dock="Top" IsVisible="{Binding IsUpdateReady}" Classes="note" Margin="24,12,24,0">
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <TextBlock Text="{Binding UpdateMessage}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                    <Button Grid.Column="1" Content="{x:Static app:Strings.UpdateInstall}" Command="{Binding InstallUpdateCommand}" Classes="accent" />
+                    <Button Grid.Column="2" Content="{x:Static app:Strings.UpdateLater}" Command="{Binding PostponeUpdateCommand}" Classes="outline" />
+                </Grid>
+            </Border>
+
+            <!-- Pending changes: visible on every page, because profiles also fill the draft -->
+            <Panel DockPanel.Dock="Bottom" DataContext="{Binding Keyboard}">
+                <Border x:DataType="app:KeyboardEditorViewModel" IsVisible="{Binding HasDrafts, FallbackValue=False}" Padding="24,12"
+                        Background="{DynamicResource HfSurface1}" BorderBrush="{DynamicResource HfBorder}" BorderThickness="0,1,0,0">
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto" ColumnSpacing="12" AutomationProperties.Name="{x:Static app:Strings.PendingChanges}">
+                        <Ellipse Width="10" Height="10" Fill="{DynamicResource HfCyan}" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DraftTitle}" FontWeight="Bold" />
+                            <TextBlock Text="{x:Static app:Strings.DraftOnly}" Classes="secondary" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="3" Text="{x:Static app:Strings.FixInput}" Classes="error" FontWeight="SemiBold"
+                                   VerticalAlignment="Center" IsVisible="{Binding HasInputError}" />
+                        <Button Grid.Column="4" Classes="outline" Command="{Binding UndoCommand}" AutomationProperties.Name="{x:Static app:Strings.UndoHelp}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon small" Data="{StaticResource IconUndo}" />
+                                <TextBlock Text="{x:Static app:Strings.Undo}" />
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="5" Classes="outline" Content="{x:Static app:Strings.DiscardAll}" Command="{Binding DiscardCommand}" />
+                        <Button Grid.Column="6" Classes="accent" Content="{x:Static app:Strings.ReviewApply}" Command="{Binding ReviewCommand}"
+                                IsEnabled="{Binding !HasInputError}" FontWeight="Bold" Padding="18,6" />
+                    </Grid>
+                </Border>
+            </Panel>
+
+            <Panel>
+                <app:DeviceView IsVisible="{Binding ShowDevicePage}" />
+                <Panel IsVisible="{Binding ShowPerformancePage}">
+                    <app:PerformanceView DataContext="{Binding Keyboard}" />
+                </Panel>
+                <Panel IsVisible="{Binding ShowLightingPage}">
+                    <app:LightingView DataContext="{Binding Keyboard.Lighting, FallbackValue={x:Null}}" />
+                </Panel>
+                <Panel IsVisible="{Binding ShowProfilesPage}">
+                    <app:ProfilesView DataContext="{Binding Profiles}" />
+                </Panel>
+            </Panel>
+        </DockPanel>
+    </Grid>
 </Window>

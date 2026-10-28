@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:HallForge.App"
+             x:Class="HallForge.App.DeviceView"
+             x:DataType="app:MainViewModel">
+    <UserControl.Styles>
+        <Style Selector="Border.step">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Background" Value="{DynamicResource HfAccentSoft}" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+        <Style Selector="Border.step > TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{DynamicResource HfText2}" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Margin="24,20" Spacing="16" MaxWidth="720" HorizontalAlignment="Left">
+            <!-- Discovering -->
+            <Border Classes="panel" IsVisible="{Binding IsSearching}" Padding="24">
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <ProgressBar IsIndeterminate="True" Width="80" VerticalAlignment="Center" />
+                    <TextBlock Text="{x:Static app:Strings.Searching}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
+            <!-- No keyboard: what the user can do -->
+            <Border Classes="panel" IsVisible="{Binding IsNoDevice}" Padding="24">
+                <StackPanel Spacing="16">
+                    <StackPanel Spacing="4">
+                        <TextBlock Classes="h1" Text="{x:Static app:Strings.NoKeyboardHeading}" />
+                        <TextBlock Classes="secondary" Text="{x:Static app:Strings.NoKeyboardIntro}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                        <Border Classes="step"><TextBlock Text="1" /></Border>
+                        <TextBlock Grid.Column="1" Text="{x:Static app:Strings.NoKeyboardStep1}" TextWrapping="Wrap" />
+                        <Border Grid.Row="1" Classes="step"><TextBlock Text="2" /></Border>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Static app:Strings.NoKeyboardStep2}" TextWrapping="Wrap" />
+                        <Border Grid.Row="2" Classes="step"><TextBlock Text="3" /></Border>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Static app:Strings.NoKeyboardStep3}" TextWrapping="Wrap" />
+                    </Grid>
+                    <Border Classes="note" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+                    </Border>
+                    <Button Classes="accent" Content="{x:Static app:Strings.Retry}" Command="{Binding RefreshCommand}" Padding="18,6" />
+                </StackPanel>
+            </Border>
+
+            <!-- Connected keyboard -->
+            <StackPanel Spacing="16" IsVisible="{Binding HasKeyboard}">
+                <StackPanel Spacing="2">
+                    <TextBlock Classes="h1" Text="{x:Static app:Strings.NavDevice}" />
+                    <TextBlock Classes="secondary" Text="{x:Static app:Strings.DeviceIntro}" TextWrapping="Wrap" />
+                </StackPanel>
+                <Border Classes="panel" DataContext="{Binding Keyboard}">
+                    <Grid x:DataType="app:KeyboardEditorViewModel" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="24" RowSpacing="10">
+                        <TextBlock Classes="label" Text="{x:Static app:Strings.DeviceModel}" />
+                        <TextBlock Grid.Column="1" Text="{Binding DeviceName}" FontWeight="SemiBold" />
+                        <TextBlock Grid.Row="1" Classes="label" Text="{x:Static app:Strings.DeviceUsbId}" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding UsbId}" />
+                        <TextBlock Grid.Row="2" Classes="label" Text="{x:Static app:Strings.DeviceModelIds}" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ModelIds}" />
+                        <TextBlock Grid.Row="3" Classes="label" Text="{x:Static app:Strings.DeviceProfile}" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ProfileText}" />
+                        <TextBlock Grid.Row="4" Classes="label" Text="{x:Static app:Strings.DeviceSupport}" />
+                        <StackPanel Grid.Row="4" Grid.Column="1" Spacing="2">
+                            <TextBlock Text="{x:Static app:Strings.Experimental}" Classes="warn" FontWeight="SemiBold" IsVisible="{Binding IsExperimental}" />
+                            <TextBlock Text="{x:Static app:Strings.ExperimentalHelp}" Classes="secondary" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="5" Classes="label" Text="{x:Static app:Strings.DeviceLayout}" />
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LayoutSummary}" />
+                    </Grid>
+                </Border>
+                <Border Classes="panel" DataContext="{Binding Keyboard}">
+                    <StackPanel x:DataType="app:KeyboardEditorViewModel" Spacing="12">
+                        <TextBlock Classes="h2" Text="{x:Static app:Strings.Backup}" />
+                        <TextBlock Text="{x:Static app:Strings.BackupAvailable}" TextWrapping="Wrap" IsVisible="{Binding !NeedsBackup}" />
+                        <StackPanel Spacing="12" IsVisible="{Binding NeedsBackup}">
+                            <TextBlock Text="{x:Static app:Strings.NoBackupYet}" TextWrapping="Wrap" />
+                            <Button Classes="accent" Content="{x:Static app:Strings.ImportBackup}" Command="{Binding ImportBackupCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding Status}" Classes="secondary" TextWrapping="Wrap"
+                                   IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
