@@ -1,14 +1,15 @@
 using System.Text.Json;
+using HallForge.Core;
 
 namespace HallForge.App;
 
 public sealed record WindowPlacement(double Width, double Height, int X, int Y, bool Maximized);
 
-/// <summary>User preferences, stored per user in the platform's local application data folder.</summary>
+/// <summary>User preferences, stored next to the state in <see cref="StateStore.DefaultRoot"/>.</summary>
 public sealed class AppSettings
 {
     private static readonly string FilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "HallForge", "settings.json");
+        StateStore.DefaultRoot, "settings.json");
 
     private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web) { WriteIndented = true };
 

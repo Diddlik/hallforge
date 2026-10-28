@@ -29,8 +29,12 @@ public sealed class StateStore(string root)
         RespectNullableAnnotations = true,
     };
 
+    /// <summary>
+    /// User data lives outside %LocalAppData%/HallForge, because the Velopack installer owns that folder and
+    /// replaces it on install.
+    /// </summary>
     public static string DefaultRoot { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "HallForge");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "HallForge");
 
     public string StatePath(string definitionId, int profile) => Path.Combine(root, "state", $"{definitionId}-profile{profile}.json");
 

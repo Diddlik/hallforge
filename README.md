@@ -51,7 +51,7 @@ The AKKO MOD007B ISO HE cannot report its key settings, so HallForge keeps what 
 
 - `backup import-akko` reads the settings that the Akko Cloud Driver stored in its local database (`%AppData%/Akko Cloud Driver/iot_db/CONFIG/db`). It saves them as an immutable backup and as the initial state. The driver only stores keys that differ from its defaults, so all other keys stay unknown.
 - `keys set` records every write in the state.
-- Files live in `%LocalAppData%/HallForge/state` and `%LocalAppData%/HallForge/backups`.
+- Files live in `%AppData%/HallForge/state` and `%AppData%/HallForge/backups` (`~/.config/HallForge` on Linux and macOS).
 
 ## Profiles
 
