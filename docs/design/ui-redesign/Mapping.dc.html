@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HallForge — Key Mapping preview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.mp *{box-sizing:border-box}
+.mp button{font:inherit;color:inherit}
+.mp .btn{cursor:pointer;transition:filter .15s ease}
+.mp .btn:hover:not(:disabled){filter:brightness(1.12)}
+.mp :focus-visible{outline:2px solid #22D3EE;outline-offset:2px}
+.mp a{text-decoration:none}
+@media (prefers-reduced-motion: reduce){.mp *{transition:none!important}}
+</style>
+</helmet>
+<div class="mp" style="width: 100%; height: 900px; display: flex; overflow: hidden; background: #0B0F17; color: #F3F6FC; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'SF Pro Text', Ubuntu, 'Noto Sans', sans-serif; font-size: 13px; line-height: 1.45">
+
+<nav aria-label="Main navigation" style="width: 208px; flex: none; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; background: #131A27; border-right: 1px solid #2A3446">
+<div style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px; margin-bottom: 16px">
+<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="#A78BFA"></rect><path d="M9.5 8.5v11M18.5 8.5v11M9.5 14h9" stroke="#160F2E" stroke-width="2.6" stroke-linecap="round" fill="none"></path><circle cx="22" cy="6" r="3" fill="#22D3EE" stroke="#131A27" stroke-width="1.5"></circle></svg>
+<span style="font-size: 17px; font-weight: 700; letter-spacing: -0.01em">HallForge</span>
+</div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="7">
+<a href="{{n.href}}" aria-current="{{n.current}}" style="{{n.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.d}}"></path></svg><span style="flex: 1">{{n.label}}</span><sc-if value="{{n.later}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #1B2434; color: #B4C0D2">Later</span></sc-if></a>
+</sc-for>
+</nav>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<header style="height: 56px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid #2A3446">
+<span style="display: flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: #131A27; font-weight: 600">AKKO MOD007B ISO HE</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: rgba(52,211,153,0.12); color: #34D399; font-weight: 600"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #34D399"></span>Connected</span>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div role="note" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; background: #1B2434; border: 1px dashed #4A5875">
+<span aria-hidden="true" style="flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: #2E2552; color: #A78BFA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4"></path></svg></span>
+<div style="flex: 1"><strong>Coming later — protocol support not verified.</strong> <span style="color: #B4C0D2">This is a mock preview of the planned Key Mapping screen. Nothing here can be saved to or sent to the keyboard.</span></div>
+<span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid #A78BFA; color: #A78BFA">Mock preview</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px">
+<h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Key Mapping</h1>
+<span style="color: #B4C0D2">Hardware layer: not exposed by device · editor shows the base layer only</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section aria-label="Keyboard" style="flex: 999 1 776px; min-width: 0; background: #131A27; border: 1px solid #2A3446; border-radius: 14px; padding: 20px">
+<div style="overflow-x: auto; padding: 4px 0">
+<div role="group" aria-label="Keyboard, ISO-DE. Mock mappings shown." style="position: relative; width: {{kbW}}px; height: {{kbH}}px; margin: 0 auto">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="67">
+<button class="btn" type="button" onClick="{{k.pick}}" aria-pressed="{{k.selected}}" aria-label="{{k.aria}}" style="{{k.style}}"><span style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; line-height: 1.1"><span style="{{k.legendStyle}}">{{k.legend}}</span><sc-if value="{{k.mapped}}" hint-placeholder-val="{{ false }}"><span style="font-size: 9px; font-weight: 700; margin-top: 2px; color: #22D3EE">{{k.to}}</span></sc-if></span></button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; gap: 18px; margin-top: 12px; font-size: 12px; color: #B4C0D2">
+<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; background: #35295F; border: 1.5px solid #A78BFA"></span>Selected</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="font-size: 10px; font-weight: 700; color: #22D3EE">Ctrl</span>Mock mapping (struck legend = original)</span>
+</div>
+</section>
+
+<section aria-labelledby="km-h" style="flex: 1 1 296px; min-width: 280px; background: #131A27; border: 1px solid #2A3446; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="km-h" style="margin: 0; font-size: 16px; font-weight: 700">{{selName}}</h2>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px">
+<div><dt style="color: #B4C0D2; font-size: 12px">Original</dt><dd style="margin: 0; font-weight: 600">{{selName}}</dd></div>
+<div><dt style="color: #B4C0D2; font-size: 12px">Proposed (mock)</dt><dd style="margin: 0; font-weight: 600; color: #22D3EE">{{selTo}}</dd></div>
+</dl>
+<div role="tablist" aria-label="Mapping type" style="display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; border-radius: 10px; background: #0B0F17">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="6">
+<button class="btn" type="button" role="tab" aria-selected="{{tb.selected}}" onClick="{{tb.pick}}" style="{{tb.style}}">{{tb.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{isCombo}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="color: #B4C0D2; font-size: 12px; font-weight: 600">Modifiers</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{mods}}" as="m" hint-placeholder-count="4">
+<button class="btn" type="button" aria-pressed="{{m.on}}" onClick="{{m.pick}}" style="{{m.style}}">{{m.label}}</button>
+</sc-for>
+</div>
+<div style="color: #B4C0D2; font-size: 12px; font-weight: 600">Key</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="min-width: 44px; height: 40px; padding: 0 12px; display: grid; place-items: center; border-radius: 8px; background: #1E2738; border: 1px solid #313D53; font-weight: 700; font-size: 15px">C</span>
+<button class="btn" type="button" style="height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Press a key to capture…</button>
+</div>
+<div style="padding: 10px 12px; border-radius: 8px; background: #0B0F17; font-weight: 700; letter-spacing: 0.02em">{{comboText}}</div>
+</div>
+</sc-if>
+<sc-if value="{{isOther}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{options}}" as="o" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; border-radius: 8px; background: #1B2434; color: #B4C0D2">{{o}}</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isMacro}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 8px"><span style="flex: 1; height: 34px; padding: 0 10px; display: flex; align-items: center; border-radius: 8px; background: #0B0F17; border: 1px solid #2A3446; color: #8C99AE">Macro name</span><span style="height: 34px; padding: 0 10px; display: flex; align-items: center; border-radius: 8px; background: #0B0F17; border: 1px solid #2A3446; color: #8C99AE">× 1</span></div>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 12px">
+<li style="display: flex; gap: 8px; padding: 6px 10px; border-radius: 6px; background: #1B2434"><span style="color: #22D3EE">↓</span>Key down · [key]</li>
+<li style="display: flex; gap: 8px; padding: 6px 10px; border-radius: 6px; background: #1B2434"><span style="color: #B4C0D2">⏱</span>Delay · [ms]</li>
+<li style="display: flex; gap: 8px; padding: 6px 10px; border-radius: 6px; background: #1B2434"><span style="color: #22D3EE">↑</span>Key up · [key]</li>
+</ol>
+<div style="font-size: 12px; color: #B4C0D2">Recording stays off until protocol and privacy review are done.</div>
+</div>
+</sc-if>
+
+<div style="flex: 1"></div>
+<div style="display: flex; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid #2A3446; color: #B4C0D2; font-size: 12px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>No Apply here: remapping is not supported yet.</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  kb() {
+    if (this._kb) return this._kb;
+    const rows = [
+      [['Dead','^'],['D1','1'],['D2','2'],['D3','3'],['D4','4'],['D5','5'],['D6','6'],['D7','7'],['D8','8'],['D9','9'],['D0','0'],['Ss','ß'],['Acc','´'],['Bksp','⟵',2,'Backspace'],['Del','Entf',1,'Delete']],
+      [['Tab','Tab',1.5],['Q','Q'],['W','W'],['E','E'],['R','R'],['T','T'],['Z','Z'],['U','U'],['I','I'],['O','O'],['P','P'],['Ue','Ü'],['Plus','+'],['Enter','↵',1.5,'Enter'],['PgUp','Bild↑',1,'Page Up']],
+      [['Caps','⇩',1.75,'Caps Lock'],['A','A'],['S','S'],['D','D'],['F','F'],['G','G'],['H','H'],['J','J'],['K','K'],['L','L'],['Oe','Ö'],['Ae','Ä'],['Hash','#'],[null,'',1.25],['PgDn','Bild↓',1,'Page Down']],
+      [['LShift','⇧',1.25,'Left Shift'],['Lt','<'],['Y','Y'],['X','X'],['C','C'],['V','V'],['B','B'],['N','N'],['M','M'],['Comma',','],['Dot','.'],['Minus','-'],['RShift','⇧',1.75,'Right Shift'],['Up','↑',1,'Arrow Up'],['End','Ende',1,'End']],
+      [['LCtrl','Strg',1.25,'Left Ctrl'],['Win','Win',1.25,'Windows'],['LAlt','Alt',1.25,'Left Alt'],['Space','',6.25,'Space'],['AltGr','AltGr'],['Fn','Fn'],['RCtrl','Strg',1,'Right Ctrl'],['Left','←',1,'Arrow Left'],['Down','↓',1,'Arrow Down'],['Right','→',1,'Arrow Right']]
+    ];
+    const keys = [];
+    rows.forEach((row, y) => { let x = 0; row.forEach((k) => { const w = k[2] || 1; if (k[0]) keys.push({ id: k[0], legend: k[1], w: w, x: x, y: y, name: k[3] || k[1] }); x += w; }); });
+    this._kb = keys;
+    return keys;
+  }
+  renderVals() {
+    const s = this.state || {};
+    const selId = s.sel || 'Caps';
+    const tab = s.tab || 'Combination';
+    const mock = { Caps: 'Ctrl', Win: 'Off', RCtrl: '⏯', Del: 'Ctrl+C' };
+    const nav = [
+      ['Overview', 'M4 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1zM4 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z', '#'],
+      ['Performance', 'M12 14l4-4M3.34 19a10 10 0 1 1 17.32 0', 'Main.dc.html'],
+      ['Key Mapping', 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10', 'Mapping.dc.html', true],
+      ['Lighting', 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z', 'Lighting.dc.html', true],
+      ['Profiles', 'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5', 'Profiles.dc.html'],
+      ['Device', 'M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3', 'NoDevice.dc.html'],
+      ['About', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', '#']
+    ].map((n) => {
+      const active = n[0] === 'Key Mapping';
+      return {
+        label: n[0], d: n[1], href: n[2], later: !!n[3], current: active ? 'page' : 'false',
+        style: 'display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 11px; border-radius: 8px; font-weight: ' + (active ? 700 : 500) + '; background: ' + (active ? '#2E2552' : 'transparent') + '; color: ' + (active ? '#F3F6FC' : '#B4C0D2')
+      };
+    });
+    const U = 46;
+    const keys = this.kb().map((k) => {
+      const sel = k.id === selId;
+      const to = mock[k.id];
+      return {
+        legend: k.legend, mapped: !!to, to: to || '', selected: sel ? 'true' : 'false',
+        aria: k.name + (sel ? ', selected' : '') + (to ? ', mock mapping to ' + to : ''),
+        pick: () => this.setState({ sel: k.id }),
+        legendStyle: 'font-weight: 600; font-size: ' + (k.legend.length > 3 ? 11 : 14) + 'px;' + (to ? ' text-decoration: line-through; opacity: 0.6; font-size: 11px;' : ''),
+        style: 'position: absolute; left: ' + (k.x * U) + 'px; top: ' + (k.y * U) + 'px; width: ' + (k.w * U - 5) + 'px; height: ' + (U - 5) + 'px; padding: 0; border-radius: 7px; border: 1px solid ' + (sel ? '#A78BFA' : '#313D53') + '; background: ' + (sel ? '#35295F' : '#1E2738') + '; color: #E8EDF6; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.38)' + (sel ? ', 0 0 0 1px #A78BFA, 0 0 16px rgba(167,139,250,0.4)' : '') + ';'
+      };
+    });
+    const selKey = this.kb().find((k) => k.id === selId);
+    const tabs = ['Key', 'Combination', 'Media', 'Mouse', 'Macro', 'Disable'].map((l) => ({
+      label: l, selected: l === tab ? 'true' : 'false',
+      pick: () => this.setState({ tab: l }),
+      style: 'height: 30px; padding: 0 10px; border-radius: 7px; border: none; font-weight: 600; background: ' + (l === tab ? '#2E2552' : 'transparent') + '; color: ' + (l === tab ? '#F3F6FC' : '#B4C0D2')
+    }));
+    const modsOn = s.mods || { Ctrl: true };
+    const mods = ['Ctrl', 'Alt', 'Shift', 'Win'].map((m) => ({
+      label: m, on: modsOn[m] ? 'true' : 'false',
+      pick: () => this.setState({ mods: Object.assign({}, modsOn, { [m]: !modsOn[m] }) }),
+      style: 'height: 32px; padding: 0 14px; border-radius: 999px; font-weight: 600; border: 1px solid ' + (modsOn[m] ? '#A78BFA' : '#2A3446') + '; background: ' + (modsOn[m] ? '#2E2552' : 'transparent')
+    }));
+    const optionSets = {
+      Key: ['Any key from the layout', 'Search: “Esc”, “F13”…'],
+      Media: ['Play / Pause', 'Next track', 'Volume up', 'Mute'],
+      Mouse: ['Left button', 'Right button', 'Middle button', 'Back / Forward'],
+      Disable: ['Disable this key', 'Restore original']
+    };
+    return {
+      nav: nav, keys: keys, kbW: 16 * U - 5, kbH: 5 * U - 5,
+      selName: selKey ? selKey.name : '',
+      selTo: mock[selId] || 'No change',
+      tabs: tabs, mods: mods,
+      comboText: ['Ctrl', 'Alt', 'Shift', 'Win'].filter((m) => modsOn[m]).concat(['C']).join(' + '),
+      isCombo: tab === 'Combination', isMacro: tab === 'Macro', isOther: !!optionSets[tab],
+      options: optionSets[tab] || []
+    };
+  }
+}
+</script>
+</body>
+</html>

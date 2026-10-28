@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HallForge — Performance</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.hf *{box-sizing:border-box}
+.hf button,.hf input{font:inherit;color:inherit}
+.hf .num{font-variant-numeric:tabular-nums}
+.hf .btn{cursor:pointer;transition:background-color .15s ease,border-color .15s ease,filter .15s ease}
+.hf .btn:hover:not(:disabled){filter:brightness(1.12)}
+.hf .btn:disabled{cursor:not-allowed;opacity:.45}
+.hf .key{cursor:pointer;transition:transform .12s ease,filter .12s ease,box-shadow .15s ease}
+.hf .key:hover{transform:translateY(-1px);filter:brightness(1.15)}
+.hf :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.hf input[type=range]{width:100%;margin:0;height:20px;cursor:pointer}
+.hf a{text-decoration:none}
+@media (prefers-reduced-motion: reduce){.hf *{transition:none!important;animation:none!important}.hf .key:hover{transform:none}}
+</style>
+</helmet>
+<div class="hf" style="--focus: {{t.cyan}}; width: 100%; height: {{h}}px; display: flex; overflow: hidden; background: {{t.bg}}; color: {{t.text}}; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'SF Pro Text', Ubuntu, 'Noto Sans', sans-serif; font-size: 13px; line-height: 1.45">
+
+<nav aria-label="Main navigation" style="width: {{railW}}px; flex: none; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; background: {{t.s1}}; border-right: 1px solid {{t.border}}">
+<div style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px; margin-bottom: 16px">
+<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" style="flex: none"><rect x="1" y="1" width="26" height="26" rx="8" fill="{{t.accent}}"></rect><path d="M9.5 8.5v11M18.5 8.5v11M9.5 14h9" stroke="{{t.accentInk}}" stroke-width="2.6" stroke-linecap="round" fill="none"></path><circle cx="22" cy="6" r="3" fill="{{t.cyan}}" stroke="{{t.s1}}" stroke-width="1.5"></circle></svg>
+<sc-if value="{{railOpen}}" hint-placeholder-val="{{ true }}"><span style="font-size: 17px; font-weight: 700; letter-spacing: -0.01em">HallForge</span></sc-if>
+</div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="7">
+<sc-if value="{{n.href}}" hint-placeholder-val="{{ true }}">
+<a href="{{n.href}}" aria-label="{{n.aria}}" aria-current="{{n.current}}" title="{{n.aria}}" style="{{n.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="{{n.d}}"></path></svg><sc-if value="{{railOpen}}" hint-placeholder-val="{{ true }}"><span style="flex: 1">{{n.label}}</span><sc-if value="{{n.later}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: {{t.s2}}; color: {{t.text2}}">Later</span></sc-if></sc-if></a>
+</sc-if>
+<sc-if value="{{n.noHref}}" hint-placeholder-val="{{ false }}">
+<button class="btn" type="button" aria-label="{{n.aria}}" title="{{n.aria}}" style="{{n.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="{{n.d}}"></path></svg><sc-if value="{{railOpen}}" hint-placeholder-val="{{ true }}"><span style="flex: 1; text-align: left">{{n.label}}</span></sc-if></button>
+</sc-if>
+</sc-for>
+<div style="flex: 1"></div>
+<button class="btn" type="button" onClick="{{toggleRail}}" aria-label="{{railToggleLabel}}" title="{{railToggleLabel}}" style="display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 11px; border: none; border-radius: 8px; background: transparent; color: {{t.text2}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{railIcon}}"></path></svg><sc-if value="{{railOpen}}" hint-placeholder-val="{{ true }}"><span>Collapse</span></sc-if></button>
+</nav>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+
+<header style="height: 56px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid {{t.border}}; overflow: hidden">
+<button class="btn" type="button" aria-label="Active device: AKKO MOD007B ISO HE. Change device" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.s1}}; white-space: nowrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"></path></svg><span style="font-weight: 600">AKKO MOD007B ISO HE</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: {{t.successSoft}}; color: {{t.success}}; font-weight: 600; white-space: nowrap"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{t.success}}"></span>Connected</span>
+<span title="Writes are limited to trigger settings on allowlisted commands. Readback is not available." style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: {{t.warnSoft}}; color: {{t.warn}}; font-weight: 600; white-space: nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>Experimental support</span>
+<span style="color: {{t.text2}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Firmware not reported · Trigger settings only · No readback</span>
+<div style="flex: 1"></div>
+<button class="btn" type="button" onClick="{{toggleTheme}}" aria-label="{{themeLabel}}" title="{{themeLabel}}" style="width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{themeIcon}}"></path></svg></button>
+<button class="btn" type="button" aria-label="Language: English. Change language" title="Language" style="height: 36px; padding: 0 10px; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent; font-weight: 600">EN</button>
+<button class="btn" type="button" aria-label="Settings" title="Settings" style="width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></button>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px">
+<div style="flex: 1 1 360px; min-width: 0">
+<h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.01em">Performance</h1>
+<p style="margin: 2px 0 0; color: {{t.text2}}">Select keys, tune trigger distances, then review. Nothing reaches the keyboard until you apply.</p>
+</div>
+<span title="The device does not expose onboard slots to HallForge. Changes target the keyboard's active configuration." style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 8px; background: {{t.s1}}; border: 1px solid {{t.border}}; color: {{t.text2}}; white-space: nowrap">Onboard slot: not exposed by device</span>
+<button class="btn" type="button" onClick="{{toggleVals}}" aria-pressed="{{showVals}}" style="display: inline-flex; align-items: center; gap: 10px; height: 30px; padding: 0 10px 0 6px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.s1}}; white-space: nowrap"><span aria-hidden="true" style="{{valsTrack}}"><span style="{{valsThumb}}"></span></span>Show values on keys</button>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+
+<div style="flex: 999 1 776px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<section aria-label="Keyboard" style="background: {{t.s1}}; border: 1px solid {{t.border}}; border-radius: 14px; padding: 16px 20px 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px">
+<span style="color: {{t.text2}}; font-weight: 600; margin-right: 4px">Quick select</span>
+<sc-for list="{{presets}}" as="p" hint-placeholder-count="6">
+<button class="btn" type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">{{p.label}}</button>
+</sc-for>
+<span style="flex: 1"></span>
+<span style="color: {{t.text3}}; font-size: 12px">Click selects · Ctrl/⌘-click toggles · Shift-click extends</span>
+</div>
+<div style="overflow-x: auto; padding: 4px 0 6px">
+<div role="group" aria-label="{{kbAria}}" style="position: relative; width: {{kbW}}px; height: {{kbH}}px; margin: 0 auto; padding: 0">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="67">
+<button class="key" type="button" onClick="{{k.pick}}" aria-pressed="{{k.selected}}" aria-label="{{k.aria}}" title="{{k.tip}}" style="{{k.style}}">
+<sc-if value="{{k.isEnter}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="{{k.footStyle}}"></span></sc-if>
+<span aria-hidden="true" style="position: absolute; left: 6px; top: 3px; font-size: 10px; opacity: 0.7">{{k.shift}}</span>
+<span aria-hidden="true" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; font-weight: 600; font-size: {{k.fs}}px; line-height: 1.1">{{k.legend}}<sc-if value="{{k.showVal}}" hint-placeholder-val="{{ false }}"><span class="num" style="font-size: 10px; font-weight: 600; margin-top: 2px; color: {{k.valColor}}">{{k.valText}}</span></sc-if></span>
+<sc-if value="{{k.unknown}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; right: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800; background: {{t.warnSoft}}; color: {{t.warn}}; border: 1px solid {{t.warn}}">?</span></sc-if>
+<sc-if value="{{k.modified}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; left: 50%; bottom: 5px; width: 16px; height: 3px; margin-left: -8px; border-radius: 2px; background: {{t.cyan}}"></span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+<div aria-label="Key state legend" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 12px; color: {{t.text2}}; font-size: 12px">
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 5px; background: {{t.keySelBg}}; border: 1.5px solid {{t.accent}}"></span>Selected</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="position: relative; width: 18px; height: 18px; border-radius: 5px; background: {{t.keyBg}}; border: 1px solid {{t.keyBorder}}"><span style="position: absolute; left: 3px; right: 3px; bottom: 3px; height: 3px; border-radius: 2px; background: {{t.cyan}}"></span></span>Modified (draft)</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800; background: {{t.warnSoft}}; color: {{t.warn}}; border: 1px solid {{t.warn}}">?</span>Unknown — no readback</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 5px; border: 1px solid {{t.keyBorder}}; background: {{t.stripes}}"></span>Not editable</span>
+<span style="flex: 1"></span>
+<span class="num">ISO-DE · {{keyCount}} keys · layout from device definition</span>
+</div>
+</section>
+
+<section aria-label="Selection" style="background: {{t.s1}}; border: 1px solid {{t.border}}; border-radius: 14px; padding: 16px 20px">
+<sc-if value="{{noteText}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; margin-bottom: 12px; border-radius: 8px; background: {{t.s2}}; color: {{t.text2}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01"></path></svg><span>{{noteText}}</span></div>
+</sc-if>
+<sc-if value="{{noSel}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 16px; padding: 18px 4px">
+<span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: {{t.s2}}; color: {{t.text2}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7 18 2.5-7.5L20 11z"></path></svg></span>
+<div><div style="font-size: 16px; font-weight: 600">No keys selected</div><div style="color: {{t.text2}}">Click a key or use Quick select. Ctrl/⌘-click adds keys; Tab moves through the keyboard, Space toggles.</div></div>
+</div>
+</sc-if>
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 10px">
+<h2 class="num" style="margin: 0; font-size: 16px; font-weight: 700">{{selTitle}}</h2>
+<span class="num" style="color: {{t.text2}}">{{selCounts}}</span>
+<span style="flex: 1"></span>
+<button class="btn" type="button" onClick="{{resetSel}}" disabled="{{resetDisabled}}" style="height: 30px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent">Reset drafts for selection</button>
+<button class="btn" type="button" style="height: 30px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent">Save as group…</button>
+</div>
+<div style="max-height: 176px; overflow: auto; border: 1px solid {{t.border}}; border-radius: 10px">
+<table class="num" style="width: 100%; border-collapse: collapse; font-size: 13px">
+<thead><tr style="text-align: left; color: {{t.text2}}; background: {{t.s2}}"><th scope="col" style="padding: 7px 12px; font-weight: 600">Key</th><th scope="col" style="padding: 7px 12px; font-weight: 600">Actuation</th><th scope="col" style="padding: 7px 12px; font-weight: 600">Release</th><th scope="col" style="padding: 7px 12px; font-weight: 600">Rapid Trigger</th><th scope="col" style="padding: 7px 12px; font-weight: 600">Source</th></tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+<tr style="border-top: 1px solid {{t.border}}">
+<th scope="row" style="padding: 7px 12px; text-align: left; font-weight: 600">{{r.name}}</th>
+<td style="padding: 7px 12px">{{r.actOld}}<sc-if value="{{r.actChanged}}" hint-placeholder-val="{{ false }}"><span style="color: {{t.text3}}"> → </span><span style="color: {{t.cyan}}; font-weight: 700">{{r.actNew}}</span></sc-if></td>
+<td style="padding: 7px 12px">{{r.relOld}}<sc-if value="{{r.relChanged}}" hint-placeholder-val="{{ false }}"><span style="color: {{t.text3}}"> → </span><span style="color: {{t.cyan}}; font-weight: 700">{{r.relNew}}</span></sc-if></td>
+<td style="padding: 7px 12px">{{r.rtOld}}<sc-if value="{{r.rtChanged}}" hint-placeholder-val="{{ false }}"><span style="color: {{t.text3}}"> → </span><span style="color: {{t.cyan}}; font-weight: 700">{{r.rtNew}}</span></sc-if></td>
+<td style="padding: 7px 12px"><span title="{{r.srcTip}}" style="{{r.srcStyle}}">{{r.src}}</span></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</sc-if>
+</section>
+</div>
+
+<section aria-labelledby="ts-h" style="flex: 1 1 296px; min-width: 280px; background: {{t.s1}}; border: 1px solid {{t.border}}; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px">
+<div>
+<h2 id="ts-h" style="margin: 0; font-size: 16px; font-weight: 700">Trigger settings</h2>
+<div class="num" style="color: {{t.text2}}; margin-top: 2px">{{scopeText}}</div>
+</div>
+
+<div>
+<div style="color: {{t.text2}}; font-size: 12px; font-weight: 600; margin-bottom: 6px">Local templates · load into draft</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{templates}}" as="tp" hint-placeholder-count="3">
+<button class="btn" type="button" onClick="{{tp.pick}}" disabled="{{noSel}}" title="{{tp.tip}}" style="height: 30px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.s2}}">{{tp.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="height: 1px; background: {{t.border}}"></div>
+
+<sc-for list="{{fields}}" as="f" hint-placeholder-count="4">
+<sc-if value="{{f.rtBefore}}" hint-placeholder-val="{{ false }}">
+<div role="group" aria-labelledby="rt-l" style="display: flex; flex-direction: column; gap: 6px; padding-bottom: 2px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span id="rt-l" style="font-weight: 600">Rapid Trigger</span>
+<span title="Dynamic actuation: the key re-presses and releases on direction changes instead of fixed points. Aggressive values can cause repeated accidental presses while typing." style="color: {{t.text3}}; display: inline-grid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"></path></svg></span>
+<span style="flex: 1"></span>
+<div style="display: inline-flex; padding: 2px; border-radius: 8px; background: {{t.s2}}; border: 1px solid {{t.border}}">
+<button class="btn" type="button" onClick="{{rtOff}}" disabled="{{noSel}}" aria-pressed="{{rtOffPressed}}" style="{{rtOffStyle}}">Off</button>
+<button class="btn" type="button" onClick="{{rtOn}}" disabled="{{noSel}}" aria-pressed="{{rtOnPressed}}" style="{{rtOnStyle}}">On</button>
+</div>
+</div>
+<div class="num" style="font-size: 12px; color: {{rtNoteColor}}">{{rtNote}}</div>
+</div>
+<div style="height: 1px; background: {{t.border}}"></div>
+</sc-if>
+<div role="group" aria-labelledby="{{f.id}}-l" style="display: flex; flex-direction: column; gap: 6px; opacity: {{f.rowOpacity}}">
+<div style="display: flex; align-items: center; gap: 8px">
+<label id="{{f.id}}-l" for="{{f.id}}" style="font-weight: 600">{{f.label}}</label>
+<span title="{{f.help}}" style="color: {{t.text3}}; display: inline-grid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"></path></svg></span>
+<span style="flex: 1"></span>
+<div style="display: inline-flex; align-items: center; height: 32px; border-radius: 8px; border: 1px solid {{f.inputBorder}}; background: {{t.bg}}; padding-right: 8px">
+<input id="{{f.id}}" class="num" type="text" inputmode="decimal" value="{{f.inputVal}}" placeholder="{{f.placeholder}}" onChange="{{f.onText}}" onBlur="{{f.onBlur}}" disabled="{{noSel}}" aria-invalid="{{f.hasErr}}" aria-describedby="{{f.id}}-n" style="width: 64px; height: 30px; border: none; background: transparent; padding: 0 4px 0 10px; text-align: right; font-weight: 700; font-size: 14px; outline: none"><span style="color: {{t.text2}}">mm</span>
+</div>
+<button class="btn" type="button" onClick="{{f.dec}}" disabled="{{f.stepDisabled}}" aria-label="Decrease {{f.label}} by 0.05 mm" style="width: 30px; height: 32px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.s2}}; font-size: 16px; line-height: 1">−</button>
+<button class="btn" type="button" onClick="{{f.inc}}" disabled="{{f.stepDisabled}}" aria-label="Increase {{f.label}} by 0.05 mm" style="width: 30px; height: 32px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.s2}}; font-size: 16px; line-height: 1">+</button>
+</div>
+<input type="range" min="{{f.lo}}" max="{{f.hi}}" step="0.01" value="{{f.slider}}" onChange="{{f.onRange}}" disabled="{{noSel}}" aria-label="{{f.label}} slider" aria-valuetext="{{f.valueText}}" style="accent-color: {{t.accent}}; opacity: {{f.sliderOpacity}}">
+<div id="{{f.id}}-n" class="num" style="display: flex; gap: 8px; font-size: 12px; color: {{f.noteColor}}"><span style="flex: 1">{{f.note}}</span><span style="color: {{t.text3}}; white-space: nowrap">{{f.lo2}}–{{f.hi2}}</span></div>
+</div>
+</sc-for>
+
+<sc-if value="{{risk}}" hint-placeholder-val="{{ false }}">
+<div role="note" style="display: flex; gap: 10px; padding: 10px 12px; border-radius: 10px; background: {{t.warnSoft}}; color: {{t.text}}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="{{t.warn}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>
+<div style="font-size: 12px"><strong>{{riskTitle}}</strong> Short distances can register accidental or repeated presses, especially while typing. The keyboard will respond exactly as configured — for everyday typing, consider the Office profile.</div>
+</div>
+</sc-if>
+
+<div style="border-top: 1px solid {{t.border}}; padding-top: 4px">
+<button class="btn" type="button" onClick="{{toggleAdv}}" aria-expanded="{{adv}}" aria-controls="adv-p" style="width: 100%; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0; border: none; background: transparent; font-weight: 600"><span style="flex: 1; text-align: left">Advanced</span><span style="color: {{t.text3}}; font-weight: 400; font-size: 12px">Deadzone · Non-stop RT · Calibration</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{advRot}}"><path d="M6 9l6 6 6-6"></path></svg></button>
+<sc-if value="{{adv}}" hint-placeholder-val="{{ false }}">
+<div id="adv-p" style="display: flex; flex-direction: column; gap: 10px; padding-top: 6px">
+<div style="display: flex; align-items: center; gap: 8px"><span style="font-weight: 600; flex: 1">Deadzone <span style="font-weight: 400; color: {{t.text3}}">(single zone on this device)</span></span><span class="num" style="color: {{t.warn}}; font-weight: 600">Unknown</span><button class="btn" type="button" disabled="{{noSel}}" style="height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid {{t.border}}; background: {{t.s2}}">Set…</button></div>
+<div style="display: flex; align-items: center; gap: 8px; color: {{t.text2}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4"></path></svg><span style="flex: 1"><strong style="color: {{t.text}}">Non-stop Rapid Trigger</strong> — unavailable: firmware support not verified</span></div>
+<div style="display: flex; align-items: center; gap: 8px; color: {{t.text2}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4"></path></svg><span style="flex: 1"><strong style="color: {{t.text}}">Calibration</strong> — unavailable: needs its own confirmed workflow</span></div>
+</div>
+</sc-if>
+</div>
+</section>
+</div>
+</main>
+
+<sc-if value="{{hasDrafts}}" hint-placeholder-val="{{ true }}">
+<footer role="region" aria-label="Pending changes" style="flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 24px; background: {{t.s1}}; border-top: 1px solid {{t.border}}">
+<span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: {{t.cyan}}; box-shadow: 0 0 0 4px {{t.cyanSoft}}"></span>
+<span class="num" style="font-weight: 700">{{draftTitle}}</span>
+<span style="color: {{t.text2}}">Draft only — nothing has been sent</span>
+<span style="flex: 1"></span>
+<sc-if value="{{hasErr}}" hint-placeholder-val="{{ false }}"><span role="alert" style="color: {{t.err}}; font-weight: 600">Fix the highlighted value to continue</span></sc-if>
+<button class="btn" type="button" onClick="{{undo}}" disabled="{{undoDisabled}}" aria-label="Undo last draft change" style="display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"></path></svg>Undo</button>
+<button class="btn" type="button" onClick="{{discard}}" style="height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid {{t.border}}; background: transparent">Discard all</button>
+<sc-if value="{{canReview}}" hint-placeholder-val="{{ true }}"><a class="btn" href="Review.dc.html" style="display: inline-flex; align-items: center; height: 36px; padding: 0 18px; border-radius: 8px; background: {{t.accent}}; color: {{t.accentInk}}; font-weight: 700">Review &amp; Apply</a></sc-if>
+<sc-if value="{{hasErr}}" hint-placeholder-val="{{ false }}"><button class="btn" type="button" disabled="{{ true }}" style="height: 36px; padding: 0 18px; border-radius: 8px; border: none; background: {{t.accent}}; color: {{t.accentInk}}; font-weight: 700">Review &amp; Apply</button></sc-if>
+</footer>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"scenario":{"editor":"enum","options":["multi","single","mixed","empty"],"default":"multi"},"rail":{"editor":"enum","options":["expanded","collapsed"],"default":"expanded"},"height":{"editor":"int","min":600,"max":1400,"default":900,"unit":"px"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  palette(name) {
+    if (name === 'light') {
+      return { bg: '#F5F7FB', s1: '#FFFFFF', s2: '#E9EDF4', border: '#CDD5E1', text: '#172033', text2: '#48566A', text3: '#5B687C',
+        accent: '#6D28D9', accentInk: '#FFFFFF', accentSoft: '#EDE5FB', cyan: '#087F98', cyanSoft: 'rgba(8,127,152,0.15)',
+        success: '#047857', successSoft: '#DDF4EA', warn: '#92400E', warnSoft: '#FEF3C7', err: '#BE123C',
+        keyBg: '#FFFFFF', keyBorder: '#BFC9D7', keyText: '#172033', keyShade: 'rgba(23,32,51,0.12)', keySelBg: '#E6DCFC', glow: 'rgba(109,40,217,0.22)',
+        stripes: 'repeating-linear-gradient(135deg, #EEF1F5 0 5px, #D5DCE6 5px 7px)' };
+    }
+    return { bg: '#0B0F17', s1: '#131A27', s2: '#1B2434', border: '#2A3446', text: '#F3F6FC', text2: '#B4C0D2', text3: '#8C99AE',
+      accent: '#A78BFA', accentInk: '#160F2E', accentSoft: '#2E2552', cyan: '#22D3EE', cyanSoft: 'rgba(34,211,238,0.18)',
+      success: '#34D399', successSoft: 'rgba(52,211,153,0.12)', warn: '#FBBF24', warnSoft: 'rgba(251,191,36,0.13)', err: '#FB7185',
+      keyBg: '#1E2738', keyBorder: '#313D53', keyText: '#E8EDF6', keyShade: 'rgba(0,0,0,0.38)', keySelBg: '#35295F', glow: 'rgba(167,139,250,0.40)',
+      stripes: 'repeating-linear-gradient(135deg, #151B27 0 5px, #263045 5px 7px)' };
+  }
+  kb() {
+    if (this._kb) return this._kb;
+    const rows = [
+      [['Dead','^','°'],['D1','1','!'],['D2','2','"'],['D3','3','§'],['D4','4','$'],['D5','5','%'],['D6','6','&'],['D7','7','/'],['D8','8','('],['D9','9',')'],['D0','0','='],['Ss','ß','?'],['Acc','´','`'],['Bksp','⟵','',2,'Backspace'],['Del','Entf','',1,'Delete']],
+      [['Tab','Tab','',1.5],['Q','Q'],['W','W'],['E','E'],['R','R'],['T','T'],['Z','Z'],['U','U'],['I','I'],['O','O'],['P','P'],['Ue','Ü'],['Plus','+','*'],['Enter','↵','',1.5,'Enter'],['PgUp','Bild↑','',1,'Page Up']],
+      [['Caps','⇩','',1.75,'Caps Lock'],['A','A'],['S','S'],['D','D'],['F','F'],['G','G'],['H','H'],['J','J'],['K','K'],['L','L'],['Oe','Ö'],['Ae','Ä'],['Hash','#',"'"],[null,'','',1.25],['PgDn','Bild↓','',1,'Page Down']],
+      [['LShift','⇧','',1.25,'Left Shift'],['Lt','<','>'],['Y','Y'],['X','X'],['C','C'],['V','V'],['B','B'],['N','N'],['M','M'],['Comma',',',';'],['Dot','.',':'],['Minus','-','_'],['RShift','⇧','',1.75,'Right Shift'],['Up','↑','',1,'Arrow Up'],['End','Ende','',1,'End']],
+      [['LCtrl','Strg','',1.25,'Left Ctrl'],['Win','Win','',1.25,'Windows'],['LAlt','Alt','',1.25,'Left Alt'],['Space','','',6.25,'Space'],['AltGr','AltGr','',1,'Alt Gr'],['Fn','Fn','',1,'Fn'],['RCtrl','Strg','',1,'Right Ctrl'],['Left','←','',1,'Arrow Left'],['Down','↓','',1,'Arrow Down'],['Right','→','',1,'Arrow Right']]
+    ];
+    const keys = [];
+    rows.forEach((row, y) => {
+      let x = 0;
+      row.forEach((k) => {
+        const w = k[3] || 1;
+        if (k[0]) keys.push({ id: k[0], legend: k[1], shift: k[2] || '', w: w, x: x, y: y, name: k[4] || k[1] });
+        x += w;
+      });
+    });
+    this._kb = keys;
+    return keys;
+  }
+  nameOf(id) { const k = this.kb().find((x) => x.id === id); return k ? k.name : id; }
+  unsupported(id) { return id === 'Fn'; }
+  unknown(id) { return ['Dead','D1','D2','D3','D4','D5','D6','D7','D8','D9','D0','Ss','Acc'].indexOf(id) >= 0; }
+  base(id) {
+    if (this.unsupported(id) || this.unknown(id)) return null;
+    if (['W','A','S','D'].indexOf(id) >= 0) return { act: 1.2, rel: 1.2, rt: id === 'W' || id === 'S', rtp: 0.15, rtr: 0.2 };
+    if (['Space','LShift','LCtrl'].indexOf(id) >= 0) return { act: 1.5, rel: 1.5, rt: false, rtp: 0.3, rtr: 0.3 };
+    return { act: 2.0, rel: 2.0, rt: false, rtp: 0.3, rtr: 0.3 };
+  }
+  scenario() {
+    const sc = this.props.scenario || 'multi';
+    if (sc === 'single') return { sel: ['W'], drafts: {} };
+    if (sc === 'mixed') return { sel: ['W','A','LShift','Space','D1'], drafts: {} };
+    if (sc === 'empty') return { sel: [], drafts: {} };
+    const d = {};
+    ['W','A','S','D'].forEach((id) => { d[id] = { act: 0.8 }; });
+    return { sel: ['W','A','S','D'], drafts: d };
+  }
+  st() { return this.state || {}; }
+  sel() { return this.st().sel || this.scenario().sel; }
+  drafts() { return this.st().drafts || this.scenario().drafts; }
+  eff(drafts, id, f) {
+    const d = drafts[id];
+    if (d && d[f] !== undefined) return d[f];
+    const b = this.base(id);
+    return b ? b[f] : undefined;
+  }
+  commit(next) {
+    const hist = (this.st().hist || []).concat([this.drafts()]).slice(-50);
+    this.setState({ drafts: next, hist: hist });
+  }
+  setFields(patch) {
+    const drafts = this.drafts();
+    const next = {};
+    Object.keys(drafts).forEach((id) => { next[id] = Object.assign({}, drafts[id]); });
+    this.sel().filter((id) => !this.unsupported(id)).forEach((id) => {
+      const d = next[id] || {};
+      const b = this.base(id);
+      Object.keys(patch).forEach((f) => {
+        if (b && b[f] === patch[f]) delete d[f]; else d[f] = patch[f];
+      });
+      if (Object.keys(d).length) next[id] = d; else delete next[id];
+    });
+    this.commit(next);
+  }
+  select(ids, anchor) {
+    this.setState({ sel: ids, anchor: anchor === undefined ? this.st().anchor : anchor, raw: {}, err: {}, note: null });
+  }
+  pick(k, e) {
+    if (this.unsupported(k.id)) { this.setState({ note: k.id }); return; }
+    const sel = this.sel();
+    const keys = this.kb();
+    const anchor = this.st().anchor;
+    if (e && e.shiftKey && anchor) {
+      const a = keys.findIndex((x) => x.id === anchor);
+      const b = keys.findIndex((x) => x.id === k.id);
+      const range = keys.slice(Math.min(a, b), Math.max(a, b) + 1).map((x) => x.id).filter((id) => !this.unsupported(id));
+      this.select(Array.from(new Set(sel.concat(range))));
+      return;
+    }
+    if (e && (e.ctrlKey || e.metaKey)) {
+      this.select(sel.indexOf(k.id) >= 0 ? sel.filter((i) => i !== k.id) : sel.concat([k.id]), k.id);
+      return;
+    }
+    this.select([k.id], k.id);
+  }
+  summary(f, ids, drafts) {
+    if (!ids.length) return { kind: 'none' };
+    const vals = ids.map((id) => this.eff(drafts, id, f));
+    const def = vals.filter((v) => v !== undefined);
+    const unknown = vals.length - def.length;
+    if (!def.length) return { kind: 'unknown', unknown: unknown };
+    const uniq = Array.from(new Set(def));
+    if (uniq.length === 1 && !unknown) return { kind: 'value', v: uniq[0] };
+    return { kind: 'mixed', uniq: uniq, def: def, unknown: unknown };
+  }
+  onText(F, text) {
+    const raw = Object.assign({}, this.st().raw, { [F.f]: text });
+    const err = Object.assign({}, this.st().err);
+    const v = parseFloat(String(text).replace(',', '.'));
+    if (!String(text).trim() || isNaN(v) || v < F.lo || v > F.hi) {
+      err[F.f] = 'Enter a value from ' + F.lo.toFixed(2) + ' to ' + F.hi.toFixed(2) + ' mm.';
+      this.setState({ raw: raw, err: err });
+      return;
+    }
+    delete err[F.f];
+    this.setState({ raw: raw, err: err });
+    this.setFields({ [F.f]: Math.round(v * 100) / 100 });
+  }
+  onBlur(f) {
+    const err = this.st().err || {};
+    if (err[f]) return;
+    const raw = Object.assign({}, this.st().raw);
+    delete raw[f];
+    this.setState({ raw: raw });
+  }
+  renderVals() {
+    const s = this.st();
+    const themeName = s.theme || this.props.theme || 'dark';
+    const t = this.palette(themeName);
+    const U = 46;
+    const keys = this.kb();
+    const sel = this.sel();
+    const drafts = this.drafts();
+    const raw = s.raw || {};
+    const errs = s.err || {};
+    const ed = sel.filter((id) => !this.unsupported(id));
+    const noSel = ed.length === 0;
+    const showVals = !!s.showVals;
+    const railOpen = s.rail ? s.rail === 'expanded' : this.props.rail !== 'collapsed';
+    const fmt = (v) => (v === undefined ? '?' : v.toFixed(2));
+    const onoff = (v) => (v === undefined ? '?' : (v ? 'On' : 'Off'));
+
+    const nav = [
+      { label: 'Overview', d: 'M4 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1zM4 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z' },
+      { label: 'Performance', d: 'M12 14l4-4M3.34 19a10 10 0 1 1 17.32 0', href: 'Main.dc.html', active: true },
+      { label: 'Key Mapping', d: 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10', href: 'Mapping.dc.html', later: true },
+      { label: 'Lighting', d: 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z', href: 'Lighting.dc.html', later: true },
+      { label: 'Profiles', d: 'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5', href: 'Profiles.dc.html' },
+      { label: 'Device', d: 'M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3', href: 'NoDevice.dc.html' },
+      { label: 'About', d: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01' }
+    ].map((n) => Object.assign({}, n, {
+      href: n.href || '',
+      noHref: !n.href,
+      current: n.active ? 'page' : 'false',
+      aria: n.label + (n.later ? ' — coming later' : ''),
+      later: !!n.later,
+      style: 'display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 11px; border-radius: 8px; border: none; width: 100%; font-weight: ' + (n.active ? 700 : 500) + '; background: ' + (n.active ? t.accentSoft : 'transparent') + '; color: ' + (n.active ? t.text : t.text2)
+    }));
+
+    const presetDefs = [
+      ['WASD', ['W','A','S','D']],
+      ['Movement', ['W','A','S','D','LShift','LCtrl','Space']],
+      ['Actions', ['Q','E','R','F','G','C','V']],
+      ['1–5', ['D1','D2','D3','D4','D5']],
+      ['All supported', keys.map((k) => k.id).filter((id) => !this.unsupported(id))],
+      ['Clear', []]
+    ];
+    const selKey = sel.slice().sort().join(',');
+    const presets = presetDefs.map((p) => {
+      const on = p[1].length > 0 && p[1].slice().sort().join(',') === selKey;
+      return {
+        label: p[0], pressed: on ? 'true' : 'false',
+        pick: () => this.select(p[1].slice(), p[1][0] || null),
+        style: 'height: 30px; padding: 0 12px; border-radius: 8px; font-weight: 600; border: 1px solid ' + (on ? t.accent : t.border) + '; background: ' + (on ? t.accentSoft : t.s2)
+      };
+    });
+
+    const keyItems = keys.map((k) => {
+      const selected = sel.indexOf(k.id) >= 0;
+      const unsup = this.unsupported(k.id);
+      const modified = !!drafts[k.id];
+      const act = this.eff(drafts, k.id, 'act');
+      const unknown = !unsup && this.unknown(k.id);
+      let bg = t.keyBg, bc = t.keyBorder, fg = t.keyText, sh = 'inset 0 -3px 0 ' + t.keyShade;
+      if (unsup) { bg = t.stripes; fg = t.text3; }
+      if (selected) { bg = t.keySelBg; bc = t.accent; sh = 'inset 0 -3px 0 ' + t.keyShade + ', 0 0 0 1px ' + t.accent + ', 0 0 16px ' + t.glow; }
+      const w = k.w * U - 5, h = U - 5;
+      const style = 'position: absolute; left: ' + (k.x * U) + 'px; top: ' + (k.y * U) + 'px; width: ' + w + 'px; height: ' + h + 'px; padding: 0; border-radius: 7px; border: 1px solid ' + bc + '; background: ' + bg + '; color: ' + fg + '; box-shadow: ' + sh + ';';
+      const footStyle = 'position: absolute; left: ' + (0.25 * U - 1) + 'px; top: ' + (U - 8) + 'px; width: ' + (1.25 * U - 5) + 'px; height: ' + (U + 2) + 'px; background: ' + bg + '; border: 1px solid ' + bc + '; border-top: none; border-radius: 0 0 7px 7px; box-shadow: inset 0 -3px 0 ' + t.keyShade + ';';
+      const parts = [k.name];
+      if (selected) parts.push('selected');
+      if (modified) parts.push('modified');
+      if (unknown && !modified) parts.push('settings unknown');
+      if (unsup) parts.push('not editable');
+      const tip = unsup ? k.name + ' — not editable: no trigger settings exposed by this device definition'
+        : k.name + ' — Actuation ' + fmt(act) + ' mm · Release ' + fmt(this.eff(drafts, k.id, 'rel')) + ' mm · Rapid Trigger ' + onoff(this.eff(drafts, k.id, 'rt')) + (modified ? ' · draft' : (unknown ? ' · unknown (no readback)' : ' · app state'));
+      return {
+        id: k.id, legend: k.legend, shift: k.shift, style: style, footStyle: footStyle, isEnter: k.id === 'Enter',
+        fs: k.legend.length > 3 ? 11 : 14,
+        selected: selected ? 'true' : 'false', modified: modified, unknown: unknown,
+        aria: parts.join(', '), tip: tip,
+        showVal: showVals && !unsup, valText: act === undefined ? '?' : act.toFixed(2), valColor: modified ? t.cyan : (selected ? t.text : t.text2),
+        pick: (e) => this.pick(k, e)
+      };
+    });
+
+    const FIELDS = [
+      { f: 'act', label: 'Actuation', lo: 0.1, hi: 3.4, help: 'Press point: how far the key travels before it registers. Bounds come from the device definition.' },
+      { f: 'rel', label: 'Release', lo: 0.1, hi: 3.4, help: 'Reset point: where a pressed key releases. Not the same as Rapid Trigger release sensitivity.' },
+      { f: 'rtp', label: 'RT press sensitivity', lo: 0.05, hi: 2.0, rt: true, help: 'With Rapid Trigger on: how far the key must travel down again to re-press.' },
+      { f: 'rtr', label: 'RT release sensitivity', lo: 0.05, hi: 2.0, rt: true, help: 'With Rapid Trigger on: how far the key must travel up to release.' }
+    ];
+    const rtSum = this.summary('rt', ed, drafts);
+    const fields = FIELDS.map((F) => {
+      const sm = this.summary(F.f, ed, drafts);
+      const err = errs[F.f];
+      const inactive = F.rt && rtSum.kind === 'value' && rtSum.v === false;
+      let note = '';
+      let noteColor = t.text2;
+      if (sm.kind === 'mixed') {
+        const lo = Math.min.apply(null, sm.def), hi = Math.max.apply(null, sm.def);
+        note = 'Mixed: ' + (lo === hi ? lo.toFixed(2) : lo.toFixed(2) + '–' + hi.toFixed(2)) + ' mm' + (sm.unknown ? ' + ' + sm.unknown + ' unknown' : '') + '. A new value applies to all.';
+        noteColor = t.warn;
+      } else if (sm.kind === 'unknown') {
+        note = 'Unknown — not read from device. A new value is sent explicitly.';
+        noteColor = t.warn;
+      } else if (sm.kind === 'value') {
+        note = inactive ? 'Kept in draft · inactive while Rapid Trigger is off' : (ed.length > 1 ? 'Same on all ' + ed.length + ' keys' : '');
+      } else {
+        note = 'Select keys to edit';
+      }
+      if (err) { note = err; noteColor = t.err; }
+      const clamp = (v) => Math.min(F.hi, Math.max(F.lo, Math.round(v * 100) / 100));
+      return {
+        id: 'fld-' + F.f, label: F.label, help: F.help, rtBefore: F.f === 'rtp',
+        inputVal: raw[F.f] != null ? raw[F.f] : (sm.kind === 'value' ? sm.v.toFixed(2) : ''),
+        placeholder: sm.kind === 'mixed' ? 'Mixed' : (sm.kind === 'unknown' ? '?' : '—'),
+        slider: sm.kind === 'value' ? sm.v : (sm.kind === 'mixed' ? Math.min.apply(null, sm.def) : F.lo),
+        lo: F.lo, hi: F.hi, lo2: F.lo.toFixed(2), hi2: F.hi.toFixed(2),
+        sliderOpacity: sm.kind === 'value' ? '1' : '0.45',
+        stepDisabled: sm.kind !== 'value',
+        dec: () => this.setFields({ [F.f]: clamp(sm.v - 0.05) }),
+        inc: () => this.setFields({ [F.f]: clamp(sm.v + 0.05) }),
+        onRange: (e) => { const r = Object.assign({}, this.st().raw); delete r[F.f]; const er = Object.assign({}, this.st().err); delete er[F.f]; this.setState({ raw: r, err: er }); this.setFields({ [F.f]: clamp(parseFloat(e.target.value)) }); },
+        onText: (e) => this.onText(F, e.target.value),
+        onBlur: () => this.onBlur(F.f),
+        note: note, noteColor: noteColor, hasErr: err ? 'true' : 'false',
+        inputBorder: err ? t.err : t.border,
+        rowOpacity: inactive ? '0.6' : '1',
+        valueText: sm.kind === 'value' ? sm.v.toFixed(2) + ' millimetres' : (sm.kind === 'mixed' ? 'Mixed values' : 'Unknown')
+      };
+    });
+
+    const segStyle = (on) => 'height: 28px; min-width: 52px; padding: 0 12px; border-radius: 6px; font-weight: 600; border: 1px solid ' + (on ? t.accent : 'transparent') + '; background: ' + (on ? t.accentSoft : 'transparent') + '; color: ' + (on ? t.text : t.text2);
+    const rtIsOn = rtSum.kind === 'value' && rtSum.v === true;
+    const rtIsOff = rtSum.kind === 'value' && rtSum.v === false;
+    let rtNote = 'Select keys to edit', rtNoteColor = t.text2;
+    if (rtSum.kind === 'mixed') {
+      const on = ed.filter((id) => this.eff(drafts, id, 'rt') === true).length;
+      const off = ed.filter((id) => this.eff(drafts, id, 'rt') === false).length;
+      rtNote = 'Mixed: ' + on + ' on · ' + off + ' off' + (rtSum.unknown ? ' · ' + rtSum.unknown + ' unknown' : '') + '. Choosing sets all selected keys.';
+      rtNoteColor = t.warn;
+    } else if (rtSum.kind === 'unknown') { rtNote = 'Unknown — not read from device.'; rtNoteColor = t.warn; }
+    else if (rtIsOn) rtNote = 'Dynamic actuation: re-press and release follow key direction.';
+    else if (rtIsOff) rtNote = 'Fixed actuation and release points. RT sensitivities are kept.';
+
+    let riskKeys = 0;
+    ed.forEach((id) => {
+      const a = this.eff(drafts, id, 'act');
+      const rt = this.eff(drafts, id, 'rt');
+      const p = this.eff(drafts, id, 'rtp'), r = this.eff(drafts, id, 'rtr');
+      if ((a !== undefined && a < 0.6) || (rt === true && ((p !== undefined && p < 0.2) || (r !== undefined && r < 0.2)))) riskKeys++;
+    });
+
+    const tplDefs = [
+      ['Comfort', { act: 2.0, rel: 2.0, rt: false }],
+      ['Sensitive', { act: 1.2, rel: 1.2, rt: true, rtp: 0.3, rtr: 0.3 }],
+      ['Gaming', { act: 0.6, rel: 0.6, rt: true, rtp: 0.2, rtr: 0.2 }]
+    ];
+    const templates = tplDefs.map((p) => ({
+      label: p[0],
+      tip: Object.keys(p[1]).map((f) => f + ' ' + (typeof p[1][f] === 'boolean' ? (p[1][f] ? 'on' : 'off') : p[1][f].toFixed(2))).join(' · ') + ' — loads into draft for the selection only',
+      pick: () => this.setFields(p[1])
+    }));
+
+    const srcStyle = (c, bgc) => 'display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; color: ' + c + '; background: ' + bgc + ';';
+    const rows = sel.map((id) => {
+      const d = drafts[id] || {};
+      const b = this.base(id);
+      const unsup = this.unsupported(id);
+      const old = (f) => (unsup ? '—' : (b ? (f === 'rt' ? onoff(b[f]) : fmt(b[f])) : 'Unknown'));
+      const nw = (f) => (f === 'rt' ? onoff(d[f]) : fmt(d[f]));
+      let src = 'App state', st = srcStyle(t.text2, t.s2), tip = 'Last values HallForge knows from its own profile or a previous apply. Not read back from the keyboard.';
+      if (unsup) { src = 'Not editable'; st = srcStyle(t.text3, t.s2); tip = 'No trigger settings exposed for this key.'; }
+      else if (drafts[id]) { src = 'Draft'; st = srcStyle(t.cyan, t.cyanSoft); tip = 'Changed locally. Not sent.'; }
+      else if (!b) { src = 'Unknown'; st = srcStyle(t.warn, t.warnSoft); tip = 'Never set by HallForge and the keyboard cannot report it.'; }
+      return {
+        name: this.nameOf(id),
+        actOld: old('act'), actChanged: d.act !== undefined, actNew: nw('act'),
+        relOld: old('rel'), relChanged: d.rel !== undefined, relNew: nw('rel'),
+        rtOld: old('rt'), rtChanged: d.rt !== undefined, rtNew: nw('rt'),
+        src: src, srcStyle: st, srcTip: tip
+      };
+    });
+
+    const unkCount = ed.filter((id) => !this.base(id)).length;
+    const draftIds = Object.keys(drafts);
+    const fieldCount = draftIds.reduce((n, id) => n + Object.keys(drafts[id]).length, 0);
+    const hasErr = Object.keys(errs).length > 0;
+    const names = sel.slice(0, 6).map((id) => this.nameOf(id)).join(', ') + (sel.length > 6 ? ' +' + (sel.length - 6) : '');
+
+    return {
+      t: t, h: Number(this.props.height) || 900,
+      railW: railOpen ? 208 : 64, railOpen: railOpen, nav: nav,
+      railToggleLabel: railOpen ? 'Collapse navigation' : 'Expand navigation',
+      railIcon: railOpen ? 'M11 17l-5-5 5-5M18 17l-5-5 5-5' : 'M13 17l5-5-5-5M6 17l5-5-5-5',
+      toggleRail: () => this.setState({ rail: railOpen ? 'collapsed' : 'expanded' }),
+      themeLabel: themeName === 'dark' ? 'Theme: dark. Switch to light' : 'Theme: light. Switch to dark',
+      themeIcon: themeName === 'dark' ? 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z' : 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41',
+      toggleTheme: () => this.setState({ theme: themeName === 'dark' ? 'light' : 'dark' }),
+      showVals: showVals ? 'true' : 'false',
+      toggleVals: () => this.setState({ showVals: !showVals }),
+      valsTrack: 'position: relative; width: 30px; height: 18px; border-radius: 999px; background: ' + (showVals ? t.accent : t.s2) + '; border: 1px solid ' + (showVals ? t.accent : t.border) + ';',
+      valsThumb: 'position: absolute; top: 2px; left: ' + (showVals ? 14 : 2) + 'px; width: 12px; height: 12px; border-radius: 50%; background: ' + (showVals ? t.accentInk : t.text2) + ';',
+      presets: presets, keys: keyItems, keyCount: keys.length,
+      kbW: 16 * U - 5, kbH: 5 * U - 5,
+      kbAria: 'Keyboard, ISO-DE layout. ' + ed.length + ' keys selected.',
+      noteText: s.note ? this.nameOf(s.note) + ' can’t be tuned: this device definition exposes no trigger settings for it, so it was not added to the selection.' : '',
+      noSel: noSel, hasSel: sel.length > 0,
+      selTitle: sel.length === 1 ? this.nameOf(sel[0]) + ' selected' : sel.length + ' keys selected — ' + names,
+      selCounts: ed.length + ' editable · ' + unkCount + ' unknown · ' + (sel.length - ed.length) + ' not editable',
+      resetDisabled: !sel.some((id) => drafts[id]),
+      resetSel: () => { const next = Object.assign({}, drafts); sel.forEach((id) => { delete next[id]; }); this.commit(next); },
+      rows: rows,
+      scopeText: noSel ? 'No keys selected' : 'Applies to ' + (ed.length === 1 ? '1 key' : ed.length + ' selected keys') + ' · only changed fields are patched',
+      templates: templates, fields: fields,
+      rtOff: () => this.setFields({ rt: false }), rtOn: () => this.setFields({ rt: true }),
+      rtOffPressed: rtIsOff ? 'true' : (rtSum.kind === 'mixed' ? 'mixed' : 'false'),
+      rtOnPressed: rtIsOn ? 'true' : (rtSum.kind === 'mixed' ? 'mixed' : 'false'),
+      rtOffStyle: segStyle(rtIsOff), rtOnStyle: segStyle(rtIsOn),
+      rtNote: rtNote, rtNoteColor: rtNoteColor,
+      risk: riskKeys > 0,
+      riskTitle: 'Aggressive settings on ' + (riskKeys === 1 ? '1 key.' : riskKeys + ' keys.'),
+      adv: !!s.adv, advRot: s.adv ? 'rotate(180deg)' : 'none',
+      toggleAdv: () => this.setState({ adv: !s.adv }),
+      hasDrafts: draftIds.length > 0,
+      draftTitle: draftIds.length + (draftIds.length === 1 ? ' key modified' : ' keys modified') + ' · ' + fieldCount + (fieldCount === 1 ? ' field change' : ' field changes'),
+      hasErr: hasErr, canReview: !hasErr,
+      undoDisabled: !(s.hist && s.hist.length),
+      undo: () => { const hist = (this.st().hist || []).slice(); const prev = hist.pop(); if (prev) this.setState({ drafts: prev, hist: hist }); },
+      discard: () => this.commit({})
+    };
+  }
+}
+</script>
+</body>
+</html>

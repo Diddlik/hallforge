@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HallForge — Lighting Studio preview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.lt *{box-sizing:border-box}
+.lt button,.lt input{font:inherit;color:inherit}
+.lt .btn{cursor:pointer;transition:filter .15s ease}
+.lt .btn:hover:not(:disabled){filter:brightness(1.15)}
+.lt .btn:disabled{cursor:not-allowed;opacity:.5}
+.lt :focus-visible{outline:2px solid #22D3EE;outline-offset:2px}
+.lt a{text-decoration:none}
+@media (prefers-reduced-motion: reduce){.lt *{transition:none!important}}
+</style>
+</helmet>
+<div class="lt" style="width: 100%; height: 900px; display: flex; overflow: hidden; background: #0B0F17; color: #F3F6FC; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'SF Pro Text', Ubuntu, 'Noto Sans', sans-serif; font-size: 13px; line-height: 1.45">
+
+<nav aria-label="Main navigation" style="width: 208px; flex: none; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; background: #131A27; border-right: 1px solid #2A3446">
+<div style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px; margin-bottom: 16px">
+<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="#A78BFA"></rect><path d="M9.5 8.5v11M18.5 8.5v11M9.5 14h9" stroke="#160F2E" stroke-width="2.6" stroke-linecap="round" fill="none"></path><circle cx="22" cy="6" r="3" fill="#22D3EE" stroke="#131A27" stroke-width="1.5"></circle></svg>
+<span style="font-size: 17px; font-weight: 700; letter-spacing: -0.01em">HallForge</span>
+</div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="7">
+<a href="{{n.href}}" aria-current="{{n.current}}" style="{{n.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.d}}"></path></svg><span style="flex: 1">{{n.label}}</span><sc-if value="{{n.later}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #1B2434; color: #B4C0D2">Later</span></sc-if></a>
+</sc-for>
+</nav>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<header style="height: 56px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid #2A3446">
+<span style="display: flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: #131A27; font-weight: 600">AKKO MOD007B ISO HE</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: rgba(52,211,153,0.12); color: #34D399; font-weight: 600"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #34D399"></span>Connected</span>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div role="note" style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; background: #1B2434; border: 1px dashed #4A5875">
+<span aria-hidden="true" style="flex: none; width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: #2E2552; color: #A78BFA"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4"></path></svg></span>
+<div style="flex: 1"><strong>Coming later — lighting protocol not implemented.</strong> <span style="color: #B4C0D2">Colors here are a simulated preview, not what the keyboard shows now. Nothing can be sent.</span></div>
+<span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid #A78BFA; color: #A78BFA">Mock preview</span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; flex: 1">Lighting Studio</h1>
+<div role="group" aria-label="Paint tool" style="display: inline-flex; padding: 3px; gap: 3px; border-radius: 10px; background: #131A27; border: 1px solid #2A3446">
+<sc-for list="{{tools}}" as="tl" hint-placeholder-count="3">
+<button class="btn" type="button" aria-pressed="{{tl.on}}" onClick="{{tl.pick}}" style="{{tl.style}}">{{tl.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section aria-label="Keyboard lighting canvas" style="flex: 999 1 776px; min-width: 0; background: #131A27; border: 1px solid #2A3446; border-radius: 14px; padding: 20px">
+<div style="overflow-x: auto; padding: 4px 0">
+<div role="group" aria-label="Keyboard. Click a key to paint it with the current color." style="position: relative; width: {{kbW}}px; height: {{kbH}}px; margin: 0 auto">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="67">
+<button class="btn" type="button" onClick="{{k.paint}}" aria-label="{{k.aria}}" style="{{k.style}}"><span style="font-weight: 600; font-size: {{k.fs}}px">{{k.legend}}</span></button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; font-size: 12px; color: #B4C0D2">
+<span>Editor layers (local only — not keyboard layers):</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: #F3F6FC"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 2px; background: #A78BFA"></span>Base</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 2px; background: #8C99AE"></span>Highlights</span>
+<span style="flex: 1"></span>
+<span>{{paintedText}}</span>
+</div>
+</section>
+
+<section aria-labelledby="col-h" style="flex: 1 1 296px; min-width: 280px; background: #131A27; border: 1px solid #2A3446; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px">
+<h2 id="col-h" style="margin: 0; font-size: 16px; font-weight: 700">Color</h2>
+<div aria-hidden="true" style="position: relative; height: 120px; border-radius: 10px; background: linear-gradient(to top, #000, rgba(0,0,0,0)), linear-gradient(to right, #fff, {{hue}})">
+<span style="position: absolute; right: 18%; top: 22%; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.5)"></span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: {{cur}}; border: 1px solid #2A3446"></span>
+<label for="hex" style="color: #B4C0D2">Hex</label>
+<input id="hex" type="text" value="{{cur}}" readonly="{{ true }}" style="flex: 1; height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #2A3446; background: #0B0F17; font-weight: 600; text-transform: uppercase">
+</div>
+<div role="group" aria-label="Swatches" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{swatches}}" as="sw" hint-placeholder-count="7">
+<button class="btn" type="button" aria-pressed="{{sw.on}}" aria-label="{{sw.name}}" title="{{sw.name}}" onClick="{{sw.pick}}" style="{{sw.style}}"></button>
+</sc-for>
+</div>
+
+<div style="height: 1px; background: #2A3446"></div>
+<div>
+<div style="font-weight: 600; margin-bottom: 8px">Effects</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px">
+<button class="btn" type="button" aria-pressed="true" style="height: 34px; border-radius: 8px; border: 1px solid #A78BFA; background: #2E2552; font-weight: 600">Static</button>
+<button class="btn" type="button" disabled="{{ true }}" title="Needs confirmed hardware support" style="height: 34px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Wave</button>
+<button class="btn" type="button" disabled="{{ true }}" title="Needs confirmed hardware support" style="height: 34px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Breathing</button>
+<button class="btn" type="button" disabled="{{ true }}" title="Needs confirmed hardware support" style="height: 34px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Reactive</button>
+</div>
+<div style="font-size: 12px; color: #B4C0D2; margin-top: 6px">Animated effects, brightness and speed appear once the device reports support.</div>
+</div>
+
+<div style="flex: 1"></div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid #2A3446">
+<button class="btn" type="button" style="height: 38px; border-radius: 8px; border: 1px solid #2A3446; background: #1B2434; font-weight: 600">Save as local preset…</button>
+<div style="display: flex; align-items: center; gap: 8px; color: #B4C0D2; font-size: 12px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>Send to keyboard: not available yet</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  kb() {
+    if (this._kb) return this._kb;
+    const rows = [
+      [['Dead','^'],['D1','1'],['D2','2'],['D3','3'],['D4','4'],['D5','5'],['D6','6'],['D7','7'],['D8','8'],['D9','9'],['D0','0'],['Ss','ß'],['Acc','´'],['Bksp','⟵',2,'Backspace'],['Del','Entf',1,'Delete']],
+      [['Tab','Tab',1.5],['Q','Q'],['W','W'],['E','E'],['R','R'],['T','T'],['Z','Z'],['U','U'],['I','I'],['O','O'],['P','P'],['Ue','Ü'],['Plus','+'],['Enter','↵',1.5,'Enter'],['PgUp','Bild↑',1,'Page Up']],
+      [['Caps','⇩',1.75,'Caps Lock'],['A','A'],['S','S'],['D','D'],['F','F'],['G','G'],['H','H'],['J','J'],['K','K'],['L','L'],['Oe','Ö'],['Ae','Ä'],['Hash','#'],[null,'',1.25],['PgDn','Bild↓',1,'Page Down']],
+      [['LShift','⇧',1.25,'Left Shift'],['Lt','<'],['Y','Y'],['X','X'],['C','C'],['V','V'],['B','B'],['N','N'],['M','M'],['Comma',','],['Dot','.'],['Minus','-'],['RShift','⇧',1.75,'Right Shift'],['Up','↑',1,'Arrow Up'],['End','Ende',1,'End']],
+      [['LCtrl','Strg',1.25,'Left Ctrl'],['Win','Win',1.25,'Windows'],['LAlt','Alt',1.25,'Left Alt'],['Space','',6.25,'Space'],['AltGr','AltGr'],['Fn','Fn'],['RCtrl','Strg',1,'Right Ctrl'],['Left','←',1,'Arrow Left'],['Down','↓',1,'Arrow Down'],['Right','→',1,'Arrow Right']]
+    ];
+    const keys = [];
+    rows.forEach((row, y) => { let x = 0; row.forEach((k) => { const w = k[2] || 1; if (k[0]) keys.push({ id: k[0], legend: k[1], w: w, x: x, y: y, name: k[3] || k[1] }); x += w; }); });
+    this._kb = keys;
+    return keys;
+  }
+  renderVals() {
+    const s = this.state || {};
+    const SW = [['Violet', '#A78BFA'], ['Cyan', '#22D3EE'], ['Amber', '#FBBF24'], ['Rose', '#FB7185'], ['Green', '#34D399'], ['White', '#E8EDF6'], ['Off', '']];
+    const cur = s.cur === undefined ? '#A78BFA' : s.cur;
+    const init = {};
+    ['W','A','S','D'].forEach((id) => { init[id] = '#A78BFA'; });
+    ['D1','D2','D3','D4','D5'].forEach((id) => { init[id] = '#22D3EE'; });
+    ['Up','Down','Left','Right'].forEach((id) => { init[id] = '#FBBF24'; });
+    const colors = s.colors || init;
+    const tool = s.tool || 'Single key';
+    const nav = [
+      ['Overview', 'M4 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1zM4 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z', '#'],
+      ['Performance', 'M12 14l4-4M3.34 19a10 10 0 1 1 17.32 0', 'Main.dc.html'],
+      ['Key Mapping', 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10', 'Mapping.dc.html', true],
+      ['Lighting', 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z', 'Lighting.dc.html', true],
+      ['Profiles', 'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5', 'Profiles.dc.html'],
+      ['Device', 'M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3', 'NoDevice.dc.html'],
+      ['About', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', '#']
+    ].map((n) => {
+      const active = n[0] === 'Lighting';
+      return {
+        label: n[0], d: n[1], href: n[2], later: !!n[3], current: active ? 'page' : 'false',
+        style: 'display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 11px; border-radius: 8px; font-weight: ' + (active ? 700 : 500) + '; background: ' + (active ? '#2E2552' : 'transparent') + '; color: ' + (active ? '#F3F6FC' : '#B4C0D2')
+      };
+    });
+    const U = 46;
+    const nameOf = (hex) => { const f = SW.find((x) => x[1] === hex); return f ? f[0] : 'Off'; };
+    const keys = this.kb().map((k) => {
+      const c = colors[k.id] || '';
+      const lit = !!c;
+      return {
+        legend: k.legend, fs: k.legend.length > 3 ? 11 : 14,
+        aria: k.name + ', ' + (lit ? nameOf(c) : 'off'),
+        paint: () => { const next = Object.assign({}, colors); if (cur) next[k.id] = cur; else delete next[k.id]; this.setState({ colors: next }); },
+        style: 'position: absolute; left: ' + (k.x * U) + 'px; top: ' + (k.y * U) + 'px; width: ' + (k.w * U - 5) + 'px; height: ' + (U - 5) + 'px; padding: 0; border-radius: 7px; color: #F3F6FC; border: 1px solid ' + (lit ? c : '#313D53') + '; background: ' + (lit ? c + '38' : '#1E2738') + '; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.38)' + (lit ? ', 0 0 14px ' + c + '55' : '') + ';'
+      };
+    });
+    const swatches = SW.map((sw) => {
+      const on = sw[1] === cur;
+      return {
+        name: sw[0], on: on ? 'true' : 'false',
+        pick: () => this.setState({ cur: sw[1] }),
+        style: 'width: 32px; height: 32px; border-radius: 50%; border: 2px solid ' + (on ? '#F3F6FC' : '#2A3446') + '; background: ' + (sw[1] || 'repeating-linear-gradient(135deg, #151B27 0 4px, #3A465C 4px 6px)') + '; box-shadow: ' + (on ? '0 0 0 2px #0B0F17 inset' : 'none') + ';'
+      };
+    });
+    const tools = ['Single key', 'Brush', 'Rectangle'].map((l) => ({
+      label: l, on: l === tool ? 'true' : 'false',
+      pick: () => this.setState({ tool: l }),
+      style: 'height: 30px; padding: 0 12px; border-radius: 7px; border: none; font-weight: 600; background: ' + (l === tool ? '#2E2552' : 'transparent') + '; color: ' + (l === tool ? '#F3F6FC' : '#B4C0D2')
+    }));
+    return {
+      nav: nav, keys: keys, kbW: 16 * U - 5, kbH: 5 * U - 5,
+      swatches: swatches, tools: tools,
+      cur: cur || '#000000', hue: cur || '#888888',
+      paintedText: Object.keys(colors).length + ' keys colored · simulated'
+    };
+  }
+}
+</script>
+</body>
+</html>

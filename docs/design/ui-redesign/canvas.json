@@ -1,0 +1,26 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-28T10:00:00Z"},
+  "title": "HallForge UI Design",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 900, "title": "Performance · WASD multi-key draft (dark)", "expand": "fill", "is_interactive": true},
+    "Single.dc.html": {"x": 1520, "y": 0, "w": 1440, "h": 900, "title": "Performance · single key", "expand": "fill", "is_interactive": true},
+    "Mixed.dc.html": {"x": 3040, "y": 0, "w": 1440, "h": 900, "title": "Performance · mixed values + unknown key", "expand": "fill", "is_interactive": true},
+    "Light.dc.html": {"x": 0, "y": 1300, "w": 1440, "h": 900, "title": "Performance · light theme", "expand": "fill", "is_interactive": true},
+    "Compact.dc.html": {"x": 1520, "y": 1300, "w": 1200, "h": 750, "title": "Performance · 1200×750, rail collapsed", "expand": "fill", "is_interactive": true},
+    "Review.dc.html": {"x": 2800, "y": 1300, "w": 1440, "h": 900, "title": "Review & Apply · sending · partial result", "expand": "fill", "is_interactive": true},
+    "NoDevice.dc.html": {"x": 0, "y": 2600, "w": 1440, "h": 900, "title": "No device · discovering · unverified model", "expand": "fill", "is_interactive": true},
+    "Profiles.dc.html": {"x": 1520, "y": 2600, "w": 1440, "h": 900, "title": "Profile library", "expand": "fill", "is_interactive": true},
+    "Mapping.dc.html": {"x": 3040, "y": 2600, "w": 1440, "h": 900, "title": "Key Mapping · coming later (mock)", "expand": "fill", "is_interactive": true},
+    "Lighting.dc.html": {"x": 4560, "y": 2600, "w": 1440, "h": 900, "title": "Lighting Studio · coming later (mock)", "expand": "fill", "is_interactive": true}
+  },
+  "order": ["Main.dc.html", "Single.dc.html", "Mixed.dc.html", "Light.dc.html", "Compact.dc.html", "Review.dc.html", "NoDevice.dc.html", "Profiles.dc.html", "Mapping.dc.html", "Lighting.dc.html"],
+  "notes": {
+    "t1": {"x": 0, "y": -260, "text": "Performance — select keys, tune precisely, preview, apply safely", "kind": "title1", "maxW": 4480},
+    "t2": {"x": 0, "y": 1040, "text": "Theme, window size and the apply flow", "kind": "title1", "maxW": 4240},
+    "t3": {"x": 0, "y": 2340, "text": "Device states, profiles and planned modules", "kind": "title1", "maxW": 6000}
+  },
+  "designSystems": []
+}
