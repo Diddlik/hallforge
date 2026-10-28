@@ -66,6 +66,20 @@ public class AkkoDriverDatabaseTests
     }
 
     [Fact]
+    public void ParseProfile_FillsKeysTheDriverDidNotStoreWithFactoryDefaults()
+    {
+        var defaults = new KeyTrigger(2.0m, 2.0m, false, 0.2m, 0.3m, 3.7m);
+        var database = Database($"{Mode(26, 9, option: "dks")}");
+
+        var import = AkkoDriverDatabase.ParseProfile(database, 1778, 0, Definition with { FactoryDefaults = defaults });
+
+        // KeyW uses a special mode and stays unknown instead of being assumed.
+        Assert.Equal(["AltLeft"], import.Keys.Keys);
+        Assert.Equal(defaults, import.Keys["AltLeft"]);
+        Assert.Equal(2, import.Warnings.Count);
+    }
+
+    [Fact]
     public void ParseProfile_FailsWithoutConfigForModel() =>
         Assert.Throws<InvalidDataException>(() => AkkoDriverDatabase.ParseProfile(Database(Mode(26, 9)), 847, 0, Definition));
 

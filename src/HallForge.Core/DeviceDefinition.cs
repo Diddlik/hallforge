@@ -22,7 +22,8 @@ public sealed record DeviceDefinition(
     IReadOnlyList<uint> FirmwareModelIds,
     TriggerLimits Limits,
     IReadOnlyDictionary<string, int> Keys,
-    IReadOnlyList<KeyGeometry> Layout)
+    IReadOnlyList<KeyGeometry> Layout,
+    KeyTrigger? FactoryDefaults = null)
 {
     public bool Matches(HidInterfaceInfo hid) =>
         Match.VendorIds.Contains(hid.VendorId)
@@ -74,6 +75,8 @@ public static class DeviceDefinitionLoader
             throw new JsonException($"Layout key '{stray.Key}' is not in keys.");
         if (definition.Keys.Values.Any(i => i is < 0 or >= TriggerLimits.MatrixSize))
             throw new JsonException($"Matrix positions must be between 0 and {TriggerLimits.MatrixSize - 1}.");
+        if (definition.FactoryDefaults is { } defaults && definition.Limits.Validate(defaults) is { Count: > 0 } errors)
+            throw new JsonException($"Factory defaults: {string.Join(" ", errors)}");
         return definition;
     }
 }

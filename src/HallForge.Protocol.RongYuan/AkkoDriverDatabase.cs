@@ -34,10 +34,10 @@ public static class AkkoDriverDatabase
 
         var keys = new Dictionary<string, KeyTrigger>();
         var warnings = new List<string>();
-        if (!profiles[profile].TryGetProperty("magnetismModes", out var modes))
-            return new AkkoImport(keys, warnings);
+        var skipped = new HashSet<string>();
+        var modes = profiles[profile].TryGetProperty("magnetismModes", out var stored) ? stored.EnumerateArray().ToList() : [];
 
-        foreach (var mode in modes.EnumerateArray())
+        foreach (var mode in modes)
         {
             var usage = mode.GetProperty("original").GetInt32();
             var keyId = KeyCodes.FromHidUsage(usage);
@@ -49,6 +49,7 @@ public static class AkkoDriverDatabase
             if (mode.GetProperty("mode").GetString() != "normal" || mode.GetProperty("option").GetString() != "normal")
             {
                 warnings.Add($"Skipped {keyId}: special key modes (DKS, mod-tap, toggle) are not supported.");
+                skipped.Add(keyId);
                 continue;
             }
             keys[keyId] = new KeyTrigger(
@@ -58,6 +59,16 @@ public static class AkkoDriverDatabase
                 Tenths(mode, "firePressTravel"),
                 Tenths(mode, "fireLiftTravel"),
                 mode.GetProperty("deadZoneTravel").GetDecimal());
+        }
+
+        // The driver stores only keys that differ from the factory setting, so missing keys have the factory values.
+        if (definition.FactoryDefaults is { } defaults)
+        {
+            var missing = definition.Keys.Keys.Where(k => !keys.ContainsKey(k) && !skipped.Contains(k)).ToList();
+            foreach (var keyId in missing)
+                keys[keyId] = defaults;
+            if (missing.Count > 0)
+                warnings.Add($"{missing.Count} keys were not stored by the driver and are set to the factory defaults of {definition.Name}.");
         }
         return new AkkoImport(keys, warnings);
     }

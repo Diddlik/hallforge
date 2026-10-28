@@ -15,6 +15,14 @@
     "rapidTrigger": { "minMm": 0.1, "maxMm": 2.5, "stepMm": 0.1 },
     "deadzone": { "minMm": 0.1, "maxMm": 4.0, "stepMm": 0.1 }
   },
+  "factoryDefaults": {
+    "actuationMm": 2.0,
+    "releaseMm": 2.0,
+    "rapidTrigger": false,
+    "rapidTriggerPressMm": 0.2,
+    "rapidTriggerReleaseMm": 0.3,
+    "deadzoneMm": 3.7
+  },
   "keys": {
     "Escape": 0,
     "Backquote": 1,
