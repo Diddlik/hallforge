@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HallForge — Profiles</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.pf *{box-sizing:border-box}
+.pf button{font:inherit;color:inherit}
+.pf .num{font-variant-numeric:tabular-nums}
+.pf .btn{cursor:pointer;transition:filter .15s ease,border-color .15s ease}
+.pf .btn:hover:not(:disabled){filter:brightness(1.12)}
+.pf :focus-visible{outline:2px solid #22D3EE;outline-offset:2px}
+.pf a{text-decoration:none}
+@media (prefers-reduced-motion: reduce){.pf *{transition:none!important}}
+</style>
+</helmet>
+<div class="pf" style="width: 100%; height: 900px; display: flex; overflow: hidden; background: #0B0F17; color: #F3F6FC; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'SF Pro Text', Ubuntu, 'Noto Sans', sans-serif; font-size: 13px; line-height: 1.45">
+
+<nav aria-label="Main navigation" style="width: 208px; flex: none; display: flex; flex-direction: column; gap: 4px; padding: 16px 12px; background: #131A27; border-right: 1px solid #2A3446">
+<div style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 6px; margin-bottom: 16px">
+<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="8" fill="#A78BFA"></rect><path d="M9.5 8.5v11M18.5 8.5v11M9.5 14h9" stroke="#160F2E" stroke-width="2.6" stroke-linecap="round" fill="none"></path><circle cx="22" cy="6" r="3" fill="#22D3EE" stroke="#131A27" stroke-width="1.5"></circle></svg>
+<span style="font-size: 17px; font-weight: 700; letter-spacing: -0.01em">HallForge</span>
+</div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="7">
+<a href="{{n.href}}" aria-current="{{n.current}}" style="{{n.style}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.d}}"></path></svg><span style="flex: 1">{{n.label}}</span><sc-if value="{{n.later}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #1B2434; color: #B4C0D2">Later</span></sc-if></a>
+</sc-for>
+</nav>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<header style="height: 56px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 24px; border-bottom: 1px solid #2A3446">
+<span style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: #131A27; font-weight: 600">AKKO MOD007B ISO HE</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; background: rgba(52,211,153,0.12); color: #34D399; font-weight: 600"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #34D399"></span>Connected</span>
+<span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: rgba(251,191,36,0.13); color: #FBBF24; font-weight: 600">Experimental support</span>
+</header>
+
+<main style="flex: 1; min-height: 0; overflow: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<div style="flex: 1 1 360px">
+<h1 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700">Profiles</h1>
+<p style="margin: 2px 0 0; color: #B4C0D2">Loading a profile only fills your draft. You review and apply separately.</p>
+</div>
+<button class="btn" type="button" style="height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Import…</button>
+<button class="btn" type="button" style="height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #2A3446; background: #1B2434; font-weight: 600">New from current draft</button>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<section aria-label="Profile library" style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="color: #B4C0D2; font-size: 12px; font-weight: 600">Templates</div>
+<sc-for list="{{tpl}}" as="p" hint-placeholder-count="4">
+<button class="btn" type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">
+<span style="display: flex; align-items: center; gap: 8px"><span style="font-size: 15px; font-weight: 700; flex: 1; text-align: left">{{p.name}}</span><sc-if value="{{p.risky}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: rgba(251,191,36,0.13); color: #FBBF24">Aggressive</span></sc-if></span>
+<span style="display: block; text-align: left; color: #B4C0D2; margin-top: 2px">{{p.intent}}</span>
+<span class="num" style="display: block; text-align: left; color: #8C99AE; font-size: 12px; margin-top: 6px">{{p.covers}}</span>
+</button>
+</sc-for>
+<div style="color: #B4C0D2; font-size: 12px; font-weight: 600; margin-top: 8px">Yours</div>
+<sc-for list="{{mine}}" as="p" hint-placeholder-count="1">
+<button class="btn" type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">
+<span style="display: block; font-size: 15px; font-weight: 700; text-align: left">{{p.name}}</span>
+<span style="display: block; text-align: left; color: #B4C0D2; margin-top: 2px">{{p.intent}}</span>
+<span class="num" style="display: block; text-align: left; color: #8C99AE; font-size: 12px; margin-top: 6px">{{p.covers}}</span>
+</button>
+</sc-for>
+</section>
+
+<section aria-labelledby="pv-h" style="flex: 999 1 560px; min-width: 0; background: #131A27; border: 1px solid #2A3446; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: flex-start; gap: 12px">
+<div style="flex: 1">
+<h2 id="pv-h" style="margin: 0; font-size: 18px; font-weight: 700">{{cur.name}}</h2>
+<div style="color: #B4C0D2; margin-top: 2px">{{cur.intent}}</div>
+</div>
+<button class="btn" type="button" style="height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Duplicate</button>
+<button class="btn" type="button" disabled="{{cur.builtin}}" style="height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Rename</button>
+<button class="btn" type="button" style="height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Export</button>
+</div>
+
+<div style="overflow-x: auto; padding: 8px 0; border-radius: 10px; background: #0B0F17">
+<div role="img" aria-label="{{cur.mapAria}}" style="position: relative; width: {{kbW}}px; height: {{kbH}}px; margin: 0 auto">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="67">
+<span style="{{k.style}}">{{k.legend}}</span>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; gap: 18px; font-size: 12px; color: #B4C0D2">
+<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 4px; background: #35295F; border: 1.5px solid #A78BFA"></span>Covered by profile</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 4px; background: #1E2738; border: 1px solid #313D53"></span>Untouched — keeps its current value</span>
+</div>
+
+<table class="num" style="width: 100%; border-collapse: collapse; border: 1px solid #2A3446; border-radius: 10px">
+<thead><tr style="text-align: left; color: #B4C0D2; background: #1B2434"><th scope="col" style="padding: 8px 14px; font-weight: 600">Keys</th><th scope="col" style="padding: 8px 14px; font-weight: 600">Actuation</th><th scope="col" style="padding: 8px 14px; font-weight: 600">Release</th><th scope="col" style="padding: 8px 14px; font-weight: 600">Rapid Trigger</th><th scope="col" style="padding: 8px 14px; font-weight: 600">RT press / release</th></tr></thead>
+<tbody>
+<sc-for list="{{cur.groups}}" as="g" hint-placeholder-count="1">
+<tr style="border-top: 1px solid #2A3446"><th scope="row" style="padding: 8px 14px; text-align: left">{{g.keys}}</th><td style="padding: 8px 14px">{{g.act}}</td><td style="padding: 8px 14px">{{g.rel}}</td><td style="padding: 8px 14px">{{g.rt}}</td><td style="padding: 8px 14px">{{g.rts}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+<p style="margin: 0; color: #8C99AE; font-size: 12px">Values are placeholders until the template defaults are confirmed for this device.</p>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding-top: 4px; border-top: 1px solid #2A3446">
+<sc-if value="{{loaded}}" hint-placeholder-val="{{ false }}"><span role="status" style="display: inline-flex; align-items: center; gap: 6px; color: #22D3EE; font-weight: 600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>{{loadedText}}</span></sc-if>
+<span style="flex: 1"></span>
+<sc-if value="{{cur.mineFlag}}" hint-placeholder-val="{{ false }}"><button class="btn" type="button" style="height: 38px; padding: 0 14px; border-radius: 8px; border: none; background: transparent; color: #FB7185">Delete</button></sc-if>
+<sc-if value="{{loaded}}" hint-placeholder-val="{{ false }}"><a class="btn" href="Main.dc.html" style="display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid #2A3446">Open in Performance</a></sc-if>
+<button class="btn" type="button" onClick="{{load}}" style="height: 38px; padding: 0 18px; border-radius: 8px; border: none; background: #A78BFA; color: #160F2E; font-weight: 700">Load into draft</button>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  kb() {
+    if (this._kb) return this._kb;
+    const rows = [
+      [['Dead','^'],['D1','1'],['D2','2'],['D3','3'],['D4','4'],['D5','5'],['D6','6'],['D7','7'],['D8','8'],['D9','9'],['D0','0'],['Ss','ß'],['Acc','´'],['Bksp','⟵',2],['Del','Entf']],
+      [['Tab','Tab',1.5],['Q','Q'],['W','W'],['E','E'],['R','R'],['T','T'],['Z','Z'],['U','U'],['I','I'],['O','O'],['P','P'],['Ue','Ü'],['Plus','+'],['Enter','↵',1.5],['PgUp','↑']],
+      [['Caps','⇩',1.75],['A','A'],['S','S'],['D','D'],['F','F'],['G','G'],['H','H'],['J','J'],['K','K'],['L','L'],['Oe','Ö'],['Ae','Ä'],['Hash','#'],[null,'',1.25],['PgDn','↓']],
+      [['LShift','⇧',1.25],['Lt','<'],['Y','Y'],['X','X'],['C','C'],['V','V'],['B','B'],['N','N'],['M','M'],['Comma',','],['Dot','.'],['Minus','-'],['RShift','⇧',1.75],['Up','↑'],['End','End']],
+      [['LCtrl','Strg',1.25],['Win','Win',1.25],['LAlt','Alt',1.25],['Space','',6.25],['AltGr','AltGr'],['Fn','Fn'],['RCtrl','Strg'],['Left','←'],['Down','↓'],['Right','→']]
+    ];
+    const keys = [];
+    rows.forEach((row, y) => { let x = 0; row.forEach((k) => { const w = k[2] || 1; if (k[0]) keys.push({ id: k[0], legend: k[1], w: w, x: x, y: y }); x += w; }); });
+    this._kb = keys;
+    return keys;
+  }
+  profiles() {
+    const all = this.kb().map((k) => k.id).filter((id) => id !== 'Fn');
+    const g = (keys, act, rel, rt, rts) => ({ keys: keys, act: act, rel: rel, rt: rt, rts: rts });
+    return [
+      { id: 'bf6', name: 'BF6 Balanced', intent: 'Responsive movement, typing keys left alone.', ids: ['W','A','S','D','LShift','LCtrl','Space'], groups: [g('W A S D, Shift, Ctrl, Space', '[x.xx] mm', '[x.xx] mm', 'On', '[x.xx] / [x.xx] mm')] },
+      { id: 'fpsc', name: 'FPS Conservative', intent: 'Rapid Trigger on movement with forgiving distances.', ids: ['W','A','S','D'], groups: [g('W A S D', '[x.xx] mm', '[x.xx] mm', 'On', '[x.xx] / [x.xx] mm')] },
+      { id: 'fpsf', name: 'FPS Fast', intent: 'Short distances on movement and abilities. Easy to trigger by accident.', risky: true, ids: ['W','A','S','D','Q','E'], groups: [g('W A S D, Q, E', '[x.xx] mm', '[x.xx] mm', 'On', '[x.xx] / [x.xx] mm')] },
+      { id: 'office', name: 'Office', intent: 'Deep, calm actuation for everyday typing. Rapid Trigger off.', ids: all, groups: [g('All editable keys', '[x.xx] mm', '[x.xx] mm', 'Off', 'unchanged')] },
+      { id: 'mine1', name: 'My WASD tweak', intent: 'Saved from a draft on [date].', mine: true, ids: ['W','A','S','D'], groups: [g('W A S D', '0.80 mm', 'unchanged', 'unchanged', 'unchanged')] }
+    ];
+  }
+  renderVals() {
+    const s = this.state || {};
+    const curId = s.cur || 'bf6';
+    const list = this.profiles();
+    const cur = list.find((p) => p.id === curId);
+    const nav = [
+      ['Overview', 'M4 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1zM4 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z', '#'],
+      ['Performance', 'M12 14l4-4M3.34 19a10 10 0 1 1 17.32 0', 'Main.dc.html'],
+      ['Key Mapping', 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10', 'Mapping.dc.html', true],
+      ['Lighting', 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z', 'Lighting.dc.html', true],
+      ['Profiles', 'M12 2l10 5-10 5L2 7zM2 17l10 5 10-5M2 12l10 5 10-5', 'Profiles.dc.html'],
+      ['Device', 'M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3', 'NoDevice.dc.html'],
+      ['About', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', '#']
+    ].map((n) => {
+      const active = n[0] === 'Profiles';
+      return {
+        label: n[0], d: n[1], href: n[2], later: !!n[3], current: active ? 'page' : 'false',
+        style: 'display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 11px; border-radius: 8px; font-weight: ' + (active ? 700 : 500) + '; background: ' + (active ? '#2E2552' : 'transparent') + '; color: ' + (active ? '#F3F6FC' : '#B4C0D2')
+      };
+    });
+    const card = (p) => {
+      const on = p.id === curId;
+      return {
+        name: p.name, intent: p.intent, risky: !!p.risky,
+        covers: (p.ids.length > 60 ? 'All editable keys' : p.ids.length + ' keys') + ' · Actuation, Release, Rapid Trigger',
+        pressed: on ? 'true' : 'false',
+        pick: () => this.setState({ cur: p.id, loaded: null }),
+        style: 'display: block; width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid ' + (on ? '#A78BFA' : '#2A3446') + '; background: ' + (on ? '#1F1A38' : '#131A27') + ';'
+      };
+    };
+    const U = 30;
+    const keys = this.kb().map((k) => {
+      const on = cur.ids.indexOf(k.id) >= 0;
+      const w = k.w * U - 4, h = U - 4;
+      return {
+        legend: k.legend,
+        style: 'position: absolute; left: ' + (k.x * U) + 'px; top: ' + (k.y * U) + 'px; width: ' + w + 'px; height: ' + h + 'px; border-radius: 5px; display: grid; place-items: center; font-size: 10px; font-weight: 600; border: ' + (on ? '1.5px solid #A78BFA' : '1px solid #313D53') + '; background: ' + (on ? '#35295F' : '#1E2738') + '; color: ' + (on ? '#F3F6FC' : '#8C99AE') + ';'
+      };
+    });
+    return {
+      nav: nav,
+      tpl: list.filter((p) => !p.mine).map(card),
+      mine: list.filter((p) => p.mine).map(card),
+      cur: { name: cur.name, intent: cur.intent, groups: cur.groups, builtin: !cur.mine, mineFlag: !!cur.mine, mapAria: cur.name + ' covers ' + cur.ids.length + ' keys' },
+      keys: keys, kbW: 16 * U - 4, kbH: 5 * U - 4,
+      loaded: s.loaded === curId,
+      loadedText: cur.ids.length + ' keys loaded into draft — nothing sent',
+      load: () => this.setState({ loaded: curId })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HallForge — Review and apply</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+.rv *{box-sizing:border-box}
+.rv button,.rv input{font:inherit;color:inherit}
+.rv .num{font-variant-numeric:tabular-nums}
+.rv .btn{cursor:pointer;transition:filter .15s ease}
+.rv .btn:hover:not(:disabled){filter:brightness(1.12)}
+.rv .btn:disabled{cursor:not-allowed;opacity:.45}
+.rv :focus-visible{outline:2px solid #22D3EE;outline-offset:2px}
+.rv a{text-decoration:none}
+.rv .bar{transition:width .3s ease}
+@media (prefers-reduced-motion: reduce){.rv *{transition:none!important}}
+</style>
+</helmet>
+<div class="rv" style="position: relative; width: 100%; height: 900px; overflow: hidden; background: #0B0F17; color: #F3F6FC; font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, 'SF Pro Text', Ubuntu, 'Noto Sans', sans-serif; font-size: 13px; line-height: 1.45">
+<div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none">
+<dc-import name="Main" scenario="multi" theme="dark" hint-size="100%,900px"></dc-import>
+</div>
+<div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(5,8,14,0.72)"></div>
+
+<div role="dialog" aria-modal="true" aria-labelledby="rv-h" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(720px, calc(100% - 32px)); max-height: calc(100% - 48px); overflow: auto; background: #131A27; border: 1px solid #2A3446; border-radius: 14px; box-shadow: 0 24px 64px rgba(0,0,0,0.5)">
+
+<div style="padding: 20px 24px 16px; border-bottom: 1px solid #2A3446">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 id="rv-h" style="margin: 0; font-size: 18px; font-weight: 700; flex: 1">{{heading}}</h2>
+<span class="num" style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #1B2434; color: #B4C0D2; font-weight: 600">AKKO MOD007B ISO HE · active config</span>
+</div>
+<div style="color: #B4C0D2; margin-top: 4px">{{subheading}}</div>
+</div>
+
+<sc-if value="{{isReview}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 16px 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="padding: 12px 14px; border-radius: 10px; background: #1B2434"><div style="color: #B4C0D2; font-size: 12px">Keys</div><div class="num" style="font-size: 20px; font-weight: 700">4</div></div>
+<div style="padding: 12px 14px; border-radius: 10px; background: #1B2434"><div style="color: #B4C0D2; font-size: 12px">Field changes</div><div class="num" style="font-size: 20px; font-weight: 700">4</div></div>
+<div style="padding: 12px 14px; border-radius: 10px; background: #1B2434"><div style="color: #B4C0D2; font-size: 12px">Write operations (est.)</div><div class="num" style="font-size: 20px; font-weight: 700">4</div></div>
+</div>
+
+<div style="border: 1px solid #2A3446; border-radius: 10px; overflow: hidden">
+<table class="num" style="width: 100%; border-collapse: collapse">
+<thead><tr style="text-align: left; color: #B4C0D2; background: #1B2434"><th scope="col" style="padding: 8px 14px; font-weight: 600">Key</th><th scope="col" style="padding: 8px 14px; font-weight: 600">Field</th><th scope="col" style="padding: 8px 14px; font-weight: 600">Current (app state)</th><th scope="col" style="padding: 8px 14px; font-weight: 600">New</th><th scope="col" style="padding: 8px 14px; font-weight: 600">Untouched</th></tr></thead>
+<tbody>
+<sc-for list="{{diff}}" as="d" hint-placeholder-count="4">
+<tr style="border-top: 1px solid #2A3446"><th scope="row" style="padding: 8px 14px; text-align: left">{{d.key}}</th><td style="padding: 8px 14px">Actuation</td><td style="padding: 8px 14px">1.20 mm</td><td style="padding: 8px 14px; color: #22D3EE; font-weight: 700">0.80 mm</td><td style="padding: 8px 14px; color: #B4C0D2">Release, RT, deadzone</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(251,191,36,0.13)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>
+<div><strong>No readback.</strong> The keyboard cannot report settings back. After sending, keys are marked <em>Sent</em> — never <em>Verified</em>.</div>
+</div>
+<div style="display: flex; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #1B2434">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B4C0D2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+<div><strong>Backup: partial</strong> — created [timestamp] from the driver database import. Keys with unknown settings (number row) cannot be restored from it. <a href="#" style="color: #A78BFA; text-decoration: underline">View backup</a></div>
+</div>
+</div>
+
+<label style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer">
+<input type="checkbox" checked="{{ack}}" onChange="{{toggleAck}}" style="width: 18px; height: 18px; margin: 1px 0 0; accent-color: #A78BFA">
+<span>I understand these changes are sent without verification and that the backup is partial.</span>
+</label>
+</div>
+<div style="display: flex; justify-content: flex-end; gap: 10px; padding: 14px 24px 20px; border-top: 1px solid #2A3446">
+<a class="btn" href="Main.dc.html" style="display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid #2A3446; color: #F3F6FC">Cancel</a>
+<button class="btn" type="button" onClick="{{send}}" disabled="{{sendDisabled}}" style="height: 38px; padding: 0 18px; border-radius: 8px; border: none; background: #A78BFA; color: #160F2E; font-weight: 700">Send 4 changes to keyboard</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isWorking}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 16px 24px 20px; display: flex; flex-direction: column; gap: 14px">
+<div role="progressbar" aria-label="Transfer progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="{{done}}" style="height: 8px; border-radius: 999px; background: #1B2434; overflow: hidden"><div class="bar" style="height: 100%; width: {{pct}}%; background: #22D3EE; border-radius: 999px"></div></div>
+<div class="num" style="color: #B4C0D2" aria-live="polite">{{progressText}}</div>
+<ul style="list-style: none; margin: 0; padding: 0; border: 1px solid #2A3446; border-radius: 10px">
+<sc-for list="{{outcomes}}" as="o" hint-placeholder-count="4">
+<li style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-top: {{o.sep}}">
+<span aria-hidden="true" style="{{o.iconStyle}}">{{o.glyph}}</span>
+<span style="font-weight: 600; width: 28px">{{o.key}}</span>
+<span style="flex: 1; color: #B4C0D2">Actuation 1.20 → 0.80 mm</span>
+<span style="font-weight: 600; color: {{o.color}}">{{o.status}}</span>
+</li>
+</sc-for>
+</ul>
+<sc-if value="{{isSending}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px"><span style="color: #B4C0D2">Device is locked for other writes while sending.</span><button class="btn" type="button" onClick="{{stop}}" style="height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Stop after current key</button></div>
+</sc-if>
+<sc-if value="{{isResult}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(251,113,133,0.12)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FB7185" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 8v4M12 16h.01"></path></svg>
+<div><strong>The keyboard disconnected while D was being written.</strong> D may hold its old or new value. Its draft is kept. Reconnect the keyboard, then retry D.</div>
+</div>
+<div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap">
+<button class="btn" type="button" style="height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Export diagnostics</button>
+<button class="btn" type="button" onClick="{{reset}}" style="height: 38px; padding: 0 16px; border-radius: 8px; border: 1px solid #2A3446; background: transparent">Retry D…</button>
+<a class="btn" href="Main.dc.html" style="display: inline-flex; align-items: center; height: 38px; padding: 0 18px; border-radius: 8px; background: #A78BFA; color: #160F2E; font-weight: 700">Done</a>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  componentWillUnmount() { clearTimeout(this._tm); }
+  tick() {
+    const s = this.state || {};
+    const done = (s.done || 0) + 1;
+    if (s.stopping || done >= 4) {
+      this.setState({ done: done, step: 'result' });
+      return;
+    }
+    this.setState({ done: done });
+    this._tm = setTimeout(() => this.tick(), 750);
+  }
+  renderVals() {
+    const s = this.state || {};
+    const step = s.step || 'review';
+    const done = s.done || 0;
+    const keys = ['W', 'A', 'S', 'D'];
+    const outcomes = keys.map((k, i) => {
+      let status = 'Queued', color = '#B4C0D2', glyph = '·', bg = '#1B2434', fg = '#B4C0D2';
+      if (step === 'result' && k === 'D') { status = 'Uncertain — interrupted'; color = '#FB7185'; glyph = '!'; bg = 'rgba(251,113,133,0.15)'; fg = '#FB7185'; }
+      else if (i < done) { status = 'Sent · not verified'; color = '#22D3EE'; glyph = '↑'; bg = 'rgba(34,211,238,0.15)'; fg = '#22D3EE'; }
+      else if (i === done && step === 'sending') { status = 'Sending…'; color = '#F3F6FC'; glyph = '…'; }
+      else if (step === 'result') { status = 'Not sent'; }
+      return {
+        key: k, status: status, color: color, glyph: glyph, sep: i ? '1px solid #2A3446' : 'none',
+        iconStyle: 'width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; background: ' + bg + '; color: ' + fg + ';'
+      };
+    });
+    const sentCount = step === 'result' ? Math.min(done, 3) : done;
+    return {
+      heading: step === 'review' ? 'Review & apply' : (step === 'sending' ? 'Sending to keyboard…' : 'Applied with problems'),
+      subheading: step === 'review' ? 'Only the fields below change. Everything else on these keys stays as it is.' : (step === 'sending' ? 'Writing allowlisted trigger commands, one key at a time.' : sentCount + ' sent · 1 uncertain. Sent means the keyboard accepted the command — it is not a readback.'),
+      isReview: step === 'review', isWorking: step !== 'review', isSending: step === 'sending', isResult: step === 'result',
+      diff: keys.map((k) => ({ key: k })),
+      ack: !!s.ack,
+      toggleAck: () => this.setState({ ack: !s.ack }),
+      sendDisabled: !s.ack,
+      send: () => { this.setState({ step: 'sending', done: 0, stopping: false }); this._tm = setTimeout(() => this.tick(), 750); },
+      stop: () => this.setState({ stopping: true }),
+      reset: () => { clearTimeout(this._tm); this.setState({ step: 'review', done: 0, ack: false, stopping: false }); },
+      done: done, pct: Math.round((done / 4) * 100),
+      progressText: done + ' of 4 keys sent',
+      outcomes: outcomes
+    };
+  }
+}
+</script>
+</body>
+</html>
