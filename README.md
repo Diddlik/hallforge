@@ -1,10 +1,86 @@
-# HallForge
+<p align="center">
+  <img src="assets/icon-512.png" width="112" alt="HallForge icon">
+</p>
 
-HallForge is a cross-platform configurator for hall-effect keyboards. It lets you edit actuation and rapid trigger settings for groups of keys, and save and apply complete profiles. It runs on Windows, Linux and macOS and talks to the keyboard directly over USB HID.
+<h1 align="center">HallForge</h1>
 
-**Status: Phase 1, experimental.** HallForge lists and inspects devices and can write the trigger setting of single keys on the AKKO MOD007B ISO HE. Writing to that model requires `--experimental` until it is verified on hardware.
+<p align="center">
+  <strong>Open-source configurator for hall-effect (magnetic switch) keyboards.</strong><br>
+  Per-key actuation point, release point, Rapid Trigger and deadzone, profiles, backups and RGB lighting.<br>
+  Windows, Linux and macOS. GUI and command line.
+</p>
 
-## Build and run
+<p align="center">
+  <a href="https://github.com/Diddlik/hallforge/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Diddlik/hallforge?color=7C3AED"></a>
+  <a href="https://github.com/Diddlik/hallforge/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Diddlik/hallforge/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-22D3EE"></a>
+  <img alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-1B2434">
+  <img alt=".NET 10" src="https://img.shields.io/badge/.NET-10-512BD4">
+</p>
+
+<p align="center">
+  <img src="docs/images/performance.png" alt="HallForge performance page: per-key actuation and Rapid Trigger settings for WASD on an AKKO MOD007B ISO HE" width="900">
+</p>
+
+HallForge replaces the vendor driver for tuning magnetic switches. Select keys on the real keyboard layout, set the actuation and release distance in 0.1 mm steps, enable Rapid Trigger with separate press and release sensitivity, review every change and send it over USB HID. Nothing reaches the keyboard before you confirm it.
+
+**Status: experimental.** The first supported keyboard is the **AKKO MOD007B ISO HE** (RongYuan firmware, USB `3151:4035`). Key settings are written but the firmware cannot report them back. Lighting changes are read back and verified.
+
+## Download
+
+Get the latest version from **[GitHub Releases](https://github.com/Diddlik/hallforge/releases/latest)**:
+
+| Platform | Installer (with automatic updates) | Portable / CLI |
+|---|---|---|
+| Windows x64 | `HallForge-win-Setup.exe` | `HallForge-win-Portable.zip`, `hallforge-cli-<version>-win-x64.zip` |
+| Linux x64 | `HallForge.AppImage` | `hallforge-cli-<version>-linux-x64.zip` |
+| macOS (Apple Silicon) | `HallForge-osx-Setup.pkg` | `HallForge-osx-Portable.zip`, `hallforge-cli-<version>-osx-arm64.zip` |
+
+The installed app checks GitHub for updates when it starts, verifies the download and restarts only when you click "Restart and update". Automatic checks can be turned off under About.
+
+## Features
+
+- **Per-key actuation and release point**: 0.1 mm steps within the limits of the keyboard, with typed values, sliders and step buttons.
+- **Rapid Trigger**: dynamic re-press and release with separate press and release sensitivity, plus bottom deadzone.
+- **Multi-key editing**: quick selections (WASD, movement, actions, number row), Ctrl-click, Shift-click ranges, mixed values shown per field.
+- **Draft, undo and review**: every edit stays a draft with undo. "Review & Apply" lists old and new values per key and sends with per-key progress. Sending can be stopped between keys.
+- **Profiles**: JSON profiles for FPS games and typing, with a coverage preview. Templates for BF6 and FPS setups are included.
+- **Backups**: imports the current settings from the AKKO Cloud Driver database before the first write.
+- **RGB lighting**: 21 effects with brightness, speed, direction and color. Every lighting change is read back from the keyboard.
+- **Light and dark theme**, English and German UI, keyboard navigation and screen reader labels.
+- **CLI** for scripting: list devices, back up, apply profiles, set keys and lighting with `--dry-run`.
+
+<p align="center">
+  <img src="docs/images/infographic.png" alt="How HallForge works: select keys, tune the draft, review every change, apply over USB. Per-key actuation, release, Rapid Trigger and deadzone." width="900">
+</p>
+
+## Screenshots
+
+| Review before writing | Profiles |
+|---|---|
+| <img src="docs/images/review.png" alt="Review and apply dialog listing every key change before it is sent" width="430"> | <img src="docs/images/profiles.png" alt="Profile library with keyboard coverage preview" width="430"> |
+| **RGB lighting** | **Light theme** |
+| <img src="docs/images/lighting.png" alt="Lighting page with effect, brightness, speed and color" width="430"> | <img src="docs/images/performance-light.png" alt="Performance page in the light theme" width="430"> |
+
+## Supported keyboards
+
+| Keyboard | Firmware | Key settings | Lighting | Status |
+|---|---|---|---|---|
+| AKKO MOD007B ISO HE | RongYuan, model id 1778 | write (no readback) | read and write (verified) | experimental |
+
+Other RongYuan based hall-effect keyboards (AKKO, MonsGeek and similar) probably use the same protocol. Adding one needs only a JSON device definition, see [Adding a keyboard](#adding-a-keyboard). Reports from other models are welcome as issues.
+
+## FAQ
+
+**What is a hall-effect keyboard?** Its switches use magnets and a hall sensor instead of a metal contact, so the keyboard measures how far each key is pressed. That makes the actuation point adjustable per key and enables Rapid Trigger.
+
+**What is Rapid Trigger?** The key registers again as soon as it moves down by the press sensitivity, and releases as soon as it moves up by the release sensitivity, instead of using fixed points. It is popular in FPS games for fast counter-strafing.
+
+**Is it safe?** HallForge never sends firmware, bootloader, key matrix or macro commands. Every write goes through an allowlist, needs a backup and is shown for review first. Unverified keyboards need an explicit acknowledgement.
+
+**Do I need the vendor driver?** No. It is only used once as a source for the backup of your current settings. Close it while HallForge is running, because both talk to the same USB interface.
+
+## Build from source
 
 The build needs the .NET 10 SDK.
 
@@ -33,23 +109,17 @@ dotnet run --project src/HallForge.App                          # GUI
 - **The keyboard uses a protocol that HallForge already supports:** add a JSON file to `devices/`. See `devices/akko-mod007b-iso-he.json`. Run `devices identify` to get the firmware model id for `firmwareModelIds`. Set `"verified": false` until the keyboard has been tested on real hardware.
 - **The keyboard uses a new protocol:** add a protocol project and give it a `protocol` id. Device definitions refer to that id.
 
-## GUI
+## Using the GUI
 
-`dotnet run --project src/HallForge.App` shows the connected keyboard with its real key layout and ISO-DE legends.
-
-- Click keys to select them, or use the presets (WASD, Movement, Q E R F, 1-5, All, None).
-- The editor shows the common value of the selection or "mixed". Changing a field only changes that field on the selected keys.
-- Keys with pending changes are outlined. Keys marked "?" have unknown settings.
-- "Load profile..." adds a profile to the pending changes. Nothing is written before "Apply".
-- "Apply" lists every change and asks for confirmation. For unverified keyboards it also asks you to acknowledge that writes cannot be verified.
-- Without a backup, the GUI offers "Create backup from AKKO driver" first.
-- The "Lighting" tab reads the current effect from the keyboard and sets effect, brightness, speed, variant and color (or rainbow). After "Apply lighting" the keyboard is read again, so the change is verified.
+- **Performance**: click keys or use Quick select, then change actuation, release, Rapid Trigger and the sensitivities in the side panel. Keys with a draft get a cyan bar; "Show values on keys" displays the actuation on every key.
+- The bar at the bottom shows the draft. **Undo** steps back, **Discard all** clears it, **Review & Apply** opens the review dialog.
+- **Profiles** loads a profile into the draft. **Lighting** reads the current effect and applies a new one. **Device** shows model, USB ID, active onboard profile and the backup.
 
 ## State and backups
 
 The AKKO MOD007B ISO HE cannot report its key settings, so HallForge keeps what it knows:
 
-- `backup import-akko` reads the settings that the Akko Cloud Driver stored in its local database (`%AppData%/Akko Cloud Driver/iot_db/CONFIG/db`). It saves them as an immutable backup and as the initial state. The driver only stores keys that differ from its defaults, so all other keys stay unknown.
+- `backup import-akko` reads the settings that the Akko Cloud Driver stored in its local database (`%AppData%/Akko Cloud Driver/iot_db/CONFIG/db`). It saves them as an immutable backup and as the initial state. The driver only stores keys that differ from its defaults, so all other keys get the factory defaults from the device definition (`factoryDefaults`).
 - `keys set` records every write in the state.
 - Files live in `%AppData%/HallForge/state` and `%AppData%/HallForge/backups` (`~/.config/HallForge` on Linux and macOS).
 

@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif">
+  <title>How HallForge configures a hall-effect keyboard</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0B0F17"/>
+      <stop offset="1" stop-color="#151036"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#B79CFF"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#22D3EE"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="760" rx="24" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <rect x="48" y="44" width="56" height="56" rx="14" fill="url(#accent)"/>
+  <path d="M65 58v28M87 58v28M65 72h22" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="76" cy="94" r="4" fill="#22D3EE"/>
+  <text x="122" y="70" font-size="30" font-weight="700" fill="#F3F6FC">HallForge</text>
+  <text x="122" y="96" font-size="17" fill="#B4C0D2">Open-source configurator for hall-effect (magnetic switch) keyboards</text>
+
+  <!-- Flow -->
+  <g font-size="15">
+    <rect x="48" y="140" width="250" height="150" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="72" y="174" font-size="13" font-weight="700" fill="#A78BFA" letter-spacing="1.5">1 · SELECT</text>
+    <text x="72" y="204" font-size="20" font-weight="700" fill="#F3F6FC">Pick keys</text>
+    <text x="72" y="232" fill="#B4C0D2">Real layout from the</text>
+    <text x="72" y="254" fill="#B4C0D2">device definition, WASD</text>
+    <text x="72" y="276" fill="#B4C0D2">and movement presets</text>
+
+    <rect x="338" y="140" width="250" height="150" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="362" y="174" font-size="13" font-weight="700" fill="#A78BFA" letter-spacing="1.5">2 · TUNE</text>
+    <text x="362" y="204" font-size="20" font-weight="700" fill="#F3F6FC">Edit the draft</text>
+    <text x="362" y="232" fill="#B4C0D2">Actuation, release, rapid</text>
+    <text x="362" y="254" fill="#B4C0D2">trigger, deadzone. Undo</text>
+    <text x="362" y="276" fill="#B4C0D2">anytime, nothing is sent</text>
+
+    <rect x="628" y="140" width="250" height="150" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="652" y="174" font-size="13" font-weight="700" fill="#A78BFA" letter-spacing="1.5">3 · REVIEW</text>
+    <text x="652" y="204" font-size="20" font-weight="700" fill="#F3F6FC">See every change</text>
+    <text x="652" y="232" fill="#B4C0D2">Old → new per key, what</text>
+    <text x="652" y="254" fill="#B4C0D2">stays untouched, backup</text>
+    <text x="652" y="276" fill="#B4C0D2">status, explicit consent</text>
+
+    <rect x="918" y="140" width="234" height="150" rx="16" fill="#1F1A38" stroke="#A78BFA"/>
+    <text x="942" y="174" font-size="13" font-weight="700" fill="#22D3EE" letter-spacing="1.5">4 · APPLY</text>
+    <text x="942" y="204" font-size="20" font-weight="700" fill="#F3F6FC">Send over USB</text>
+    <text x="942" y="232" fill="#B4C0D2">Allowlisted HID commands,</text>
+    <text x="942" y="254" fill="#B4C0D2">per-key progress, stop</text>
+    <text x="942" y="276" fill="#B4C0D2">between keys</text>
+  </g>
+  <g stroke="#22D3EE" stroke-width="3" marker-end="url(#arrow)">
+    <line x1="302" y1="215" x2="332" y2="215"/>
+    <line x1="592" y1="215" x2="622" y2="215"/>
+    <line x1="882" y1="215" x2="912" y2="215"/>
+  </g>
+
+  <!-- Travel diagram -->
+  <rect x="48" y="320" width="540" height="392" rx="16" fill="#131A27" stroke="#2A3446"/>
+  <text x="72" y="356" font-size="20" font-weight="700" fill="#F3F6FC">Per-key travel, in 0.1 mm steps</text>
+  <text x="72" y="382" font-size="15" fill="#B4C0D2">Every key gets its own magnetic trigger points</text>
+  <g font-size="14">
+    <!-- key cap -->
+    <rect x="100" y="410" width="120" height="70" rx="12" fill="#35295F" stroke="#A78BFA" stroke-width="2"/>
+    <text x="160" y="452" font-size="22" font-weight="700" fill="#F3F6FC" text-anchor="middle">W</text>
+    <rect x="148" y="480" width="24" height="200" rx="6" fill="#1E2738" stroke="#313D53"/>
+    <!-- scale -->
+    <line x1="250" y1="480" x2="250" y2="680" stroke="#48566A" stroke-width="2"/>
+    <text x="262" y="486" fill="#8C99AE">0.0 mm</text>
+    <text x="262" y="684" fill="#8C99AE">4.0 mm</text>
+    <!-- actuation -->
+    <line x1="140" y1="565" x2="420" y2="565" stroke="#A78BFA" stroke-width="3" stroke-dasharray="6 5"/>
+    <text x="430" y="561" font-weight="700" fill="#A78BFA">Actuation</text>
+    <text x="430" y="581" fill="#B4C0D2">0.1–4.0 mm</text>
+    <!-- release -->
+    <line x1="140" y1="515" x2="420" y2="515" stroke="#34D399" stroke-width="3" stroke-dasharray="6 5"/>
+    <text x="430" y="511" font-weight="700" fill="#34D399">Release</text>
+    <text x="430" y="531" fill="#B4C0D2">reset point</text>
+    <!-- rapid trigger -->
+    <path d="M300 625 v-30 M290 605 l10 -10 l10 10" stroke="#22D3EE" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M340 595 v30 M330 615 l10 10 l10 -10" stroke="#22D3EE" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <text x="430" y="616" font-weight="700" fill="#22D3EE">Rapid Trigger</text>
+    <text x="430" y="636" fill="#B4C0D2">re-press / release on</text>
+    <text x="430" y="654" fill="#B4C0D2">direction change</text>
+    <!-- deadzone -->
+    <rect x="140" y="660" width="280" height="20" fill="#FBBF24" fill-opacity="0.15"/>
+    <text x="430" y="676" font-weight="700" fill="#FBBF24">Deadzone</text>
+  </g>
+
+  <!-- Feature grid -->
+  <g font-size="15">
+    <rect x="628" y="320" width="254" height="120" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="652" y="356" font-size="18" font-weight="700" fill="#F3F6FC">Profiles</text>
+    <text x="652" y="384" fill="#B4C0D2">JSON templates for FPS,</text>
+    <text x="652" y="406" fill="#B4C0D2">typing, your own setups</text>
+
+    <rect x="898" y="320" width="254" height="120" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="922" y="356" font-size="18" font-weight="700" fill="#F3F6FC">RGB lighting</text>
+    <text x="922" y="384" fill="#B4C0D2">21 effects, read back and</text>
+    <text x="922" y="406" fill="#B4C0D2">verified after every write</text>
+
+    <rect x="628" y="456" width="254" height="120" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="652" y="492" font-size="18" font-weight="700" fill="#F3F6FC">Backups</text>
+    <text x="652" y="520" fill="#B4C0D2">Import from the vendor</text>
+    <text x="652" y="542" fill="#B4C0D2">driver before any write</text>
+
+    <rect x="898" y="456" width="254" height="120" rx="16" fill="#131A27" stroke="#2A3446"/>
+    <text x="922" y="492" font-size="18" font-weight="700" fill="#F3F6FC">Safe by design</text>
+    <text x="922" y="520" fill="#B4C0D2">No firmware or bootloader</text>
+    <text x="922" y="542" fill="#B4C0D2">commands, ever</text>
+
+    <rect x="628" y="592" width="524" height="120" rx="16" fill="#1F1A38" stroke="#A78BFA"/>
+    <text x="652" y="628" font-size="18" font-weight="700" fill="#F3F6FC">Windows · Linux · macOS — GUI and CLI</text>
+    <text x="652" y="656" fill="#B4C0D2">.NET 10 + Avalonia, auto-updates via Velopack, GPL-3.0.</text>
+    <text x="652" y="680" fill="#B4C0D2">New keyboards are added as a JSON device definition.</text>
+  </g>
+</svg>
