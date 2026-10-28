@@ -188,33 +188,19 @@ importAkko.SetAction(result =>
     var definition = target.Definition;
     try
     {
-        uint modelId;
-        byte profile;
-        using (var session = RongYuanSession.Open(transport, target))
-            (modelId, profile) = (session.ModelId, session.Profile);
-
-        if (stateStore.Load(definition.Id, profile) is not null && !result.GetValue(replaceOption))
+        using var session = RongYuanSession.Open(transport, target);
+        if (stateStore.Load(definition.Id, session.Profile) is not null && !result.GetValue(replaceOption))
         {
-            Console.Error.WriteLine($"HallForge already keeps a state for profile {profile} ({stateStore.StatePath(definition.Id, profile)}). Use --replace to overwrite it.");
+            Console.Error.WriteLine($"HallForge already keeps a state for profile {session.Profile} ({stateStore.StatePath(definition.Id, session.Profile)}). Use --replace to overwrite it.");
             return ExitInvalidInput;
         }
 
-        var import = AkkoDriverDatabase.ReadProfile(result.GetValue(databaseOption)!.FullName, modelId, profile, definition);
+        var import = session.ImportAkkoDriver(result.GetValue(databaseOption)!.FullName, stateStore);
         foreach (var warning in import.Warnings)
             Console.WriteLine($"Warning: {warning}");
-        var invalid = import.Keys.Where(k => definition.Limits.Validate(k.Value).Count > 0).Select(k => k.Key).ToList();
-        if (invalid.Count > 0)
-        {
-            Console.Error.WriteLine($"Imported values outside the model limits for: {string.Join(", ", invalid)}. Nothing was saved.");
-            return ExitInvalidInput;
-        }
-
-        var state = new KeyboardState(KeyboardState.CurrentFormatVersion, definition.Id, modelId, profile, "akko-driver-import", DateTime.UtcNow, import.Keys);
-        PrintState(state, definition);
-        var backup = stateStore.SaveBackup(state);
-        stateStore.Save(state);
-        Console.WriteLine($"Backup: {backup}");
-        Console.WriteLine($"{import.Keys.Count} keys imported. Keys not listed keep the driver's defaults and are unknown to HallForge.");
+        PrintState(import.State, definition);
+        Console.WriteLine($"Backup: {import.BackupPath}");
+        Console.WriteLine($"{import.State.Keys.Count} keys imported. Keys not listed keep the driver's defaults and are unknown to HallForge.");
         return 0;
     }
     catch (DeviceNotSupportedException ex)

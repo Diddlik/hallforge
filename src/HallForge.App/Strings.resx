@@ -15,17 +15,17 @@
   <data name="WindowTitle" xml:space="preserve">
     <value>HallForge {0}</value>
   </data>
-  <data name="KeyboardsHeading" xml:space="preserve">
-    <value>Keyboards</value>
-  </data>
   <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
   </data>
   <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
-  <data name="DeviceListName" xml:space="preserve">
-    <value>Detected keyboards</value>
+  <data name="LoadProfile" xml:space="preserve">
+    <value>Load profile…</value>
+  </data>
+  <data name="ProfileFileType" xml:space="preserve">
+    <value>HallForge profile</value>
   </data>
   <data name="Searching" xml:space="preserve">
     <value>Searching for keyboards…</value>
@@ -33,20 +33,143 @@
   <data name="NoKeyboardFound" xml:space="preserve">
     <value>No supported keyboard found. Connect the keyboard with a USB cable and select Refresh.</value>
   </data>
-  <data name="KeyboardsFound" xml:space="preserve">
-    <value>{0} keyboard interface(s) found. This version only reads devices and never writes to them.</value>
-  </data>
   <data name="ListFailed" xml:space="preserve">
     <value>Could not list HID devices: {0} Check the device permissions and select Refresh.</value>
   </data>
-  <data name="DeviceItem" xml:space="preserve">
-    <value>{0} ({1}:{2}), {3}</value>
+  <data name="KeyboardsHeading" xml:space="preserve">
+    <value>Keyboard</value>
   </data>
-  <data name="SupportSupported" xml:space="preserve">
-    <value>supported</value>
+  <data name="ExperimentalBadge" xml:space="preserve">
+    <value>Experimental: this keyboard cannot report its settings, so writes are not verified.</value>
   </data>
-  <data name="SupportReadOnly" xml:space="preserve">
-    <value>not verified, read-only</value>
+  <data name="KeyboardViewName" xml:space="preserve">
+    <value>Keyboard layout. Select keys to edit them.</value>
+  </data>
+  <data name="KeyAccessibleName" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="KeyAccessibleValue" xml:space="preserve">
+    <value>actuation {0} mm, rapid trigger {1}</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>on</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>off</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="Mixed" xml:space="preserve">
+    <value>mixed</value>
+  </data>
+  <data name="PresetWasd" xml:space="preserve">
+    <value>WASD</value>
+  </data>
+  <data name="PresetMovement" xml:space="preserve">
+    <value>Movement</value>
+  </data>
+  <data name="PresetActions" xml:space="preserve">
+    <value>Q E R F</value>
+  </data>
+  <data name="PresetNumbers" xml:space="preserve">
+    <value>1–5</value>
+  </data>
+  <data name="PresetAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="PresetNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="SelectKeysHint" xml:space="preserve">
+    <value>Select keys on the keyboard to edit them.</value>
+  </data>
+  <data name="Actuation" xml:space="preserve">
+    <value>Actuation (mm)</value>
+  </data>
+  <data name="Release" xml:space="preserve">
+    <value>Release (mm)</value>
+  </data>
+  <data name="RapidTrigger" xml:space="preserve">
+    <value>Rapid trigger</value>
+  </data>
+  <data name="RapidTriggerPress" xml:space="preserve">
+    <value>RT press (mm)</value>
+  </data>
+  <data name="RapidTriggerRelease" xml:space="preserve">
+    <value>RT release (mm)</value>
+  </data>
+  <data name="Deadzone" xml:space="preserve">
+    <value>Deadzone (mm)</value>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="ApplyCount" xml:space="preserve">
+    <value>Apply ({0})</value>
+  </data>
+  <data name="ImportBackup" xml:space="preserve">
+    <value>Create backup from AKKO driver</value>
+  </data>
+  <data name="Connecting" xml:space="preserve">
+    <value>Connecting to the keyboard…</value>
+  </data>
+  <data name="StateLoaded" xml:space="preserve">
+    <value>Onboard profile {0}: {1} key settings known. Keys marked ? are unknown because the keyboard cannot report them.</value>
+  </data>
+  <data name="NoBackupYet" xml:space="preserve">
+    <value>Onboard profile {0}: no backup yet. Create a backup from the AKKO driver before applying changes.</value>
+  </data>
+  <data name="ConnectFailed" xml:space="preserve">
+    <value>Could not connect to the keyboard: {0} Close the AKKO driver and select Refresh.</value>
+  </data>
+  <data name="BackupImported" xml:space="preserve">
+    <value>Backup created with {0} key settings: {1}</value>
+  </data>
+  <data name="BackupImportFailed" xml:space="preserve">
+    <value>Could not create the backup: {0}</value>
+  </data>
+  <data name="BackupRequired" xml:space="preserve">
+    <value>Create a backup before applying changes.</value>
+  </data>
+  <data name="ProfileLoaded" xml:space="preserve">
+    <value>Profile {0} added to the pending changes. Nothing is written until you select Apply.</value>
+  </data>
+  <data name="ProfileKeysIgnored" xml:space="preserve">
+    <value>Profile added. These keys do not exist on this keyboard and were ignored: {0}</value>
+  </data>
+  <data name="ProfileLoadFailed" xml:space="preserve">
+    <value>Could not load the profile: {0}</value>
+  </data>
+  <data name="Sending" xml:space="preserve">
+    <value>Sending {0} of {1}…</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>Sent {0} key settings. The keyboard cannot confirm them, so test the keys.</value>
+  </data>
+  <data name="ApplyFailed" xml:space="preserve">
+    <value>Applying stopped: {0} {1} keys were sent and are recorded. Restore a backup if needed.</value>
+  </data>
+  <data name="ProfileChanged" xml:space="preserve">
+    <value>The active onboard profile changed to {0}. Select Refresh and try again.</value>
+  </data>
+  <data name="TriggerSummary" xml:space="preserve">
+    <value>{0}/{1} mm, RT {2} {3}/{4}, DZ {5}</value>
+  </data>
+  <data name="ConfirmTitle" xml:space="preserve">
+    <value>Apply changes</value>
+  </data>
+  <data name="ConfirmHeading" xml:space="preserve">
+    <value>Send these settings to {0}?</value>
+  </data>
+  <data name="ConfirmExperimental" xml:space="preserve">
+    <value>I understand that this keyboard is not verified and that HallForge cannot read the settings back.</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
   </data>
   <data name="UpdateAvailable" xml:space="preserve">
     <value>HallForge {0} is available.</value>
@@ -56,6 +179,9 @@
   </data>
   <data name="UpdateLater" xml:space="preserve">
     <value>Later</value>
+  </data>
+  <data name="UpdateBlockedByPending" xml:space="preserve">
+    <value>Apply or discard the pending key changes before updating.</value>
   </data>
   <data name="UpdateDownloading" xml:space="preserve">
     <value>Downloading the update…</value>

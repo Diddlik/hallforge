@@ -31,6 +31,17 @@ dotnet run --project src/HallForge.App                          # GUI
 - **The keyboard uses a protocol that HallForge already supports:** add a JSON file to `devices/`. See `devices/akko-mod007b-iso-he.json`. Run `devices identify` to get the firmware model id for `firmwareModelIds`. Set `"verified": false` until the keyboard has been tested on real hardware.
 - **The keyboard uses a new protocol:** add a protocol project and give it a `protocol` id. Device definitions refer to that id.
 
+## GUI
+
+`dotnet run --project src/HallForge.App` shows the connected keyboard with its real key layout and ISO-DE legends.
+
+- Click keys to select them, or use the presets (WASD, Movement, Q E R F, 1-5, All, None).
+- The editor shows the common value of the selection or "mixed". Changing a field only changes that field on the selected keys.
+- Keys with pending changes are outlined. Keys marked "?" have unknown settings.
+- "Load profile..." adds a profile to the pending changes. Nothing is written before "Apply".
+- "Apply" lists every change and asks for confirmation. For unverified keyboards it also asks you to acknowledge that writes cannot be verified.
+- Without a backup, the GUI offers "Create backup from AKKO driver" first.
+
 ## State and backups
 
 The AKKO MOD007B ISO HE cannot report its key settings, so HallForge keeps what it knows:

@@ -4,6 +4,8 @@ namespace HallForge.Protocol.RongYuan;
 
 public sealed class DeviceNotSupportedException(string message) : Exception(message);
 
+public sealed record AkkoImportResult(KeyboardState State, string BackupPath, IReadOnlyList<string> Warnings);
+
 /// <summary>
 /// An open, identified RongYuan keyboard: the firmware model id matches the definition and the active onboard
 /// profile is known. Shared by GUI and CLI so both apply the same checks before any write.
@@ -57,6 +59,21 @@ public sealed class RongYuanSession : IDisposable
                 store.RecordWrite(Definition, ModelId, Profile, change.KeyId, change.After);
                 sent?.Invoke(change);
             });
+
+    /// <summary>Saves the settings the Akko Cloud Driver stored for the active profile as backup and as current state.</summary>
+    /// <exception cref="InvalidDataException">The database has no data for this model or values outside the model limits.</exception>
+    public AkkoImportResult ImportAkkoDriver(string databasePath, StateStore store)
+    {
+        var import = AkkoDriverDatabase.ReadProfile(databasePath, ModelId, Profile, Definition);
+        var invalid = import.Keys.Where(k => Definition.Limits.Validate(k.Value).Count > 0).Select(k => k.Key).ToList();
+        if (invalid.Count > 0)
+            throw new InvalidDataException($"Imported values are outside the model limits for: {string.Join(", ", invalid)}. Nothing was saved.");
+
+        var state = new KeyboardState(KeyboardState.CurrentFormatVersion, Definition.Id, ModelId, Profile, "akko-driver-import", DateTime.UtcNow, import.Keys);
+        var backupPath = store.SaveBackup(state);
+        store.Save(state);
+        return new AkkoImportResult(state, backupPath, import.Warnings);
+    }
 
     public void Dispose() => _connection.Dispose();
 }

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 
 namespace HallForge.App;
 
@@ -21,8 +22,28 @@ public partial class MainWindow : Window
         Closing += (_, _) => SavePlacement();
     }
 
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        if (DataContext is MainViewModel viewModel)
+            viewModel.ConfirmApply = request => new ApplyDialog(request).ShowDialog<bool>(this);
+    }
+
     private void OnAbout(object? sender, RoutedEventArgs e) =>
         new AboutWindow { DataContext = DataContext }.ShowDialog(this);
+
+    private async void OnLoadProfile(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { Keyboard: { } keyboard })
+            return;
+        var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            AllowMultiple = false,
+            FileTypeFilter = [new FilePickerFileType(Strings.ProfileFileType) { Patterns = ["*.json"] }],
+        });
+        if (files.Count == 1 && files[0].TryGetLocalPath() is { } path)
+            keyboard.LoadProfile(path);
+    }
 
     private void RestorePlacement()
     {

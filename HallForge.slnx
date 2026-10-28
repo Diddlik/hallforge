@@ -7,6 +7,7 @@
     <Project Path="src/HallForge.Transport.Hid/HallForge.Transport.Hid.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/HallForge.App.Tests/HallForge.App.Tests.csproj" />
     <Project Path="tests/HallForge.Core.Tests/HallForge.Core.Tests.csproj" />
     <Project Path="tests/HallForge.Protocol.RongYuan.Tests/HallForge.Protocol.RongYuan.Tests.csproj" />
   </Folder>

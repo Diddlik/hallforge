@@ -18,10 +18,13 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var settings = AppSettings.Load();
+            var transport = new HidSharpTransport();
             var discovery = new KeyboardDiscoveryService(
-                new HidSharpTransport(),
+                transport,
                 DeviceDefinitionLoader.LoadDirectory(Path.Combine(AppContext.BaseDirectory, "devices")));
-            var viewModel = new MainViewModel(discovery, settings);
+            // ISO German is the only shipped legend set so far; other layouts are added as files in layouts/.
+            var legends = KeyLegends.Load(Path.Combine(AppContext.BaseDirectory, "layouts", "iso-de.json"));
+            var viewModel = new MainViewModel(discovery, transport, new StateStore(StateStore.DefaultRoot), legends, settings);
             var window = new MainWindow(settings) { DataContext = viewModel };
             window.Opened += async (_, _) => await viewModel.StartAsync();
             desktop.MainWindow = window;

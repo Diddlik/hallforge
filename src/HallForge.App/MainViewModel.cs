@@ -1,9 +1,9 @@
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HallForge.Core;
+using HallForge.Protocol.RongYuan;
 using Velopack;
 using Velopack.Sources;
 
@@ -11,7 +11,8 @@ namespace HallForge.App;
 
 public sealed record ThirdPartyLibrary(string Name, string License);
 
-public sealed partial class MainViewModel(KeyboardDiscoveryService discovery, AppSettings settings) : ObservableObject
+public sealed partial class MainViewModel(
+    KeyboardDiscoveryService discovery, IHidTransport transport, StateStore store, KeyLegends legends, AppSettings settings) : ObservableObject
 {
     private const string RepositoryUrl = "https://github.com/Diddlik/hallforge";
 
@@ -31,7 +32,11 @@ public sealed partial class MainViewModel(KeyboardDiscoveryService discovery, Ap
         new("Velopack", "MIT"),
     ];
 
-    public ObservableCollection<string> Devices { get; } = [];
+    /// <summary>Set by the view; asks the user to confirm a write.</summary>
+    public Func<ApplyRequest, Task<bool>> ConfirmApply { get; set; } = _ => Task.FromResult(false);
+
+    [ObservableProperty]
+    public partial KeyboardEditorViewModel? Keyboard { get; set; }
 
     [ObservableProperty]
     public partial string Status { get; set; } = "";
@@ -63,20 +68,20 @@ public sealed partial class MainViewModel(KeyboardDiscoveryService discovery, Ap
     private async Task RefreshAsync()
     {
         Status = Strings.Searching;
-        Devices.Clear();
+        Keyboard = null;
         try
         {
             // HID enumeration blocks; keep the UI thread responsive.
             var candidates = await Task.Run(() => discovery.Discover());
-            foreach (var c in candidates)
+            var target = candidates.FirstOrDefault(c => c.Definition!.Protocol == "rongyuan" && c.Definition.Layout.Count > 0);
+            if (target is null)
             {
-                Devices.Add(Format(Strings.DeviceItem,
-                    c.Definition!.Name,
-                    DiagnosticReport.Hex(c.Interface.VendorId),
-                    DiagnosticReport.Hex(c.Interface.ProductId),
-                    c.Support == SupportLevel.Supported ? Strings.SupportSupported : Strings.SupportReadOnly));
+                Status = Strings.NoKeyboardFound;
+                return;
             }
-            Status = candidates.Count == 0 ? Strings.NoKeyboardFound : Format(Strings.KeyboardsFound, candidates.Count);
+            Status = "";
+            Keyboard = new KeyboardEditorViewModel(target, legends, transport, store, request => ConfirmApply(request));
+            await Keyboard.LoadStateCommand.ExecuteAsync(null);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -118,6 +123,12 @@ public sealed partial class MainViewModel(KeyboardDiscoveryService discovery, Ap
     [RelayCommand]
     private void InstallUpdate()
     {
+        // Pending key changes exist only in memory; restarting would lose them.
+        if (Keyboard is { PendingCount: > 0 })
+        {
+            UpdateMessage = Strings.UpdateBlockedByPending;
+            return;
+        }
         if (_pendingUpdate is not null)
             _updates.ApplyUpdatesAndRestart(_pendingUpdate);
     }
