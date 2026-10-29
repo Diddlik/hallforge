@@ -840,4 +840,46 @@
   <data name="KeyboardSettingFailed" xml:space="preserve">
     <value>Die Tastatureinstellung konnte nicht geändert werden: {0}</value>
   </data>
+  <data name="AutoSwitchTitle" xml:space="preserve">
+    <value>Je Programm umschalten</value>
+  </data>
+  <data name="AutoSwitchIntro" xml:space="preserve">
+    <value>Kommt ein Programm in den Vordergrund, setzt HallForge Modus und Onboard-Profil aus seiner Regel. Jeder Wechsel besteht aus ein oder zwei kurzen Befehlen, die zurückgelesen werden. Einstellungen pro Taste werden dabei nie neu geschrieben.</value>
+  </data>
+  <data name="AutoSwitchEnable" xml:space="preserve">
+    <value>Automatisch umschalten</value>
+  </data>
+  <data name="AutoSwitchNote" xml:space="preserve">
+    <value>Solange das an ist, läuft HallForge nach dem Schließen des Fensters im Tray weiter. Das Profil wird nicht gewechselt, solange Tastenänderungen offen sind.</value>
+  </data>
+  <data name="AutoSwitchUnsupported" xml:space="preserve">
+    <value>Automatisches Umschalten gibt es nur unter Windows.</value>
+  </data>
+  <data name="AutoSwitchOther" xml:space="preserve">
+    <value>Alle anderen Programme</value>
+  </data>
+  <data name="AutoSwitchProgramHint" xml:space="preserve">
+    <value>Programmname, z. B. bf6 oder notepad</value>
+  </data>
+  <data name="AutoSwitchAdd" xml:space="preserve">
+    <value>Programm hinzufügen</value>
+  </data>
+  <data name="AutoSwitchRemove" xml:space="preserve">
+    <value>Regel für {0} entfernen</value>
+  </data>
+  <data name="AutoSwitchRefresh" xml:space="preserve">
+    <value>Laufende Programme aktualisieren</value>
+  </data>
+  <data name="AutoSwitched" xml:space="preserve">
+    <value>{0} im Vordergrund: auf {1}, {2} umgeschaltet.</value>
+  </data>
+  <data name="TrayOpen" xml:space="preserve">
+    <value>HallForge öffnen</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Beenden</value>
+  </data>
+  <data name="TrayToolTip" xml:space="preserve">
+    <value>HallForge: Umschalten je Programm</value>
+  </data>
 </root>

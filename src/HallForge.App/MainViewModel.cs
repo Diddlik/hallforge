@@ -28,6 +28,7 @@ public sealed partial class MainViewModel(
 
     private readonly UpdateManager _updates = new(new GithubSource(RepositoryUrl, null, prerelease: false));
     private UpdateInfo? _pendingUpdate;
+    private Avalonia.Threading.DispatcherTimer? _autoSwitchTimer;
 
     public static string Version { get; } = typeof(MainViewModel).Assembly
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion.Split('+')[0];
@@ -124,8 +125,26 @@ public sealed partial class MainViewModel(
         }
     }
 
+    public AutoSwitchViewModel AutoSwitch => field ??= new AutoSwitchViewModel(settings, () => Keyboard?.Settings,
+        () => Keyboard is { } k && (k.IsBusy || k.Lighting.IsBusy || k.Roar.IsBusy), ForegroundProgram.Current, SaveSettings);
+
+    private void SaveSettings()
+    {
+        try
+        {
+            settings.Save();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // The settings are saved again when the window closes.
+        }
+    }
+
     public async Task StartAsync()
     {
+        // Polling is simpler than a WinEvent hook and a one-second delay is not noticeable when switching programs.
+        _autoSwitchTimer ??= new Avalonia.Threading.DispatcherTimer(TimeSpan.FromSeconds(1), Avalonia.Threading.DispatcherPriority.Background,
+            async (_, _) => await AutoSwitch.CheckAsync());
         await RefreshAsync();
         if (settings.AutoCheckForUpdates && _updates.IsInstalled)
             await CheckForUpdatesAsync();

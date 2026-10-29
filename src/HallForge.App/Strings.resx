@@ -849,4 +849,46 @@
   <data name="KeyboardSettingFailed" xml:space="preserve">
     <value>Could not change the keyboard setting: {0}</value>
   </data>
+  <data name="AutoSwitchTitle" xml:space="preserve">
+    <value>Switch per program</value>
+  </data>
+  <data name="AutoSwitchIntro" xml:space="preserve">
+    <value>When a program comes to the front, HallForge sets the travel mode and onboard profile of its rule. Each switch is one or two short commands that are read back; key settings are never rewritten.</value>
+  </data>
+  <data name="AutoSwitchEnable" xml:space="preserve">
+    <value>Switch automatically</value>
+  </data>
+  <data name="AutoSwitchNote" xml:space="preserve">
+    <value>While this is on, closing the window keeps HallForge running in the tray. The profile is not switched while key changes are pending.</value>
+  </data>
+  <data name="AutoSwitchUnsupported" xml:space="preserve">
+    <value>Automatic switching is available on Windows only.</value>
+  </data>
+  <data name="AutoSwitchOther" xml:space="preserve">
+    <value>All other programs</value>
+  </data>
+  <data name="AutoSwitchProgramHint" xml:space="preserve">
+    <value>Program name, e.g. bf6 or notepad</value>
+  </data>
+  <data name="AutoSwitchAdd" xml:space="preserve">
+    <value>Add program</value>
+  </data>
+  <data name="AutoSwitchRemove" xml:space="preserve">
+    <value>Remove rule for {0}</value>
+  </data>
+  <data name="AutoSwitchRefresh" xml:space="preserve">
+    <value>Refresh running programs</value>
+  </data>
+  <data name="AutoSwitched" xml:space="preserve">
+    <value>{0} in front: switched to {1}, {2}.</value>
+  </data>
+  <data name="TrayOpen" xml:space="preserve">
+    <value>Open HallForge</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="TrayToolTip" xml:space="preserve">
+    <value>HallForge: switching per program</value>
+  </data>
 </root>

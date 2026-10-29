@@ -23,13 +23,14 @@ public sealed partial class KeyboardSettingsViewModel(
 
     public bool RequiresExperimentalConsent => !target.Definition!.Verified;
 
-    public IReadOnlyList<TravelModeItem> Modes { get; } = Enum.GetValues<MagnetismMode>()
+    public static IReadOnlyList<TravelModeItem> AllModes { get; } = Enum.GetValues<MagnetismMode>()
         .Select(m => new TravelModeItem(m, Strings.ResourceManager.GetString($"TravelMode{m}", CultureInfo.CurrentUICulture) ?? m.ToString()))
         .ToList();
 
-    public IReadOnlyList<OnboardProfileItem> Profiles { get; } = Enumerable.Range(0, 4)
+    public static IReadOnlyList<OnboardProfileItem> AllProfiles { get; } = Enumerable.Range(0, 4)
         .Select(p => new OnboardProfileItem((byte)p, Text.Format(Strings.OnboardProfileNumber, p + 1)))
         .ToList();
+
 
     [ObservableProperty]
     public partial bool IsBusy { get; set; }
@@ -97,6 +98,47 @@ public sealed partial class KeyboardSettingsViewModel(
             () => Show(Mode!.Mode, oldValue.Profile), Text.Format(Strings.ProfileSwitched, newValue.Profile + 1), profileSwitched);
     }
 
+    /// <summary>
+    /// Switches mode and profile for automatic switching. While key drafts exist the profile is left as it is,
+    /// because switching it would show and apply the drafts against another profile.
+    /// </summary>
+    /// <returns>False when the keyboard is busy or not loaded, so the caller should try again later.</returns>
+    public async Task<bool> SwitchToAsync(MagnetismMode mode, byte profile, string program)
+    {
+        if (!IsLoaded || IsBusy || Mode is not { } current || Profile is not { } currentProfile)
+            return false;
+        var switchMode = mode != current.Mode;
+        var switchProfile = profile != currentProfile.Profile && !hasDrafts();
+        if (!switchMode && !switchProfile)
+            return true;
+        IsBusy = true;
+        try
+        {
+            await Task.Run(() =>
+            {
+                using var session = RongYuanSession.Open(transport, target);
+                if (switchMode)
+                    session.Client.WriteMagnetismMode(mode);
+                if (switchProfile)
+                    session.Client.WriteActiveProfile(profile);
+            });
+            Show(mode, switchProfile ? profile : currentProfile.Profile);
+            Status = Text.Format(Strings.AutoSwitched, program, Mode!.Name, Profile!.Name);
+        }
+        catch (Exception ex) when (ex is IOException or ProtocolException or DeviceNotSupportedException or UnauthorizedAccessException)
+        {
+            Status = Text.Format(Strings.KeyboardSettingFailed, ex.Message);
+            switchProfile = false;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+        if (switchProfile)
+            await profileSwitched();
+        return true;
+    }
+
     private async Task WriteAsync(Action<RongYuanSession> write, Action revert, string done, Func<Task>? then)
     {
         IsBusy = true;
@@ -126,8 +168,8 @@ public sealed partial class KeyboardSettingsViewModel(
     private void Show(MagnetismMode mode, byte profile)
     {
         _showing = true;
-        Mode = Modes.First(m => m.Mode == mode);
-        Profile = Profiles.First(p => p.Profile == profile);
+        Mode = AllModes.First(m => m.Mode == mode);
+        Profile = AllProfiles.First(p => p.Profile == profile);
         _showing = false;
     }
 }

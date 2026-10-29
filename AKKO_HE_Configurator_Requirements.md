@@ -494,7 +494,7 @@ heconfig backup restore backup.json --device <device-id> --yes
 - Mehr Modelle und Tastaturlayouts (zusätzliche Product IDs, ISO/ANSI, Layout-Mapping).
 - Weitere Parameter (Deadzone, Non-stop RT), falls bestätigt.
 - Roar Mode erst nach dokumentiertem Protokoll-/Verhaltenstest.
-- Per-App-Profilzuweisung **optional** und ausschließlich nach explizitem Opt-in; niemals unterbrechendes automatisches Schreiben im Spiel.
+- Per-App-Profilzuweisung **optional** und ausschließlich nach explizitem Opt-in; niemals unterbrechendes automatisches Schreiben im Spiel. Umgesetzt 2026-10-29: Regeln Programm → Modus und Onboard-Profil, nur Windows, Opt-in, ein bis zwei geprüfte Befehle je Wechsel, keine Tastenschreibvorgänge.
 - Sensor-Live-View, RGB und weitere Features nur nach eigenem Scope-Review.
 
 ---

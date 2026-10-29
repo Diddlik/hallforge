@@ -112,7 +112,7 @@ Design:
 - GUI toolkit, update mechanism, and distribution:
   - Avalonia 12 with the Fluent theme and CommunityToolkit.Mvvm.
   - User-facing strings are in `src/HallForge.App/Strings.resx` (English, neutral) and `Strings.de.resx` (German); the UI follows the OS display language. A test checks that translations keep the format placeholders of the neutral strings.
-  - User preferences and window placement are stored in `%AppData%/HallForge/settings.json` (`AppSettings`).
+  - User preferences and window placement are stored in `%AppData%/HallForge/settings.json` (`AppSettings`). This includes the opt-in per-program switching (`AutoSwitch`, `ProgramRules`, `OtherPrograms`), run by `AutoSwitchViewModel`: it polls the foreground process (`ForegroundProgram`, Windows only) once per second, ignores HallForge itself and applies travel mode and onboard profile through `KeyboardSettingsViewModel.SwitchToAsync`. While it is enabled, closing the window hides it to the tray (`App.KeepRunningInTray`); the tray menu exits.
   - Velopack auto-update checks GitHub Releases, can be disabled in About, and restarts only when the user clicks.
   - Release: push tag `v<Version>` (must equal `<Version>` in `Directory.Build.props`). `.github/workflows/release.yml` packs the GUI with Velopack for win-x64, linux-x64 and osx-arm64, uploads it to GitHub Releases, and attaches a self-contained CLI zip per platform. Verified with v0.1.0 (GUI only; CLI zips start with the next release). The update path from one release to the next is not verified yet.
   - New third-party libraries must be added to `MainViewModel.ThirdPartyLibraries` and to the README.

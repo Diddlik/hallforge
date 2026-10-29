@@ -89,7 +89,7 @@
                         </StackPanel>
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="24" RowSpacing="10">
                             <TextBlock Classes="label" Text="{x:Static app:Strings.TravelMode}" VerticalAlignment="Center" />
-                            <ComboBox Grid.Column="1" ItemsSource="{Binding Modes}" SelectedItem="{Binding Mode}" MinWidth="320"
+                            <ComboBox Grid.Column="1" ItemsSource="{x:Static app:KeyboardSettingsViewModel.AllModes}" SelectedItem="{Binding Mode}" MinWidth="320"
                                       IsEnabled="{Binding IsLoaded}" AutomationProperties.Name="{x:Static app:Strings.TravelMode}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate DataType="app:TravelModeItem">
@@ -98,7 +98,7 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                             <TextBlock Grid.Row="1" Classes="label" Text="{x:Static app:Strings.DeviceProfile}" VerticalAlignment="Center" />
-                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Profiles}" SelectedItem="{Binding Profile}" MinWidth="320"
+                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{x:Static app:KeyboardSettingsViewModel.AllProfiles}" SelectedItem="{Binding Profile}" MinWidth="320"
                                       IsEnabled="{Binding IsLoaded}" AutomationProperties.Name="{x:Static app:Strings.DeviceProfile}"
                                       ToolTip.Tip="{x:Static app:Strings.OnboardProfileHelp}">
                                 <ComboBox.ItemTemplate>
@@ -115,6 +115,88 @@
                         </StackPanel>
                         <TextBlock Classes="caption warn" Text="{x:Static app:Strings.KeyboardSettingsExperimental}" TextWrapping="Wrap"
                                    IsVisible="{Binding RequiresExperimentalConsent}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Opt-in switching of travel mode and onboard profile per foreground program -->
+                <Border Classes="panel" DataContext="{Binding AutoSwitch}">
+                    <StackPanel x:DataType="app:AutoSwitchViewModel" Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                            <StackPanel Spacing="2">
+                                <TextBlock Classes="h2" Text="{x:Static app:Strings.AutoSwitchTitle}" />
+                                <TextBlock Classes="secondary" Text="{x:Static app:Strings.AutoSwitchIntro}" TextWrapping="Wrap" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding IsEnabled}" VerticalAlignment="Top"
+                                          IsEnabled="{x:Static app:AutoSwitchViewModel.IsSupported}"
+                                          OnContent="{x:Static app:Strings.AutoSwitchEnable}" OffContent="{x:Static app:Strings.AutoSwitchEnable}" />
+                        </Grid>
+                        <TextBlock Classes="caption warn" Text="{x:Static app:Strings.AutoSwitchUnsupported}"
+                                   IsVisible="{x:Static app:AutoSwitchViewModel.IsUnsupported}" />
+
+                        <ItemsControl ItemsSource="{Binding Rules}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="8" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="app:ProgramRuleViewModel">
+                                    <Grid ColumnDefinitions="160,*,140,Auto" ColumnSpacing="8">
+                                        <TextBlock Text="{Binding Program}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" SelectedItem="{Binding Mode}"
+                                                  ItemsSource="{x:Static app:KeyboardSettingsViewModel.AllModes}" AutomationProperties.Name="{x:Static app:Strings.TravelMode}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate DataType="app:TravelModeItem">
+                                                    <TextBlock Text="{Binding Name}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                        <ComboBox Grid.Column="2" HorizontalAlignment="Stretch" SelectedItem="{Binding Profile}"
+                                                  ItemsSource="{x:Static app:KeyboardSettingsViewModel.AllProfiles}" AutomationProperties.Name="{x:Static app:Strings.DeviceProfile}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate DataType="app:OnboardProfileItem">
+                                                    <TextBlock Text="{Binding Name}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                        <Button Grid.Column="3" Classes="step" Content="✕" AutomationProperties.Name="{Binding RemoveName}" ToolTip.Tip="{Binding RemoveName}"
+                                                Command="{Binding $parent[ItemsControl].((app:AutoSwitchViewModel)DataContext).RemoveCommand}" CommandParameter="{Binding}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Grid ColumnDefinitions="160,*,140,Auto" ColumnSpacing="8">
+                            <TextBlock Text="{x:Static app:Strings.AutoSwitchOther}" Classes="secondary" VerticalAlignment="Center" TextWrapping="Wrap" />
+                            <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" ItemsSource="{x:Static app:KeyboardSettingsViewModel.AllModes}" SelectedItem="{Binding OtherMode}"
+                                      AutomationProperties.Name="{x:Static app:Strings.AutoSwitchOther}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="app:TravelModeItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <ComboBox Grid.Column="2" HorizontalAlignment="Stretch" ItemsSource="{x:Static app:KeyboardSettingsViewModel.AllProfiles}" SelectedItem="{Binding OtherProfile}"
+                                      AutomationProperties.Name="{x:Static app:Strings.AutoSwitchOther}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="app:OnboardProfileItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                            <AutoCompleteBox Text="{Binding NewProgram}" ItemsSource="{Binding RunningPrograms}" FilterMode="ContainsOrdinal"
+                                             PlaceholderText="{x:Static app:Strings.AutoSwitchProgramHint}" AutomationProperties.Name="{x:Static app:Strings.AutoSwitchProgramHint}"
+                                             GotFocus="OnProgramBoxFocused" />
+                            <Button Grid.Column="1" Classes="outline" Content="{x:Static app:Strings.AutoSwitchAdd}" Command="{Binding AddCommand}" />
+                            <Button Grid.Column="2" Classes="step" Command="{Binding RefreshProgramsCommand}"
+                                    AutomationProperties.Name="{x:Static app:Strings.AutoSwitchRefresh}" ToolTip.Tip="{x:Static app:Strings.AutoSwitchRefresh}">
+                                <Path Classes="icon small" Data="{StaticResource IconRefresh}" />
+                            </Button>
+                        </Grid>
+                        <TextBlock Classes="caption" Text="{x:Static app:Strings.AutoSwitchNote}" TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
                 <Border Classes="panel" DataContext="{Binding Keyboard}">
