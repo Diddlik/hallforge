@@ -101,6 +101,9 @@ dotnet run --project src/HallForge.Cli -- led show --device <id>          # curr
 dotnet run --project src/HallForge.Cli -- led set --device <id> --mode AlwaysOn --brightness 4 --color FF0000 --dry-run
 dotnet run --project src/HallForge.Cli -- roar show --device <id>         # Roar mode keys (read-only)
 dotnet run --project src/HallForge.Cli -- roar set --device <id> --keys KeyW KeyA KeyS KeyD --dry-run
+dotnet run --project src/HallForge.Cli -- mode show --device <id>         # travel mode, as with Fn+1 to Fn+4
+dotnet run --project src/HallForge.Cli -- mode set --device <id> --mode Custom
+dotnet run --project src/HallForge.Cli -- profile set --device <id> --profile 2   # switch the active onboard profile
 dotnet run --project src/HallForge.Cli -- keys set --device <id> --key AltLeft --actuation 1.9 --release 1.9 --rapid-trigger false --rt-press 0.2 --rt-release 0.3 --deadzone 3.7 --dry-run
 dotnet run --project src/HallForge.App                          # GUI
 ```

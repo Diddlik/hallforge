@@ -9,7 +9,9 @@ namespace HallForge.Protocol.RongYuan;
 /// </summary>
 public enum ReadCommand : byte
 {
-    GetProfile = 0x84,
+    // 0x84 is GET_REPORT (report rate) in this driver class, not the profile.
+    GetProfile = 0x85,
+    GetMagnetismMode = 0x9D,
     GetLedParam = 0x87,
     GetUsbVersion = 0x8F,
     GetFeatureList = 0xE6,
@@ -42,6 +44,8 @@ public sealed class RongYuanClient(IHidConnection connection)
     // FEA_CMD_GET/SET_KBOPTION of this driver class; only the backlight bit is changed, for Roar mode.
     private const byte GetKeyboardOption = 0x86;
     private const byte SetKeyboardOption = 0x06;
+    private const byte SetProfile = 0x05;
+    private const byte SetMagnetismMode = 0x1D;
     private const byte NormalMode = 0x01;
     private const byte RapidTriggerFlag = 0x80;
     // Onboard profiles 0-3; the firmware does not bounds-check the profile byte.
@@ -168,11 +172,50 @@ public sealed class RongYuanClient(IHidConnection connection)
         return Enumerable.Range(0, keyCount).Select(i => BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(i * 2))).ToList();
     }
 
+    /// <remarks>
+    /// The firmware answers profile 0 with the unchanged request (verified in vendor capture <c>ws/usb2</c>),
+    /// so this read cannot tell profile 0 from an unsupported command.
+    /// </remarks>
     public byte ReadActiveProfile()
     {
-        var profile = Query(ReadCommand.GetProfile)[1];
+        var profile = ReadStable((byte)ReadCommand.GetProfile)[1];
         return profile <= MaxProfile ? profile : throw new ProtocolException($"Unexpected active profile {profile}.");
     }
+
+    /// <summary>Switches the active onboard profile (SET_PROFILE 0x05) and reads it back.</summary>
+    /// <exception cref="ProtocolException">The keyboard does not report the new profile.</exception>
+    public void WriteActiveProfile(byte profile)
+    {
+        if (profile > MaxProfile)
+            throw new ArgumentOutOfRangeException(nameof(profile));
+        connection.SetFeature(Frame(SetProfile, [profile]));
+        if (!PollUntil(() => ReadActiveProfile() == profile))
+            throw new ProtocolException($"The keyboard did not switch to profile {profile + 1}.");
+    }
+
+    public MagnetismMode ReadMagnetismMode()
+    {
+        var mode = (MagnetismMode)Query(ReadCommand.GetMagnetismMode)[1];
+        return Enum.IsDefined(mode) ? mode : throw new ProtocolException($"Unexpected travel mode {(byte)mode}.");
+    }
+
+    /// <summary>Switches the travel mode (SET_KEY_MAGNETISM_MODE 0x1D, as Fn+1 to Fn+4 do) and reads it back.</summary>
+    /// <exception cref="ProtocolException">The keyboard does not report the new mode.</exception>
+    public void WriteMagnetismMode(MagnetismMode mode)
+    {
+        if (!Enum.IsDefined(mode))
+            throw new ArgumentOutOfRangeException(nameof(mode));
+        connection.SetFeature(Frame(SetMagnetismMode, [(byte)mode]));
+        if (!PollUntil(() => ReadMagnetismMode() == mode))
+            throw new ProtocolException($"The keyboard did not switch to travel mode {mode}.");
+    }
+
+    // Right after a SET the firmware may still report the old value for a moment.
+    private static bool PollUntil(Func<bool> done) => PollDelaysMs.Any(delay =>
+    {
+        Thread.Sleep(delay);
+        return done();
+    });
 
     /// <summary>Sends one key's settings. The firmware does not acknowledge or report them back, so success cannot be verified.</summary>
     public void WriteKeyTrigger(KeyTrigger trigger, byte profile, int matrixIndex)
@@ -201,13 +244,17 @@ public sealed class RongYuanClient(IHidConnection connection)
         return actual;
     }
 
-    /// <remarks>
-    /// The response repeats the request bytes and differs only in the slots, so with all slots empty it is
-    /// indistinguishable from an echo. It is accepted after two identical reads instead of by echo detection.
-    /// </remarks>
-    public IReadOnlyList<RoarSlot?> ReadRoar()
+    /// <remarks>The response with all slots empty equals the request; see <see cref="ReadStable"/>.</remarks>
+    public IReadOnlyList<RoarSlot?> ReadRoar() => Roar.Parse(ReadStable(Roar.GetCommand));
+
+    /// <summary>
+    /// For commands whose response repeats the request and only fills in values (GET_PROFILE, GET_MAGNETISM_FAST
+    /// on model 1778): a zero value is indistinguishable from an echo, so a response is accepted after two
+    /// identical reads instead of by echo detection.
+    /// </summary>
+    private byte[] ReadStable(byte command)
     {
-        var request = Frame(Roar.GetCommand, []);
+        var request = Frame(command, []);
         byte[]? previous = null;
         for (var attempt = 0; attempt < Attempts; attempt++)
         {
@@ -216,11 +263,11 @@ public sealed class RongYuanClient(IHidConnection connection)
             var response = new byte[ReportLength];
             connection.GetFeature(response);
             var current = response[1..];
-            if (current[0] == Roar.GetCommand && previous is not null && current.AsSpan().SequenceEqual(previous))
-                return Roar.Parse(current);
+            if (current[0] == command && previous is not null && current.AsSpan().SequenceEqual(previous))
+                return current;
             previous = current;
         }
-        throw new ProtocolException($"No stable response to 0x{Roar.GetCommand:X2} after {Attempts} attempts.");
+        throw new ProtocolException($"No stable response to 0x{command:X2} after {Attempts} attempts.");
     }
 
     /// <summary>
@@ -241,8 +288,7 @@ public sealed class RongYuanClient(IHidConnection connection)
         if (options.LedOff == ledOff)
             return;
         connection.SetFeature(Frame(SetKeyboardOption, [profile, options.WithLedOff(ledOff).Flags, options.FnLayout]));
-        // The firmware may still report the old value for a moment, so only a value that never changes is a failure.
-        if (!PollDelaysMs.Any(delay => { Thread.Sleep(delay); return ReadKeyboardOptions(profile).LedOff == ledOff; }))
+        if (!PollUntil(() => ReadKeyboardOptions(profile).LedOff == ledOff))
             throw new ProtocolException("The keyboard did not change the backlight setting for Roar mode.");
     }
 

@@ -5,6 +5,19 @@ namespace HallForge.Protocol.RongYuan;
 public sealed record RoarSlot(int MatrixIndex, bool Enabled);
 
 /// <summary>
+/// Travel mode (GET 0x9D / SET 0x1D), also switched on the keyboard with Fn+1 to Fn+4. Per the manual: Comfort
+/// 2 mm, Sensitive 0.5 mm, Gaming 0.5 mm with non-stop rapid trigger, Custom uses the per-key settings.
+/// Per-key settings written by HallForge take effect only in Custom.
+/// </summary>
+public enum MagnetismMode : byte
+{
+    Comfort = 0,
+    Sensitive = 1,
+    Gaming = 2,
+    Custom = 3,
+}
+
+/// <summary>
 /// Per-profile keyboard options (GET 0x86 / SET 0x06). Bits of <paramref name="Flags"/> per the vendor driver:
 /// 0 Win lock, 2 Mac mode, 3 WASD/arrow swap, 4 backlight off, 5 side light off, 6 keyboard mode, 7 lock.
 /// HallForge changes only bit 4 and writes everything else back as read.

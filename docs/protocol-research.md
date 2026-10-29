@@ -46,12 +46,12 @@ The vendor driver was opened on the actuation page while USBPcap was capturing. 
 | 0xF0 | `F0 03 01` | |
 | 0x80 GET_REV | `80 01 01` | |
 | 0xAE GET_MLED_VERSION | `AE 03 01` | |
-| 0x84 GET_PROFILE | `84 00 01` | Active profile 0 |
-| 0x85 GET_LEDONOFF | `85` | |
+| 0x84 GET_REPORT | `84 00 01` | Report rate; not the profile (see Onboard profiles) |
+| 0x85 GET_PROFILE | `85 00 .. 7A` | Unchanged request = profile 0 (see Onboard profiles) |
 | 0x86 GET_KBOPTION | `86 00 10 01` | Keyboard options of profile 0 (see Roar mode) |
 | 0x92 | `92 78 00 78 00 84 03 58 02` | Sleep times? (0x78 = 120, 0x384 = 900, 0x258 = 600) |
 | 0x97 GET_AUTOOS_EN | `97` | |
-| 0x9D GET_KEY_MAGNETISM_MODE | `9D 03` | |
+| 0x9D GET_KEY_MAGNETISM_MODE | `9D 03` | Travel mode Custom |
 | 0x9F GET_MAGNETISM_FAST | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | Roar mode: W, A, S, D enabled |
 
 Consequence: for model 1778, per-key actuation, release and rapid trigger cannot currently be read back from the device. Backups and readback verification (requirements US-02, US-03 and 3.5 step 6) are not possible with the commands known so far.
@@ -63,7 +63,7 @@ The vendor driver writes one key per report and never reads back. Payload offset
 | Offset | Meaning |
 |---|---|
 | 0 | 0x1A |
-| 1 | Profile (0-3, from GET_PROFILE 0x84) |
+| 1 | Profile (0-3, from GET_PROFILE 0x85) |
 | 2 | 0x01 = normal mode |
 | 3 | Option (0 = normal; 2 dks, 3 mod-tap, 4/5 toggle, 6 gamepad are not supported by HallForge), `| 0x80` = rapid trigger on |
 | 4 | Actuation in 0.1 mm |
@@ -98,6 +98,28 @@ The vendor driver calls it "guansu" (光速) internally and shows it as "Roar Se
 - After any Roar change, the vendor driver writes SET_KBOPTION 0x06 `[06, profile, flags, fn layout]` with bit 4 of the flags ("LED off") set while any slot is enabled. GET_KBOPTION 0x86 `[86, profile]` returns `86 00 10 01` on model 1778. Flag bits per the driver: 0 Win lock, 2 Mac mode, 3 WASD/arrow swap, 4 LED off, 5 side LED off, 6 keyboard mode, 7 lock. HallForge changes only bit 4, writes the rest back as read, and refuses responses with unknown non-zero bytes 4-6.
 - Right after a SET, the firmware keeps answering with the previous response for up to a few hundred ms, so reads after writes poll until the value appears.
 - Verified on hardware with `hallforge roar set --experimental`: cleared all slots (backlight on), restored W, A, D, S (backlight off), twice, each read back.
+
+## Command table of the model's driver class
+
+The vendor driver's base command table that matches the verified commands of model 1778 (KBOPTION 0x06/0x86, LEDPARAM 0x07/0x87) lists: SET_REPORT 0x04 / GET_REPORT 0x84, SET_PROFILE 0x05 / GET_PROFILE 0x85, SET_KEYMATRIX 0x09, SET_MACRO 0x0B, SET_FN 0x10, SET_KEYMATRIX_SIMPLE 0x13, SET_FN_SIMPLE 0x15 and others. HallForge read the profile with 0x84 until 2026-10-29; that is GET_REPORT, whose byte 1 also happened to be 0.
+
+## Onboard profiles (GET 0x85 / SET 0x05, verified, 2026-10-29)
+
+- GET_PROFILE 0x85: byte 1 is the active profile 0-3. Profile 0 comes back as the unchanged request (`85 00 00 00 00 00 00 7A`, vendor capture `ws/usb2`), so profile 0 cannot be told from an unsupported command; the client accepts two identical reads.
+- SET_PROFILE 0x05 `[05, profile]` with the Bit7 checksum, as in the driver's encoder. Not captured from the vendor driver (it shows no profile selector for this model, and the manual names no profile shortcut), but taken from the matching command table.
+- Verified on hardware with `hallforge profile set --experimental`: switched from profile 1 to 2 (read back as byte 1 = 1) and back to 1.
+
+## Travel mode (GET 0x9D / SET 0x1D, verified, 2026-10-29)
+
+- The manual's Fn+1 to Fn+4 shortcuts: Fn+1 2 mm (Comfort), Fn+2 0.5 mm (Sensitive), Fn+3 0.5 mm plus "Ultra Sensitive Mode" (Gaming; the Chinese text says 火力模式, the driver's name for non-stop rapid trigger), Fn+4 the per-key settings from the driver (Custom, 2 mm by default).
+- GET_KEY_MAGNETISM_MODE 0x9D: byte 1 = mode 0-3, byte 2 keyboard disabled, byte 3 gamepad enabled (vendor decoder).
+- SET_KEY_MAGNETISM_MODE 0x1D `[1D, mode]`, Bit7 checksum (capture `ws/usb6`: `1d000000000000e2` to `1d030000000000df`).
+- Per-key settings written with 0x1A take effect only in Custom.
+- Verified on hardware: Custom to Comfort and back, each read back.
+
+## Other manual facts (MOD007B HE user manual, file.akkogear.com/MOD007B_HE.pdf)
+
+Fn+L backlight on/off, Fn+W swaps WASD and the arrow keys, Fn+Left Win locks the Win key, Fn+Home/PgUp/End/PgDn select lighting effect groups, Fn+\ cycles colors, holding Fn+~ for 5 s restores factory settings. These match bits of KBOPTION (LED off, WASD swap, Win lock).
 
 ## Non-stop rapid trigger (vendor driver, not yet tested on hardware)
 

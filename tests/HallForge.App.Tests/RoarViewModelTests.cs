@@ -18,7 +18,7 @@ public class RoarViewModelTests
             byte[] response = _request[1] switch
             {
                 0x8F => [0x8F, 0xF2, 0x06, 0, 0, 0, 0, 1, 2],
-                0x84 => [0x84, 0],
+                0x85 => [0x85, 0],
                 0x9F => Convert.FromHexString("9F00000000000060010E"),
                 var command => [command, 1],
             };

@@ -572,6 +572,75 @@ roarSet.SetAction(result =>
     }
 });
 
+var modeShow = new Command("show", "Read the travel mode (read-only).") { deviceOption };
+modeShow.SetAction(result => WithSession(result, write: false, session =>
+{
+    Console.WriteLine($"Travel mode: {session.Client.ReadMagnetismMode()}");
+    return 0;
+}));
+var travelModeOption = new Option<MagnetismMode>("--mode") { Description = "Comfort (2 mm), Sensitive (0.5 mm), Gaming (0.5 mm, non-stop rapid trigger) or Custom (per-key settings).", Required = true };
+var modeSet = new Command("set", "Switch the travel mode like Fn+1 to Fn+4 and verify it by reading it back.") { deviceOption, travelModeOption, experimentalOption };
+modeSet.SetAction(result => WithSession(result, write: true, session =>
+{
+    session.Client.WriteMagnetismMode(result.GetValue(travelModeOption));
+    Console.WriteLine($"Switched and verified: travel mode {result.GetValue(travelModeOption)}.");
+    return 0;
+}));
+
+var profileShow = new Command("show", "Read the active onboard profile (read-only).") { deviceOption };
+profileShow.SetAction(result => WithSession(result, write: false, session =>
+{
+    Console.WriteLine($"Active onboard profile: {session.Profile + 1}");
+    return 0;
+}));
+var profileNumberOption = new Option<int>("--profile") { Description = "Onboard profile 1-4.", Required = true };
+var profileSet = new Command("set", "Switch the active onboard profile and verify it by reading it back.") { deviceOption, profileNumberOption, experimentalOption };
+profileSet.SetAction(result =>
+{
+    var number = result.GetValue(profileNumberOption);
+    if (number is < 1 or > 4)
+    {
+        Console.Error.WriteLine("--profile must be 1-4.");
+        return ExitInvalidInput;
+    }
+    return WithSession(result, write: true, session =>
+    {
+        session.Client.WriteActiveProfile((byte)(number - 1));
+        Console.WriteLine($"Switched and verified: onboard profile {number} is active.");
+        return 0;
+    });
+});
+
+int WithSession(ParseResult result, bool write, Func<RongYuanSession, int> action)
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    if (write && !target.Definition!.Verified && !result.GetValue(experimentalOption))
+    {
+        Console.Error.WriteLine($"'{target.Definition.Name}' is not verified for writing. Use --experimental only for hardware research.");
+        return ExitUnsupported;
+    }
+    try
+    {
+        using var session = RongYuanSession.Open(transport, target);
+        return action(session);
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitUnsupported;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Device error: {ex.Message}");
+        return ExitDeviceError;
+    }
+}
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
@@ -580,6 +649,8 @@ var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configur
     new Command("profiles", "Apply portable key setting profiles.") { profilesApply },
     new Command("led", "Keyboard lighting.") { ledShow, ledSet },
     new Command("roar", "Roar mode: up to four keys with the fastest response.") { roarShow, roarSet },
+    new Command("mode", "Travel mode (Fn+1 to Fn+4).") { modeShow, modeSet },
+    new Command("profile", "Active onboard profile.") { profileShow, profileSet },
     new Command("state", "Key settings known to HallForge (the device cannot report them).") { stateShow },
 };
 return root.Parse(args).Invoke();

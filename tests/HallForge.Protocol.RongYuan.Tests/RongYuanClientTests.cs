@@ -226,6 +226,48 @@ public class RongYuanClientTests
             new RongYuanClient(new FakeConnection(empty, empty)).WriteRoar([new RoarSlot(14, true), null, null, null], profile: 0));
     }
 
+    // Recorded from the vendor driver session (ws/usb2): profile 0 comes back as the unchanged request.
+    [Fact]
+    public void ReadActiveProfile_RecordedProfile0EchoIsProfile0()
+    {
+        var echo = Response(Convert.FromHexString("850000000000007a"));
+
+        Assert.Equal(0, new RongYuanClient(new FakeConnection(echo, echo)).ReadActiveProfile());
+    }
+
+    [Fact]
+    public void WriteActiveProfile_SendsSetProfileAndWaitsForTheNewProfile()
+    {
+        var connection = new FakeConnection(Response(0x85, 0), Response(0x85, 1), Response(0x85, 1));
+
+        new RongYuanClient(connection).WriteActiveProfile(1);
+
+        Assert.Equal("05010000000000f9", Convert.ToHexStringLower(connection.Sent[0], 1, 8));
+    }
+
+    [Fact]
+    public void WriteActiveProfile_FailsWhenTheProfileDoesNotChange() =>
+        Assert.Throws<ProtocolException>(() => new RongYuanClient(new FakeConnection(Response(0x85, 0))).WriteActiveProfile(1));
+
+    // SET_KEY_MAGNETISM_MODE frames recorded from the vendor driver (ws/usb6): Comfort, Sensitive, Gaming, Custom.
+    [Theory]
+    [InlineData(MagnetismMode.Comfort, "1d000000000000e2")]
+    [InlineData(MagnetismMode.Sensitive, "1d010000000000e1")]
+    [InlineData(MagnetismMode.Gaming, "1d020000000000e0")]
+    [InlineData(MagnetismMode.Custom, "1d030000000000df")]
+    public void WriteMagnetismMode_MatchesVendorDriverCaptureAndVerifies(MagnetismMode mode, string expected)
+    {
+        var connection = new FakeConnection(Response(0x9D, (byte)mode, 0, 0, 0, 0, 0, 0x01));
+
+        new RongYuanClient(connection).WriteMagnetismMode(mode);
+
+        Assert.Equal(expected, Convert.ToHexStringLower(connection.Sent[0], 1, 8));
+    }
+
+    [Fact]
+    public void ReadMagnetismMode_RejectsUnknownMode() =>
+        Assert.Throws<ProtocolException>(() => new RongYuanClient(new FakeConnection(Response(0x9D, 7))).ReadMagnetismMode());
+
     [Fact]
     public void Identify_TreatsFeatureListWithoutMarkerAsUnknownPrecision()
     {
