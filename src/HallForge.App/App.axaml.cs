@@ -58,7 +58,7 @@ public partial class App : Application
         {
             Icon = window.Icon,
             ToolTipText = Strings.TrayToolTip,
-            IsVisible = autoSwitch.IsEnabled,
+            IsVisible = autoSwitch.IsActive,
             Menu = new NativeMenu { open, exit },
         };
         tray.Clicked += (_, _) => ShowWindow();
@@ -66,12 +66,12 @@ public partial class App : Application
         autoSwitch.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(AutoSwitchViewModel.IsEnabled))
-                tray.IsVisible = autoSwitch.IsEnabled;
+                tray.IsVisible = autoSwitch.IsActive;
         };
         // Programmatic closes (tray "Exit") and system shutdown still end the app.
         window.Closing += (_, e) =>
         {
-            if (autoSwitch.IsEnabled && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
+            if (autoSwitch.IsActive && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
             {
                 e.Cancel = true;
                 window.Hide();

@@ -56,12 +56,15 @@ public sealed partial class AutoSwitchViewModel : ObservableObject
         _loading = true;
         OtherMode = ModeItem(other.Mode);
         OtherProfile = ProfileItem(other.Profile);
-        IsEnabled = settings.AutoSwitch && IsSupported;
+        IsEnabled = settings.AutoSwitch;
         _loading = false;
     }
 
     public static bool IsSupported => ForegroundProgram.IsSupported;
     public static bool IsUnsupported => !IsSupported;
+
+    /// <summary>Enabled and able to run; the setting is kept on other systems but has no effect there.</summary>
+    public bool IsActive => IsEnabled && IsSupported;
     public ObservableCollection<ProgramRuleViewModel> Rules { get; }
 
     [ObservableProperty]
