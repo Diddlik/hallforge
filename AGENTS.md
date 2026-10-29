@@ -131,7 +131,7 @@ Design:
   - A new keyboard on a known protocol needs only a JSON file (match, firmware model ids, limits, `keys` matrix map, `layout` geometry in key units). Printed labels per language are in `layouts/*.json` (`KeyLegends`), separate from devices. A new protocol gets its own `HallForge.Protocol.<Name>` project.
   - Unknown or unverified devices are never written to.
   - Firmware, bootloader, keymatrix, macro and FN commands are never exposed.
-  - Every SET command goes through an allowlist. The writes are the per-key trigger setting (0x1A, unverifiable) and the lighting effect (SET_LEDPARAM 0x07, verified by reading it back) in `RongYuanClient`/`LightingState`. Unverified definitions need `--experimental`.
+  - Every SET command goes through an allowlist. The writes are the per-key trigger setting (0x1A, unverifiable), the lighting effect (SET_LEDPARAM 0x07, verified by reading it back) and Roar mode (0x1F, verified by 0x9F, plus only the LED-off bit of SET_KBOPTION 0x06) in `RongYuanClient`/`LightingState`/`Roar`. Unverified definitions need `--experimental`.
   - Millimeter input is parsed with `Millimeters.TryParse` (invariant '.', ',' rejected), never with the current culture.
   - The GUI and the CLI share the same services. Version numbers come only from `Directory.Build.props`, and package versions come only from `Directory.Packages.props`.
 - Generated files: `bin/` and `obj/`.

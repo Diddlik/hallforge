@@ -472,6 +472,106 @@ ledSet.SetAction(result =>
     }
 });
 
+var roarShow = new Command("show", "Read the Roar mode keys (read-only).") { deviceOption };
+roarShow.SetAction(result =>
+{
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    try
+    {
+        using var session = RongYuanSession.Open(transport, target);
+        Console.WriteLine($"Roar keys: {DescribeRoar(session.Client.ReadRoar(), session.Definition)}");
+        Console.WriteLine($"Backlight: {(session.Client.ReadKeyboardOptions(session.Profile).LedOff ? "off" : "on")} (profile {session.Profile})");
+        return 0;
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitUnsupported;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Read failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
+var roarKeysOption = new Option<string[]>("--keys")
+{
+    Description = $"Up to {Roar.SlotCount} key ids (e.g. KeyW KeyA KeyS KeyD). Omit to turn Roar mode off.",
+    AllowMultipleArgumentsPerToken = true,
+};
+var roarSet = new Command("set", "Set the Roar mode keys and verify them by reading them back. Turns the backlight off while Roar is on, like the vendor driver.")
+{
+    deviceOption, roarKeysOption, dryRunOption, yesOption, experimentalOption,
+};
+roarSet.SetAction(result =>
+{
+    var keyIds = result.GetValue(roarKeysOption) ?? [];
+    if (keyIds.Length > Roar.SlotCount || keyIds.Distinct().Count() != keyIds.Length)
+    {
+        Console.Error.WriteLine($"--keys takes up to {Roar.SlotCount} different keys.");
+        return ExitInvalidInput;
+    }
+    var target = discovery.Discover().FirstOrDefault(c => c.Interface.Id == result.GetValue(deviceOption));
+    if (target is null)
+    {
+        Console.Error.WriteLine("Device not found or has no device definition. Run 'hallforge devices list'.");
+        return ExitDeviceNotFound;
+    }
+    var unknown = keyIds.Where(k => !target.Definition!.Keys.ContainsKey(k)).ToList();
+    if (unknown.Count > 0)
+    {
+        Console.Error.WriteLine($"Unknown key(s): {string.Join(", ", unknown)}. Run 'hallforge keys list'.");
+        return ExitInvalidInput;
+    }
+    var slots = keyIds.Select(k => (RoarSlot?)new RoarSlot(target.Definition!.Keys[k], true))
+        .Concat(Enumerable.Repeat<RoarSlot?>(null, Roar.SlotCount - keyIds.Length)).ToList();
+    var dryRun = result.GetValue(dryRunOption);
+    if (!dryRun && !target.Definition!.Verified && !result.GetValue(experimentalOption))
+    {
+        Console.Error.WriteLine($"'{target.Definition.Name}' is not verified for writing. Use --dry-run to preview, or --experimental only for hardware research.");
+        return ExitUnsupported;
+    }
+    try
+    {
+        using var session = RongYuanSession.Open(transport, target);
+        Console.WriteLine($"Current: {DescribeRoar(session.Client.ReadRoar(), session.Definition)}");
+        Console.WriteLine($"New:     {DescribeRoar(slots, session.Definition)}");
+        if (dryRun)
+        {
+            Console.WriteLine("Dry run: nothing was sent.");
+            return 0;
+        }
+        if (!result.GetValue(yesOption))
+        {
+            Console.Write("Send these Roar keys to the keyboard? [y/N] ");
+            if (!string.Equals(Console.ReadLine()?.Trim(), "y", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Cancelled.");
+                return ExitCancelled;
+            }
+        }
+        session.Client.WriteRoar(slots, session.Profile);
+        Console.WriteLine("Sent and verified: the keyboard reports the new Roar keys.");
+        return 0;
+    }
+    catch (DeviceNotSupportedException ex)
+    {
+        Console.Error.WriteLine(ex.Message);
+        return ExitUnsupported;
+    }
+    catch (Exception ex) when (ex is IOException or TimeoutException or ProtocolException)
+    {
+        Console.Error.WriteLine($"Roar write failed: {ex.Message}");
+        return ExitDeviceError;
+    }
+});
+
 var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configurator")
 {
     new Command("devices", "Discover and inspect keyboards (read-only).") { list, probe, identify, magnetism },
@@ -479,9 +579,18 @@ var root = new RootCommand($"HallForge {version} - Hall-effect keyboard configur
     new Command("backup", "Create and restore backups of key settings.") { importAkko, backupRestore },
     new Command("profiles", "Apply portable key setting profiles.") { profilesApply },
     new Command("led", "Keyboard lighting.") { ledShow, ledSet },
+    new Command("roar", "Roar mode: up to four keys with the fastest response.") { roarShow, roarSet },
     new Command("state", "Key settings known to HallForge (the device cannot report them).") { stateShow },
 };
 return root.Parse(args).Invoke();
+
+static string DescribeRoar(IReadOnlyList<RoarSlot?> slots, DeviceDefinition definition)
+{
+    var keys = slots.OfType<RoarSlot>()
+        .Select(s => (definition.Keys.FirstOrDefault(k => k.Value == s.MatrixIndex).Key ?? $"matrix {s.MatrixIndex}") + (s.Enabled ? "" : " (off)"))
+        .ToList();
+    return keys.Count > 0 ? string.Join(", ", keys) : "none";
+}
 
 static string Describe(KeyTrigger? t) => t is null
     ? "unknown"

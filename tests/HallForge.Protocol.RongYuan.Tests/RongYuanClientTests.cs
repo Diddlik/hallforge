@@ -186,6 +186,46 @@ public class RongYuanClientTests
         Assert.Throws<CommandNotSupportedException>(() => new RongYuanClient(new FakeConnection(echo)).ReadPage(MagnetismTable.PressTravel, 0));
     }
 
+    // With no Roar keys the response equals the request, so it must not be taken for an unsupported command.
+    [Fact]
+    public void ReadRoar_AcceptsEmptyResponseThatLooksLikeAnEcho()
+    {
+        var empty = Response(Convert.FromHexString("9F000000000000600000"));
+
+        Assert.All(new RongYuanClient(new FakeConnection(empty, empty)).ReadRoar(), Assert.Null);
+    }
+
+    [Fact]
+    public void ReadRoar_SkipsStaleResponseOfAnotherCommand()
+    {
+        var roar = Response(Convert.FromHexString("9F00000000000060010E"));
+
+        var slots = new RongYuanClient(new FakeConnection(Response(0x87, 0x13), roar, roar)).ReadRoar();
+
+        Assert.Equal(new RoarSlot(14, true), slots[0]);
+    }
+
+    [Fact]
+    public void WriteRoar_VerifiesSlotsAndTurnsBacklightOffWhileEnabled()
+    {
+        var roar = Response(Convert.FromHexString("9F00000000000060010E"));
+        var connection = new FakeConnection(roar, roar, Response(0x86, 0x00, 0x00, 0x01), Response(0x86, 0x00, 0x10, 0x01));
+
+        new RongYuanClient(connection).WriteRoar([new RoarSlot(14, true), null, null, null], profile: 0);
+
+        Assert.Equal("1f000000000000e0010e", Convert.ToHexStringLower(connection.Sent[0], 1, 10));
+        Assert.Contains(connection.Sent, r => Convert.ToHexStringLower(r, 1, 8) == "06001001000000e8");
+    }
+
+    [Fact]
+    public void WriteRoar_FailsWhenTheKeyboardReportsOtherSlots()
+    {
+        var empty = Response(Convert.FromHexString("9F000000000000600000"));
+
+        Assert.Throws<ProtocolException>(() =>
+            new RongYuanClient(new FakeConnection(empty, empty)).WriteRoar([new RoarSlot(14, true), null, null, null], profile: 0));
+    }
+
     [Fact]
     public void Identify_TreatsFeatureListWithoutMarkerAsUnknownPrecision()
     {

@@ -98,6 +98,8 @@ dotnet run --project src/HallForge.Cli -- backup restore <backup.json> --device 
 dotnet run --project src/HallForge.Cli -- keys list --device <id>
 dotnet run --project src/HallForge.Cli -- led show --device <id>          # current lighting effect (read-only)
 dotnet run --project src/HallForge.Cli -- led set --device <id> --mode AlwaysOn --brightness 4 --color FF0000 --dry-run
+dotnet run --project src/HallForge.Cli -- roar show --device <id>         # Roar mode keys (read-only)
+dotnet run --project src/HallForge.Cli -- roar set --device <id> --keys KeyW KeyA KeyS KeyD --dry-run
 dotnet run --project src/HallForge.Cli -- keys set --device <id> --key AltLeft --actuation 1.9 --release 1.9 --rapid-trigger false --rt-press 0.2 --rt-release 0.3 --deadzone 3.7 --dry-run
 dotnet run --project src/HallForge.App                          # GUI
 ```

@@ -26,6 +26,7 @@ Observed on 2026-10-28, Windows 11 (build 26300), with `hallforge devices probe`
   - Q was then restored to its previous setting from the vendor driver database (0.9 / 0.9 mm, rapid trigger off, 0.2 / 0.3 mm, deadzone 3.7 mm).
   - Per-key settings cannot be read back, so this test is the only verification available.
 - Lighting write (2026-10-28): `hallforge led set --experimental` changed RainDown/brightness 4 to PressActionOff/brightness 2/speed 2/rainbow. The read-back matched. The vendor driver window was open at the time; it did not interfere.
+- Roar mode (2026-10-29): `hallforge roar show` read W, A, D, S enabled and the backlight off. `hallforge roar set --experimental` cleared the slots and restored them twice; each slot write and the backlight switch were read back and matched.
 - Support level: `Unverified`. Writes need `--experimental`.
 
 ### AKKO MOD007B ISO HE 2.4G receiver, VID 0x3151 PID 0x4011

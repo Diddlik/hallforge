@@ -40,7 +40,7 @@ The vendor driver was opened on the actuation page while USBPcap was capturing. 
 
 | Request | Response (non-zero prefix) | Notes |
 |---|---|---|
-| 0xFD | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | Returns the buffer of a previous 0x9F; meaning unknown |
+| 0xFD | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | Returns the buffer of the previous 0x9F; meaning unknown |
 | 0x8F GET_USB_VERSION | `8F F2 06 00 00 00 00 70` | Model id 1778 |
 | 0x87 GET_LEDPARAM | `87 13 02 02 07 B4 B4 B4` | |
 | 0xF0 | `F0 03 01` | |
@@ -48,11 +48,11 @@ The vendor driver was opened on the actuation page while USBPcap was capturing. 
 | 0xAE GET_MLED_VERSION | `AE 03 01` | |
 | 0x84 GET_PROFILE | `84 00 01` | Active profile 0 |
 | 0x85 GET_LEDONOFF | `85` | |
-| 0x86 GET_DEBOUNCE | `86 00 10 01` | |
+| 0x86 GET_KBOPTION | `86 00 10 01` | Keyboard options of profile 0 (see Roar mode) |
 | 0x92 | `92 78 00 78 00 84 03 58 02` | Sleep times? (0x78 = 120, 0x384 = 900, 0x258 = 600) |
 | 0x97 GET_AUTOOS_EN | `97` | |
 | 0x9D GET_KEY_MAGNETISM_MODE | `9D 03` | |
-| 0x9F | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | |
+| 0x9F GET_MAGNETISM_FAST | `9F 00 .. 60 01 0E 01 09 01 15 01 0F` | Roar mode: W, A, S, D enabled |
 
 Consequence: for model 1778, per-key actuation, release and rapid trigger cannot currently be read back from the device. Backups and readback verification (requirements US-02, US-03 and 3.5 step 6) are not possible with the commands known so far.
 
@@ -87,6 +87,21 @@ Response bytes (byte 0 = echo): 1 mode (0 off ... 24 fireworks, see `LightingMod
 Writing (SET_LEDPARAM 0x07, verified by vendor driver capture `ws/usb4`): `[07, mode, 4 - speed, brightness, option << 4 | color mode, R, G, B, checksum]` with the **Bit8** checksum (255 minus the low byte of the sum of bytes 0-7, stored at byte 8). Color mode 8 = fixed color, 7 = rainbow. Brightness and speed are 0-4. The vendor driver substitutes #FAFFFA for white and waits 500 ms after the write. HallForge reads the lighting back after every write and fails if it differs, so lighting writes are verified, unlike key settings. User picture, music and screen color modes are not writable because they need data HallForge does not provide.
 
 Option values the vendor driver writes for model 1778 (`LightingState.VariantsOf`, from the driver's lighting encoder, not individually tested on hardware): Wave 0 right, 1 left, 2 down, 3 up; Snake 0 zigzag, 1 back and forth; Kaleidoscope 0 outward, 1 inward; Line wave and Fireworks 0 right, 1 left; Circle wave 0 counterclockwise, 1 clockwise. All other writable effects use option 0.
+
+## Roar mode (GET 0x9F / SET 0x1F, verified read and write, 2026-10-29)
+
+The vendor driver calls it "guansu" (光速) internally and shows it as "Roar Setting" for models with `otherSetting.isguansu`, which includes model 1778. Its help text: the fastest response for up to four keys; the backlight is turned off while Roar is on.
+
+- GET_MAGNETISM_FAST 0x9F: the response repeats the request bytes 0-7 (command, zeros, our checksum 0x60) and adds four slots `[enabled, matrix index]` at bytes 8-15. With all slots empty it equals the request, so `ReadRoar` accepts two identical reads instead of using echo detection.
+- SET_MAGNETISM_FAST 0x1F (capture `ws/usb5`): `1F 00 00 00 00 00 00 E0` then the four slots. The Bit7 checksum covers only bytes 0-6, not the slots. An empty slot is `00 00`; a disabled slot keeps its key (`00 0E`).
+- The setting is global; the command has no profile byte.
+- After any Roar change, the vendor driver writes SET_KBOPTION 0x06 `[06, profile, flags, fn layout]` with bit 4 of the flags ("LED off") set while any slot is enabled. GET_KBOPTION 0x86 `[86, profile]` returns `86 00 10 01` on model 1778. Flag bits per the driver: 0 Win lock, 2 Mac mode, 3 WASD/arrow swap, 4 LED off, 5 side LED off, 6 keyboard mode, 7 lock. HallForge changes only bit 4, writes the rest back as read, and refuses responses with unknown non-zero bytes 4-6.
+- Right after a SET, the firmware keeps answering with the previous response for up to a few hundred ms, so reads after writes poll until the value appears.
+- Verified on hardware with `hallforge roar set --experimental`: cleared all slots (backlight on), restored W, A, D, S (backlight off), twice, each read back.
+
+## Non-stop rapid trigger (vendor driver, not yet tested on hardware)
+
+The vendor driver labels the 0x1A rapid trigger flag (`fire`, option byte `| 0x80`) "Non-stop Rapid Trigger": "When enabled, rapid trigger will only stop when you fully release the key", otherwise it stops once the key rises above the actuation point. The driver has no separate switch for plain rapid trigger. Whether the RT sensitivities take effect without the flag is still to be tested by typing.
 
 ## Next steps (Phase 1)
 

@@ -4,8 +4,8 @@ using HallForge.Core;
 namespace HallForge.Protocol.RongYuan;
 
 /// <summary>
-/// The only commands this client can send. Keeping the allowlist as an enum means no code path
-/// can build a frame for SET, firmware or bootloader opcodes.
+/// The read commands this client can send. Keeping the allowlist as an enum means no code path can build a
+/// frame for other opcodes; the few writes (key trigger, lighting, Roar) are fixed constants with their own encoders.
 /// </summary>
 public enum ReadCommand : byte
 {
@@ -37,8 +37,11 @@ public sealed class RongYuanClient(IHidConnection connection)
     public const int ReportLength = 65;
     public const int PageLength = 64;
     private const byte GetMultiMagnetism = 0xE5;
-    // The only write this client can send: one key's trigger settings (vendor name FEA_CMD_SET_MAGNETISM_MODE).
+    // Write of one key's trigger settings (vendor name FEA_CMD_SET_MAGNETISM_MODE).
     private const byte SetKeyTriggerCommand = 0x1A;
+    // FEA_CMD_GET/SET_KBOPTION of this driver class; only the backlight bit is changed, for Roar mode.
+    private const byte GetKeyboardOption = 0x86;
+    private const byte SetKeyboardOption = 0x06;
     private const byte NormalMode = 0x01;
     private const byte RapidTriggerFlag = 0x80;
     // Onboard profiles 0-3; the firmware does not bounds-check the profile byte.
@@ -196,6 +199,68 @@ public sealed class RongYuanClient(IHidConnection connection)
         if (actual != expected)
             throw new ProtocolException($"The keyboard reports {actual} after writing {lighting}.");
         return actual;
+    }
+
+    /// <remarks>
+    /// The response repeats the request bytes and differs only in the slots, so with all slots empty it is
+    /// indistinguishable from an echo. It is accepted after two identical reads instead of by echo detection.
+    /// </remarks>
+    public IReadOnlyList<RoarSlot?> ReadRoar()
+    {
+        var request = Frame(Roar.GetCommand, []);
+        byte[]? previous = null;
+        for (var attempt = 0; attempt < Attempts; attempt++)
+        {
+            connection.SetFeature(request);
+            Thread.Sleep(PollDelaysMs[0]);
+            var response = new byte[ReportLength];
+            connection.GetFeature(response);
+            var current = response[1..];
+            if (current[0] == Roar.GetCommand && previous is not null && current.AsSpan().SequenceEqual(previous))
+                return Roar.Parse(current);
+            previous = current;
+        }
+        throw new ProtocolException($"No stable response to 0x{Roar.GetCommand:X2} after {Attempts} attempts.");
+    }
+
+    /// <summary>
+    /// Writes the Roar slots and reads them back. Like the vendor driver, it then switches the backlight of the
+    /// given profile off while any Roar key is enabled and on again when none is, because the vendor states that
+    /// the backlight disturbs the fastest key response.
+    /// </summary>
+    /// <exception cref="ProtocolException">The keyboard reports other values than were written.</exception>
+    public void WriteRoar(IReadOnlyList<RoarSlot?> slots, byte profile)
+    {
+        connection.SetFeature(Roar.Encode(slots));
+        Thread.Sleep(WriteSpacing);
+        if (!ReadRoar().SequenceEqual(slots))
+            throw new ProtocolException("The keyboard reports other Roar keys than were written.");
+
+        var ledOff = slots.Any(s => s?.Enabled == true);
+        var options = ReadKeyboardOptions(profile);
+        if (options.LedOff == ledOff)
+            return;
+        connection.SetFeature(Frame(SetKeyboardOption, [profile, options.WithLedOff(ledOff).Flags, options.FnLayout]));
+        // The firmware may still report the old value for a moment, so only a value that never changes is a failure.
+        if (!PollDelaysMs.Any(delay => { Thread.Sleep(delay); return ReadKeyboardOptions(profile).LedOff == ledOff; }))
+            throw new ProtocolException("The keyboard did not change the backlight setting for Roar mode.");
+    }
+
+    public KeyboardOptions ReadKeyboardOptions(byte profile)
+    {
+        if (profile > MaxProfile)
+            throw new ArgumentOutOfRangeException(nameof(profile));
+        var request = Frame(GetKeyboardOption, [profile]);
+        byte[] last = [];
+        for (var attempt = 0; attempt < Attempts; attempt++)
+        {
+            // Right after a Roar write the firmware keeps answering with the previous response for a while.
+            Thread.Sleep(PollDelaysMs[attempt]);
+            var response = last = Exchange(request);
+            if (response[0] == GetKeyboardOption)
+                return KeyboardOptions.Parse(response);
+        }
+        throw new ProtocolException($"No matching response to 0x{GetKeyboardOption:X2} after {Attempts} attempts (last {Convert.ToHexString(last, 0, 9)}).");
     }
 
     public RongYuanIdentity Identify()
