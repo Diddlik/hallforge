@@ -798,4 +798,46 @@
   <data name="ApplyRoar" xml:space="preserve">
     <value>Roar-Modus anwenden</value>
   </data>
+  <data name="KeyboardSettings" xml:space="preserve">
+    <value>Tastatureinstellungen</value>
+  </data>
+  <data name="KeyboardSettingsIntro" xml:space="preserve">
+    <value>Einstellungen, die die Tastatur selbst meldet. Jede Änderung wird sofort geschrieben und zurückgelesen.</value>
+  </data>
+  <data name="KeyboardSettingsExperimental" xml:space="preserve">
+    <value>Dieses Tastaturmodell ist nicht für Schreibzugriffe verifiziert. Eine Änderung hier wird sofort geschrieben.</value>
+  </data>
+  <data name="TravelMode" xml:space="preserve">
+    <value>Modus</value>
+  </data>
+  <data name="TravelModeComfort" xml:space="preserve">
+    <value>Comfort: 2 mm (Fn+1)</value>
+  </data>
+  <data name="TravelModeSensitive" xml:space="preserve">
+    <value>Sensitive: 0,5 mm (Fn+2)</value>
+  </data>
+  <data name="TravelModeGaming" xml:space="preserve">
+    <value>Gaming: 0,5 mm, Non-stop Rapid Trigger (Fn+3)</value>
+  </data>
+  <data name="TravelModeCustom" xml:space="preserve">
+    <value>Custom: Einstellungen pro Taste (Fn+4)</value>
+  </data>
+  <data name="TravelModeSwitched" xml:space="preserve">
+    <value>Modus gewechselt und geprüft: {0}.</value>
+  </data>
+  <data name="NotCustomWarning" xml:space="preserve">
+    <value>Die Tastatur ist nicht im Modus Custom. Die Einstellungen pro Taste auf dieser Seite wirken deshalb nicht. Drücke Fn+4 oder wechsle den Modus auf der Geräteseite.</value>
+  </data>
+  <data name="OnboardProfileNumber" xml:space="preserve">
+    <value>Profil {0}</value>
+  </data>
+  <data name="ProfileSwitched" xml:space="preserve">
+    <value>Zu Onboard-Profil {0} gewechselt und geprüft. Die Seite zeigt jetzt, was HallForge über dieses Profil weiß.</value>
+  </data>
+  <data name="ProfileSwitchBlockedByDrafts" xml:space="preserve">
+    <value>Sende oder verwirf deine Tastenänderungen, bevor du das Onboard-Profil wechselst.</value>
+  </data>
+  <data name="KeyboardSettingFailed" xml:space="preserve">
+    <value>Die Tastatureinstellung konnte nicht geändert werden: {0}</value>
+  </data>
 </root>

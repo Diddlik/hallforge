@@ -138,6 +138,14 @@
                 </ComboBox>
             </Grid>
 
+            <!-- Per-key settings have no effect outside Custom mode -->
+            <Border Classes="note warn" IsVisible="{Binding Settings.IsNotCustom}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Path Classes="icon small" Data="{StaticResource IconWarning}" Stroke="{DynamicResource HfWarn}" VerticalAlignment="Top" Margin="0,2,0,0" />
+                    <TextBlock Grid.Column="1" Text="{x:Static app:Strings.NotCustomWarning}" TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+
             <!-- Status of the last action -->
             <Border Classes="note" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                 <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">

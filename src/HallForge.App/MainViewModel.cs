@@ -162,6 +162,7 @@ public sealed partial class MainViewModel(
             await Keyboard.LoadStateCommand.ExecuteAsync(null);
             await Keyboard.Lighting.LoadCommand.ExecuteAsync(null);
             await Keyboard.Roar.LoadCommand.ExecuteAsync(null);
+            await Keyboard.Settings.LoadCommand.ExecuteAsync(null);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {

@@ -807,4 +807,46 @@
   <data name="ApplyRoar" xml:space="preserve">
     <value>Apply Roar mode</value>
   </data>
+  <data name="KeyboardSettings" xml:space="preserve">
+    <value>Keyboard settings</value>
+  </data>
+  <data name="KeyboardSettingsIntro" xml:space="preserve">
+    <value>Settings the keyboard reports itself. Each change is written right away and read back.</value>
+  </data>
+  <data name="KeyboardSettingsExperimental" xml:space="preserve">
+    <value>This keyboard model is not verified for writing. Changing a setting here writes to it right away.</value>
+  </data>
+  <data name="TravelMode" xml:space="preserve">
+    <value>Travel mode</value>
+  </data>
+  <data name="TravelModeComfort" xml:space="preserve">
+    <value>Comfort: 2 mm (Fn+1)</value>
+  </data>
+  <data name="TravelModeSensitive" xml:space="preserve">
+    <value>Sensitive: 0.5 mm (Fn+2)</value>
+  </data>
+  <data name="TravelModeGaming" xml:space="preserve">
+    <value>Gaming: 0.5 mm, non-stop rapid trigger (Fn+3)</value>
+  </data>
+  <data name="TravelModeCustom" xml:space="preserve">
+    <value>Custom: per-key settings (Fn+4)</value>
+  </data>
+  <data name="TravelModeSwitched" xml:space="preserve">
+    <value>Travel mode switched and verified: {0}.</value>
+  </data>
+  <data name="NotCustomWarning" xml:space="preserve">
+    <value>The keyboard is not in Custom mode, so the per-key settings on this page have no effect. Press Fn+4 or switch the travel mode on the Device page.</value>
+  </data>
+  <data name="OnboardProfileNumber" xml:space="preserve">
+    <value>Profile {0}</value>
+  </data>
+  <data name="ProfileSwitched" xml:space="preserve">
+    <value>Switched to onboard profile {0} and verified. The page now shows what HallForge knows about this profile.</value>
+  </data>
+  <data name="ProfileSwitchBlockedByDrafts" xml:space="preserve">
+    <value>Apply or discard your key changes before switching the onboard profile.</value>
+  </data>
+  <data name="KeyboardSettingFailed" xml:space="preserve">
+    <value>Could not change the keyboard setting: {0}</value>
+  </data>
 </root>

@@ -79,6 +79,44 @@
                         <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding LayoutSummary}" />
                     </Grid>
                 </Border>
+
+                <!-- Keyboard-wide settings, written right away and read back -->
+                <Border Classes="panel" DataContext="{Binding Keyboard.Settings}">
+                    <StackPanel x:DataType="app:KeyboardSettingsViewModel" Spacing="12">
+                        <StackPanel Spacing="2">
+                            <TextBlock Classes="h2" Text="{x:Static app:Strings.KeyboardSettings}" />
+                            <TextBlock Classes="secondary" Text="{x:Static app:Strings.KeyboardSettingsIntro}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="24" RowSpacing="10">
+                            <TextBlock Classes="label" Text="{x:Static app:Strings.TravelMode}" VerticalAlignment="Center" />
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding Modes}" SelectedItem="{Binding Mode}" MinWidth="320"
+                                      IsEnabled="{Binding IsLoaded}" AutomationProperties.Name="{x:Static app:Strings.TravelMode}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="app:TravelModeItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Grid.Row="1" Classes="label" Text="{x:Static app:Strings.DeviceProfile}" VerticalAlignment="Center" />
+                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Profiles}" SelectedItem="{Binding Profile}" MinWidth="320"
+                                      IsEnabled="{Binding IsLoaded}" AutomationProperties.Name="{x:Static app:Strings.DeviceProfile}"
+                                      ToolTip.Tip="{x:Static app:Strings.OnboardProfileHelp}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="app:OnboardProfileItem">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="10"
+                                    IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <ProgressBar IsIndeterminate="True" Width="80" IsVisible="{Binding IsBusy}" VerticalAlignment="Center" />
+                            <TextBlock Classes="caption" Text="{Binding Status}" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <TextBlock Classes="caption warn" Text="{x:Static app:Strings.KeyboardSettingsExperimental}" TextWrapping="Wrap"
+                                   IsVisible="{Binding RequiresExperimentalConsent}" />
+                    </StackPanel>
+                </Border>
                 <Border Classes="panel" DataContext="{Binding Keyboard}">
                     <StackPanel x:DataType="app:KeyboardEditorViewModel" Spacing="12">
                         <TextBlock Classes="h2" Text="{x:Static app:Strings.Backup}" />

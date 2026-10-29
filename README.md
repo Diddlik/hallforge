@@ -48,6 +48,7 @@ The installed app checks GitHub for updates when it starts, verifies the downloa
 - **Backups**: imports the current settings from the AKKO Cloud Driver database before the first write.
 - **RGB lighting**: 21 effects with brightness, speed, direction and color. Every lighting change is read back from the keyboard.
 - **Roar mode**: up to four keys with the fastest response, chosen from the key selection. The backlight turns off while Roar is on, as in the AKKO driver. Every change is read back from the keyboard.
+- **Travel mode and onboard profile**: switch Comfort, Sensitive, Gaming and Custom (like Fn+1 to Fn+4) and the active onboard profile on the Device page. Both are read back. The Performance page warns when the keyboard is not in Custom mode.
 - **Light and dark theme**, English and German UI, keyboard navigation and screen reader labels.
 - **CLI** for scripting: list devices, back up, apply profiles, set keys and lighting with `--dry-run`.
 
