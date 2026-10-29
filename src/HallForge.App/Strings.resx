@@ -768,4 +768,43 @@
   <data name="ShownValue" xml:space="preserve">
     <value>Value shown on keys</value>
   </data>
+  <data name="RoarTitle" xml:space="preserve">
+    <value>Roar mode</value>
+  </data>
+  <data name="RoarHelp" xml:space="preserve">
+    <value>Up to four keys respond with the fastest reaction. Like the AKKO driver, HallForge turns the backlight off while Roar mode is on, because the vendor says it disturbs the fastest response. Select the keys on the keyboard, then use them.</value>
+  </data>
+  <data name="RoarCurrent" xml:space="preserve">
+    <value>Roar keys: {0}</value>
+  </data>
+  <data name="RoarNone" xml:space="preserve">
+    <value>none</value>
+  </data>
+  <data name="RoarUseSelection" xml:space="preserve">
+    <value>Use selected keys</value>
+  </data>
+  <data name="RoarTurnOff" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="RoarSelectKeys" xml:space="preserve">
+    <value>Select one to four keys on the keyboard first.</value>
+  </data>
+  <data name="RoarUnchanged" xml:space="preserve">
+    <value>The keyboard already uses these Roar keys.</value>
+  </data>
+  <data name="RoarVerified" xml:space="preserve">
+    <value>Roar mode applied and verified: the keyboard reports the new keys.</value>
+  </data>
+  <data name="RoarFailed" xml:space="preserve">
+    <value>Roar mode could not be applied: {0}</value>
+  </data>
+  <data name="RoarReviewSummary" xml:space="preserve">
+    <value>One Roar mode change.</value>
+  </data>
+  <data name="RoarReviewNote" xml:space="preserve">
+    <value>The keyboard reports its Roar keys, so HallForge reads them back after writing and fails if they differ. The backlight of the active profile is turned off while any Roar key is set and on again when none is.</value>
+  </data>
+  <data name="ApplyRoar" xml:space="preserve">
+    <value>Apply Roar mode</value>
+  </data>
 </root>

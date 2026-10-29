@@ -47,6 +47,7 @@ The installed app checks GitHub for updates when it starts, verifies the downloa
 - **Profiles**: JSON profiles for FPS games and typing, with a coverage preview. Templates for BF6 and FPS setups are included.
 - **Backups**: imports the current settings from the AKKO Cloud Driver database before the first write.
 - **RGB lighting**: 21 effects with brightness, speed, direction and color. Every lighting change is read back from the keyboard.
+- **Roar mode**: up to four keys with the fastest response, chosen from the key selection. The backlight turns off while Roar is on, as in the AKKO driver. Every change is read back from the keyboard.
 - **Light and dark theme**, English and German UI, keyboard navigation and screen reader labels.
 - **CLI** for scripting: list devices, back up, apply profiles, set keys and lighting with `--dry-run`.
 

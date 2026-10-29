@@ -117,11 +117,14 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
                     HasInputError = Fields.Any(f => f.HasError);
             };
         Lighting = new LightingViewModel(target, transport, review);
+        Roar = new RoarViewModel(target, transport, review, () => Selected.Select(k => k.KeyId).ToList(),
+            id => Keys.FirstOrDefault(k => k.KeyId == id) is { } key ? Name(key) : id);
         ShownValue = ValueFields[0];
         RefreshEditor(keepInput: false);
     }
 
     public LightingViewModel Lighting { get; }
+    public RoarViewModel Roar { get; }
 
     public ObservableCollection<KeyViewModel> Keys { get; }
     public double CanvasWidth { get; }

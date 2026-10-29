@@ -759,4 +759,43 @@
   <data name="ShownValue" xml:space="preserve">
     <value>Auf Tasten angezeigter Wert</value>
   </data>
+  <data name="RoarTitle" xml:space="preserve">
+    <value>Roar-Modus</value>
+  </data>
+  <data name="RoarHelp" xml:space="preserve">
+    <value>Bis zu vier Tasten reagieren mit der schnellsten Reaktion. Wie der AKKO-Treiber schaltet HallForge die Beleuchtung aus, solange der Roar-Modus an ist, weil sie laut Hersteller die schnellste Reaktion stört. Wähle die Tasten auf der Tastatur aus und übernimm sie dann.</value>
+  </data>
+  <data name="RoarCurrent" xml:space="preserve">
+    <value>Roar-Tasten: {0}</value>
+  </data>
+  <data name="RoarNone" xml:space="preserve">
+    <value>keine</value>
+  </data>
+  <data name="RoarUseSelection" xml:space="preserve">
+    <value>Ausgewählte Tasten verwenden</value>
+  </data>
+  <data name="RoarTurnOff" xml:space="preserve">
+    <value>Ausschalten</value>
+  </data>
+  <data name="RoarSelectKeys" xml:space="preserve">
+    <value>Wähle zuerst eine bis vier Tasten auf der Tastatur aus.</value>
+  </data>
+  <data name="RoarUnchanged" xml:space="preserve">
+    <value>Die Tastatur verwendet diese Roar-Tasten bereits.</value>
+  </data>
+  <data name="RoarVerified" xml:space="preserve">
+    <value>Roar-Modus angewendet und geprüft: Die Tastatur meldet die neuen Tasten.</value>
+  </data>
+  <data name="RoarFailed" xml:space="preserve">
+    <value>Roar-Modus konnte nicht angewendet werden: {0}</value>
+  </data>
+  <data name="RoarReviewSummary" xml:space="preserve">
+    <value>Eine Änderung am Roar-Modus.</value>
+  </data>
+  <data name="RoarReviewNote" xml:space="preserve">
+    <value>Die Tastatur meldet ihre Roar-Tasten. HallForge liest sie nach dem Schreiben zurück und meldet einen Fehler, wenn sie abweichen. Die Beleuchtung des aktiven Profils wird ausgeschaltet, solange eine Roar-Taste gesetzt ist, und wieder eingeschaltet, wenn keine mehr gesetzt ist.</value>
+  </data>
+  <data name="ApplyRoar" xml:space="preserve">
+    <value>Roar-Modus anwenden</value>
+  </data>
 </root>
