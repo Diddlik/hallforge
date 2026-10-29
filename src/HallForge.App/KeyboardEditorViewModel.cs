@@ -100,16 +100,17 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
         CanvasWidth = _definition.Layout.Max(g => g.X + g.W) * KeyViewModel.Pitch;
         CanvasHeight = _definition.Layout.Max(g => g.Y + g.H) * KeyViewModel.Pitch;
         var limits = _definition.Limits;
+        var maxTravel = (double)limits.Travel.MaxMm;
         Actuation = new TriggerFieldViewModel(Strings.Actuation, Strings.ActuationHelp, limits.Travel,
-            t => t.ActuationMm, mm => new TriggerPatch(ActuationMm: mm), Edit, Step);
+            t => t.ActuationMm, mm => new TriggerPatch(ActuationMm: mm), Edit, Step) { Kind = TravelKind.Actuation, MaxTravel = maxTravel };
         Release = new TriggerFieldViewModel(Strings.Release, Strings.ReleaseHelp, limits.Travel,
-            t => t.ReleaseMm, mm => new TriggerPatch(ReleaseMm: mm), Edit, Step);
+            t => t.ReleaseMm, mm => new TriggerPatch(ReleaseMm: mm), Edit, Step) { Kind = TravelKind.Release, MaxTravel = maxTravel };
         RapidTriggerPress = new TriggerFieldViewModel(Strings.RapidTriggerPress, Strings.RapidTriggerPressHelp, limits.RapidTrigger,
-            t => t.RapidTriggerPressMm, mm => new TriggerPatch(RapidTriggerPressMm: mm), Edit, Step);
+            t => t.RapidTriggerPressMm, mm => new TriggerPatch(RapidTriggerPressMm: mm), Edit, Step) { Kind = TravelKind.RapidTriggerPress, MaxTravel = maxTravel };
         RapidTriggerRelease = new TriggerFieldViewModel(Strings.RapidTriggerRelease, Strings.RapidTriggerReleaseHelp, limits.RapidTrigger,
-            t => t.RapidTriggerReleaseMm, mm => new TriggerPatch(RapidTriggerReleaseMm: mm), Edit, Step);
+            t => t.RapidTriggerReleaseMm, mm => new TriggerPatch(RapidTriggerReleaseMm: mm), Edit, Step) { Kind = TravelKind.RapidTriggerRelease, MaxTravel = maxTravel };
         Deadzone = new TriggerFieldViewModel(Strings.Deadzone, Strings.DeadzoneHelp, limits.Deadzone,
-            t => t.DeadzoneMm, mm => new TriggerPatch(DeadzoneMm: mm), Edit, Step);
+            t => t.DeadzoneMm, mm => new TriggerPatch(DeadzoneMm: mm), Edit, Step) { Kind = TravelKind.Deadzone, MaxTravel = maxTravel };
         foreach (var field in Fields)
             field.PropertyChanged += (_, e) =>
             {

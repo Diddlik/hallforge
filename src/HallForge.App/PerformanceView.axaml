@@ -58,8 +58,13 @@
             <Setter Property="Foreground" Value="{DynamicResource HfText}" />
         </Style>
 
-        <Style Selector="StackPanel.field.inactive">
+        <Style Selector="StackPanel.field.inactive, app|TravelDiagram.inactive">
             <Setter Property="Opacity" Value="0.6" />
+        </Style>
+        <Style Selector="app|TravelDiagram">
+            <Setter Property="TrackBrush" Value="{DynamicResource HfSurface2}" />
+            <Setter Property="KeyBrush" Value="{DynamicResource HfText3}" />
+            <Setter Property="AccentBrush" Value="{DynamicResource HfAccent}" />
         </Style>
         <Style Selector="TextBox.mm.error">
             <Setter Property="BorderBrush" Value="{DynamicResource HfErr}" />
@@ -86,7 +91,18 @@
 
     <UserControl.DataTemplates>
         <DataTemplate DataType="app:TriggerFieldViewModel">
-            <StackPanel Classes="field" Classes.inactive="{Binding IsInactive}" Spacing="6" IsEnabled="{Binding IsEnabled}">
+            <Grid Classes="fieldRow" ColumnDefinitions="Auto,*" ColumnSpacing="10" Background="Transparent">
+            <!-- Plays while the pointer or keyboard focus is on the field -->
+            <app:TravelDiagram Kind="{Binding Kind}" Value="{Binding SliderValue}" MaxTravel="{Binding MaxTravel}"
+                               Width="30" Height="64" VerticalAlignment="Top" Margin="0,2,0,0" Classes.inactive="{Binding IsInactive}">
+                <app:TravelDiagram.IsPlaying>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <Binding Path="IsPointerOver" RelativeSource="{RelativeSource AncestorType=Grid}" />
+                        <Binding Path="IsKeyboardFocusWithin" RelativeSource="{RelativeSource AncestorType=Grid}" />
+                    </MultiBinding>
+                </app:TravelDiagram.IsPlaying>
+            </app:TravelDiagram>
+            <StackPanel Grid.Column="1" Classes="field" Classes.inactive="{Binding IsInactive}" Spacing="6" IsEnabled="{Binding IsEnabled}">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center" />
                     <Border Background="Transparent" ToolTip.Tip="{Binding Help}" VerticalAlignment="Center">
@@ -112,6 +128,7 @@
                     <TextBlock Grid.Column="1" Classes="caption" Text="{Binding RangeText}" />
                 </Grid>
             </StackPanel>
+            </Grid>
         </DataTemplate>
     </UserControl.DataTemplates>
 

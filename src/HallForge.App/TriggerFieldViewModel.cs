@@ -17,6 +17,8 @@ public sealed partial class TriggerFieldViewModel(
     private bool _refreshing;
 
     public string Label { get; } = label;
+    public TravelKind Kind { get; init; }
+    public double MaxTravel { get; init; } = 4;
     public string Help { get; } = help;
     public TravelRange Range { get; } = range;
     public double Minimum => (double)Range.MinMm;
