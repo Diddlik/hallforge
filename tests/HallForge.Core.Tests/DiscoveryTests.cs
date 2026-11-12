@@ -134,7 +134,7 @@ public class DiscoveryTests
         var service = new KeyboardDiscoveryService(new FakeTransport(Hid("receiver", pid: 0x4011)), [definition]);
 
         Assert.Empty(service.Discover());
-        Assert.Same(definition, service.FindReceiver());
+        Assert.Same(definition, service.FindReceiver()?.Definition);
     }
 
     [Fact]

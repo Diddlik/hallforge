@@ -31,7 +31,9 @@ public sealed class KeyboardDiscoveryService(IHidTransport transport, IReadOnlyL
             .Where(c => includeUnmatched || c.Definition is not null)
             .ToList();
 
-    /// <summary>The model whose wireless receiver is plugged in, if any.</summary>
-    public DeviceDefinition? FindReceiver() =>
-        transport.Enumerate().Select(hid => _definitions.FirstOrDefault(d => d.IsReceiver(hid))).FirstOrDefault(d => d is not null);
+    /// <summary>The configuration interface of a plugged-in wireless receiver, if any.</summary>
+    public KeyboardCandidate? FindReceiver() =>
+        transport.Enumerate()
+            .Select(hid => new KeyboardCandidate(hid, _definitions.FirstOrDefault(d => d.IsReceiver(hid))))
+            .FirstOrDefault(c => c.Definition is not null);
 }

@@ -140,4 +140,4 @@ Only read commands and the two receiver-local settings the vendor driver sends i
   - 0xFD: `AA 55 01 00 ..`, the receiver id.
 - Commands for the keyboard (0x8F, 0x80, 0x85, 0x87, 0x9D) get no answer. The receiver returns zeros when read directly (polled for 1.5 s) and after 0xFC (fetch cached response, polled for 3 s). The 0xF7 byte 0 never turns 1. The interrupt endpoints carry only key input.
 - USB capture of Akko Cloud Driver v3 with the same setup: `F7`, `FE 40`, `F7`, `F6 0A`, `8F ..70` (with checksum), `F7`, `FC`, read → zeros, then `87 ..78`, `FC`, read → zeros. After that it only polls 0xF7 every 2 s, without a checksum byte. The vendor driver gets no answer from the keyboard over the receiver either.
-- Consequence: the keyboard cannot be configured over the receiver with the commands known so far. HallForge keeps the receiver in `receiverProductIds` and asks for the cable.
+- Consequence: the keyboard cannot be configured over the receiver with the commands known so far. HallForge keeps the receiver in `receiverProductIds`, asks for the cable and shows the battery from 0xF7 (`RongYuanReceiver`).

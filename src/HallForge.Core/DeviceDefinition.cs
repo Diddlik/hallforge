@@ -32,7 +32,10 @@ public sealed record DeviceDefinition(
         && hid.Usage == Match.Usage;
 
     public bool IsReceiver(HidInterfaceInfo hid) =>
-        Match.VendorIds.Contains(hid.VendorId) && Match.ReceiverProductIds?.Contains(hid.ProductId) == true;
+        Match.VendorIds.Contains(hid.VendorId)
+        && Match.ReceiverProductIds?.Contains(hid.ProductId) == true
+        && hid.UsagePage == Match.UsagePage
+        && hid.Usage == Match.Usage;
 }
 
 /// <summary>Identifies the vendor configuration interface. An empty product id list matches any product of the vendor.</summary>

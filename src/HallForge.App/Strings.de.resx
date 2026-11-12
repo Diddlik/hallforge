@@ -891,4 +891,7 @@
   <data name="ReceiverOnly" xml:space="preserve">
     <value>Der 2,4-GHz-Empfänger der {0} ist eingesteckt. HallForge konfiguriert die Tastatur nur über das USB-Kabel, schließe also das Kabel an.</value>
   </data>
+  <data name="ReceiverBattery" xml:space="preserve">
+    <value>2,4-GHz-Empfänger · Akku der Tastatur {0} %</value>
+  </data>
 </root>

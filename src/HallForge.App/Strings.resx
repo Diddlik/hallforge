@@ -900,4 +900,7 @@
   <data name="ReceiverOnly" xml:space="preserve">
     <value>The 2.4 GHz receiver of the {0} is plugged in. HallForge configures the keyboard only over the USB cable, so connect the cable.</value>
   </data>
+  <data name="ReceiverBattery" xml:space="preserve">
+    <value>2.4 GHz receiver · keyboard battery {0} %</value>
+  </data>
 </root>

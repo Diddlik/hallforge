@@ -153,6 +153,8 @@
                     </Border>
                     <TextBlock Grid.Column="3" Classes="secondary" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                Text="{Binding Keyboard.HeaderInfo, FallbackValue=''}" />
+                    <TextBlock Grid.Column="3" Classes="secondary" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Text="{Binding ReceiverBattery}" IsVisible="{Binding IsNoDevice}" />
                     <Button Grid.Column="4" Classes="icon" Command="{Binding RefreshCommand}"
                             ToolTip.Tip="{x:Static app:Strings.SearchAgain}" AutomationProperties.Name="{x:Static app:Strings.SearchAgain}">
                         <Path Classes="icon" Data="{StaticResource IconRefresh}" />

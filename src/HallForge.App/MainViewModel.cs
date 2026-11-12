@@ -57,6 +57,10 @@ public sealed partial class MainViewModel(
     /// <summary>The cable was pulled while drafts exist; the editor stays so they are not lost.</summary>
     public bool IsKeyboardLost => Keyboard is not null && !IsKeyboardConnected;
 
+    /// <summary>Battery of a keyboard that is only reachable over its receiver.</summary>
+    [ObservableProperty]
+    public partial string? ReceiverBattery { get; set; }
+
     private bool _checkingDevices;
     private bool _recheckDevices;
 
@@ -171,6 +175,7 @@ public sealed partial class MainViewModel(
             return;
         }
         IsKeyboardConnected = false;
+        ReceiverBattery = null;
         Keyboard = null;
         Profiles = null;
         IsSearching = true;
@@ -182,7 +187,9 @@ public sealed partial class MainViewModel(
             if (target is null)
             {
                 var receiver = await Task.Run(discovery.FindReceiver);
-                Status = receiver is null ? Strings.NoKeyboardFound : Format(Strings.ReceiverOnly, receiver.Name);
+                Status = receiver is null ? Strings.NoKeyboardFound : Format(Strings.ReceiverOnly, receiver.Definition!.Name);
+                if (receiver is { Definition.Protocol: "rongyuan" } && await Task.Run(() => ReadReceiverBattery(receiver)) is { } battery)
+                    ReceiverBattery = Format(Strings.ReceiverBattery, battery);
                 return;
             }
             Status = "";
@@ -203,6 +210,20 @@ public sealed partial class MainViewModel(
         finally
         {
             IsSearching = false;
+        }
+    }
+
+    private int? ReadReceiverBattery(KeyboardCandidate receiver)
+    {
+        try
+        {
+            using var connection = transport.Open(receiver.Interface);
+            return RongYuanReceiver.ReadBattery(connection);
+        }
+        catch (Exception ex) when (ex is IOException or TimeoutException or UnauthorizedAccessException)
+        {
+            // The battery is a hint; the receiver message is shown without it.
+            return null;
         }
     }
 
