@@ -130,3 +130,14 @@ The vendor driver labels the 0x1A rapid trigger flag (`fire`, option byte `| 0x8
 1. Done: proof of concept on KeyQ (3.5 mm, confirmed by typing, then restored to 0.9 mm). See `hardware-compatibility.md`.
 2. Done: `backup import-akko` imports the vendor driver state. The newest `devConfig_<modelId>` value in the log-structured database is the last one in the file, which was verified against today's AltLeft change. Array index = onboard profile.
 3. Done: `StateStore` keeps the last applied state.
+
+## 2.4 GHz receiver, PID 0x4011 (2026-11-12, MOD007B in 2.4 GHz mode, cable unplugged)
+
+Only read commands and the two receiver-local settings the vendor driver sends itself (0xFE, 0xF6) were used.
+
+- The receiver answers its own commands on interface 2 (0xFFFF / 0x0002), report id 0, 64-byte feature reports:
+  - 0xF7: `00 64 00 00 01 01 01 00`. Byte 1 is the keyboard battery in percent (0x64 = 100). Byte 0 is "response pending" in the monsgeek-akko-linux notes. With the keyboard switched off, the receiver reported `00 00 00 01 01 01 00 00`.
+  - 0xFD: `AA 55 01 00 ..`, the receiver id.
+- Commands for the keyboard (0x8F, 0x80, 0x85, 0x87, 0x9D) get no answer. The receiver returns zeros when read directly (polled for 1.5 s) and after 0xFC (fetch cached response, polled for 3 s). The 0xF7 byte 0 never turns 1. The interrupt endpoints carry only key input.
+- USB capture of Akko Cloud Driver v3 with the same setup: `F7`, `FE 40`, `F7`, `F6 0A`, `8F ..70` (with checksum), `F7`, `FC`, read → zeros, then `87 ..78`, `FC`, read → zeros. After that it only polls 0xF7 every 2 s, without a checksum byte. The vendor driver gets no answer from the keyboard over the receiver either.
+- Consequence: the keyboard cannot be configured over the receiver with the commands known so far. HallForge keeps the receiver in `receiverProductIds` and asks for the cable.
