@@ -22,6 +22,9 @@ public sealed class AppSettings
     public WindowPlacement? Window { get; set; }
     public bool NavigationCollapsed { get; set; }
 
+    /// <summary>Closing the window hides it to the tray instead of ending the app.</summary>
+    public bool CloseToTray { get; set; }
+
     /// <summary>"Light" or "Dark"; null follows the system setting.</summary>
     public string? Theme { get; set; }
 

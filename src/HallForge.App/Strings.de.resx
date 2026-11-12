@@ -894,4 +894,7 @@
   <data name="ReceiverBattery" xml:space="preserve">
     <value>2,4-GHz-Empfänger · Akku der Tastatur {0} %</value>
   </data>
+  <data name="CloseToTray" xml:space="preserve">
+    <value>Beim Schließen im Infobereich weiterlaufen</value>
+  </data>
 </root>

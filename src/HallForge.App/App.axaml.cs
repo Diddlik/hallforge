@@ -33,17 +33,17 @@ public partial class App : Application
             HidSharp.DeviceList.Local.Changed += (_, _) =>
                 Avalonia.Threading.Dispatcher.UIThread.Post(async () => await viewModel.CheckDevicesAsync());
             desktop.MainWindow = window;
-            KeepRunningInTray(window, viewModel.AutoSwitch);
+            KeepRunningInTray(window, viewModel);
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
     /// <summary>
-    /// Automatic switching only works while HallForge runs, so with it enabled, closing the window hides it to
-    /// the tray. "Exit" in the tray menu ends the app.
+    /// With close to tray or automatic switching enabled, closing the window hides it to the tray.
+    /// "Exit" in the tray menu ends the app.
     /// </summary>
-    private void KeepRunningInTray(Window window, AutoSwitchViewModel autoSwitch)
+    private void KeepRunningInTray(Window window, MainViewModel viewModel)
     {
         void ShowWindow()
         {
@@ -60,20 +60,25 @@ public partial class App : Application
         {
             Icon = window.Icon,
             ToolTipText = Strings.TrayToolTip,
-            IsVisible = autoSwitch.IsActive,
+            IsVisible = viewModel.KeepsRunningInTray,
             Menu = new NativeMenu { open, exit },
         };
         tray.Clicked += (_, _) => ShowWindow();
         TrayIcon.SetIcons(this, [tray]);
-        autoSwitch.PropertyChanged += (_, e) =>
+        viewModel.AutoSwitch.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(AutoSwitchViewModel.IsEnabled))
-                tray.IsVisible = autoSwitch.IsActive;
+                tray.IsVisible = viewModel.KeepsRunningInTray;
+        };
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(MainViewModel.KeepsRunningInTray))
+                tray.IsVisible = viewModel.KeepsRunningInTray;
         };
         // Programmatic closes (tray "Exit") and system shutdown still end the app.
         window.Closing += (_, e) =>
         {
-            if (autoSwitch.IsActive && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
+            if (viewModel.KeepsRunningInTray && !e.IsProgrammatic && e.CloseReason == WindowCloseReason.WindowClosing)
             {
                 e.Cancel = true;
                 window.Hide();

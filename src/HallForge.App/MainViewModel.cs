@@ -139,6 +139,20 @@ public sealed partial class MainViewModel(
         }
     }
 
+    public bool CloseToTray
+    {
+        get => settings.CloseToTray;
+        set
+        {
+            settings.CloseToTray = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(KeepsRunningInTray));
+        }
+    }
+
+    /// <summary>Automatic switching needs a running app, so it also keeps HallForge in the tray.</summary>
+    public bool KeepsRunningInTray => CloseToTray || AutoSwitch.IsActive;
+
     public AutoSwitchViewModel AutoSwitch => field ??= new AutoSwitchViewModel(settings, () => Keyboard?.Settings,
         () => Keyboard is { } k && (k.IsBusy || k.Lighting.IsBusy || k.Roar.IsBusy), ForegroundProgram.Current, SaveSettings);
 

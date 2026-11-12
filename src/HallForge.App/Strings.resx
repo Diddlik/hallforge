@@ -903,4 +903,7 @@
   <data name="ReceiverBattery" xml:space="preserve">
     <value>2.4 GHz receiver · keyboard battery {0} %</value>
   </data>
+  <data name="CloseToTray" xml:space="preserve">
+    <value>Keep running in the tray when the window is closed</value>
+  </data>
 </root>
