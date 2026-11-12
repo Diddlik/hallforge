@@ -30,14 +30,22 @@ public sealed record DeviceDefinition(
         && (Match.ProductIds.Count == 0 || Match.ProductIds.Contains(hid.ProductId))
         && hid.UsagePage == Match.UsagePage
         && hid.Usage == Match.Usage;
+
+    public bool IsReceiver(HidInterfaceInfo hid) =>
+        Match.VendorIds.Contains(hid.VendorId) && Match.ReceiverProductIds?.Contains(hid.ProductId) == true;
 }
 
 /// <summary>Identifies the vendor configuration interface. An empty product id list matches any product of the vendor.</summary>
+/// <param name="ReceiverProductIds">
+/// Wireless receivers of this model. They are only recognized so the user can be told to use the cable; the
+/// protocol over a receiver is not verified, so they are never configured.
+/// </param>
 public sealed record DeviceMatch(
     [property: JsonConverter(typeof(HexIntListConverter))] IReadOnlyList<int> VendorIds,
     [property: JsonConverter(typeof(HexIntListConverter))] IReadOnlyList<int> ProductIds,
     [property: JsonConverter(typeof(HexIntConverter))] int UsagePage,
-    [property: JsonConverter(typeof(HexIntConverter))] int Usage);
+    [property: JsonConverter(typeof(HexIntConverter))] int Usage,
+    [property: JsonConverter(typeof(HexIntListConverter))] IReadOnlyList<int>? ReceiverProductIds = null);
 
 public static class DeviceDefinitionLoader
 {

@@ -47,8 +47,18 @@ public sealed partial class MainViewModel(
     public Func<ReviewViewModel, Task> ShowReview { get; set; } = _ => Task.CompletedTask;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasKeyboard), nameof(IsNoDevice), nameof(ShowDevicePage), nameof(ShowPerformancePage), nameof(ShowLightingPage), nameof(ShowProfilesPage))]
+    [NotifyPropertyChangedFor(nameof(HasKeyboard), nameof(IsNoDevice), nameof(IsKeyboardLost), nameof(ShowDevicePage), nameof(ShowPerformancePage), nameof(ShowLightingPage), nameof(ShowProfilesPage))]
     public partial KeyboardEditorViewModel? Keyboard { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsKeyboardLost))]
+    public partial bool IsKeyboardConnected { get; set; }
+
+    /// <summary>The cable was pulled while drafts exist; the editor stays so they are not lost.</summary>
+    public bool IsKeyboardLost => Keyboard is not null && !IsKeyboardConnected;
+
+    private bool _checkingDevices;
+    private bool _recheckDevices;
 
     [ObservableProperty]
     public partial ProfileLibraryViewModel? Profiles { get; set; }
@@ -160,6 +170,7 @@ public sealed partial class MainViewModel(
             Status = Strings.RefreshBlockedByPending;
             return;
         }
+        IsKeyboardConnected = false;
         Keyboard = null;
         Profiles = null;
         IsSearching = true;
@@ -170,11 +181,13 @@ public sealed partial class MainViewModel(
             var target = candidates.FirstOrDefault(c => c.Definition!.Protocol == "rongyuan" && c.Definition.Layout.Count > 0);
             if (target is null)
             {
-                Status = Strings.NoKeyboardFound;
+                var receiver = await Task.Run(discovery.FindReceiver);
+                Status = receiver is null ? Strings.NoKeyboardFound : Format(Strings.ReceiverOnly, receiver.Name);
                 return;
             }
             Status = "";
             Keyboard = new KeyboardEditorViewModel(target, legends, transport, store, review => ShowReview(review));
+            IsKeyboardConnected = true;
             Profiles = new ProfileLibraryViewModel(Path.Combine(AppContext.BaseDirectory, "profiles"), Keyboard, () => PageIndex = (int)Page.Performance);
             if (PageIndex == (int)Page.Device)
                 PageIndex = (int)Page.Performance;
@@ -190,6 +203,45 @@ public sealed partial class MainViewModel(
         finally
         {
             IsSearching = false;
+        }
+    }
+
+    /// <summary>Called on the UI thread when HID devices arrive or leave.</summary>
+    public async Task CheckDevicesAsync()
+    {
+        // Events come in bursts per plug; remember the last one instead of running checks in parallel.
+        if (_checkingDevices || IsSearching)
+        {
+            _recheckDevices = true;
+            return;
+        }
+        _checkingDevices = true;
+        try
+        {
+            do
+            {
+                _recheckDevices = false;
+                if (Keyboard is not { } keyboard)
+                {
+                    await RefreshAsync();
+                    continue;
+                }
+                var path = keyboard.InterfacePath;
+                var present = await Task.Run(() => transport.Enumerate().Any(h => h.Path == path));
+                if (!present && keyboard.PendingCount == 0)
+                    await RefreshAsync();
+                else
+                    IsKeyboardConnected = present;
+            }
+            while (_recheckDevices);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Status = Format(Strings.ListFailed, ex.Message);
+        }
+        finally
+        {
+            _checkingDevices = false;
         }
     }
 

@@ -882,4 +882,13 @@
   <data name="TrayToolTip" xml:space="preserve">
     <value>HallForge: Umschalten je Programm</value>
   </data>
+  <data name="Disconnected" xml:space="preserve">
+    <value>Getrennt</value>
+  </data>
+  <data name="DisconnectedHelp" xml:space="preserve">
+    <value>Die Tastatur ist nicht mehr verbunden. Stecke das USB-Kabel wieder ein; deine offenen Änderungen bleiben erhalten.</value>
+  </data>
+  <data name="ReceiverOnly" xml:space="preserve">
+    <value>Der 2,4-GHz-Empfänger der {0} ist eingesteckt. HallForge konfiguriert die Tastatur nur über das USB-Kabel, schließe also das Kabel an.</value>
+  </data>
 </root>

@@ -31,7 +31,7 @@ Observed on 2026-10-28, Windows 11 (build 26300), with `hallforge devices probe`
 
 ### AKKO MOD007B ISO HE 2.4G receiver, VID 0x3151 PID 0x4011
 
-This is the 2.4 GHz receiver of the same keyboard, as confirmed by the owner. The same interface layout was seen, including 0xFFFF / 0x0002 on interface 2. Wireless writes are out of scope for the MVP.
+This is the 2.4 GHz receiver of the same keyboard, as confirmed by the owner. The same interface layout was seen, including 0xFFFF / 0x0002 on interface 2. Wireless writes are out of scope for the MVP. `devices/akko-mod007b-iso-he.json` lists it as `receiverProductIds`, so the GUI only tells the user to connect the cable. On 2026-11-12, with the keyboard also on the cable, the receiver's 0xFFFF / 0x0002 interface did not answer GET_USB_VERSION (0x8F) after 5 attempts. Whether it answers with the keyboard in 2.4 GHz mode only is not tested.
 
 ## Open questions
 

@@ -128,11 +128,14 @@
                         </StackPanel>
                     </Button>
                     <Panel Grid.Column="1" VerticalAlignment="Center">
-                        <Border Classes="pill success" IsVisible="{Binding HasKeyboard}">
+                        <Border Classes="pill success" IsVisible="{Binding IsKeyboardConnected}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Ellipse Width="8" Height="8" Fill="{DynamicResource HfSuccess}" VerticalAlignment="Center" />
                                 <TextBlock Text="{x:Static app:Strings.Connected}" />
                             </StackPanel>
+                        </Border>
+                        <Border Classes="pill warn" IsVisible="{Binding IsKeyboardLost}" ToolTip.Tip="{x:Static app:Strings.DisconnectedHelp}">
+                            <TextBlock Text="{x:Static app:Strings.Disconnected}" />
                         </Border>
                         <Border Classes="pill draft" IsVisible="{Binding IsSearching}">
                             <TextBlock Text="{x:Static app:Strings.Discovering}" />

@@ -7,7 +7,8 @@
     "vendorIds": ["0x3151"],
     "productIds": ["0x4035"],
     "usagePage": "0xFFFF",
-    "usage": "0x0002"
+    "usage": "0x0002",
+    "receiverProductIds": ["0x4011"]
   },
   "firmwareModelIds": [1778],
   "limits": {

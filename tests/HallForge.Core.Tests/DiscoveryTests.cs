@@ -126,6 +126,18 @@ public class DiscoveryTests
     }
 
     [Fact]
+    public void FindReceiver_RecognizesReceiverButDiscoverIgnoresIt()
+    {
+        var definition = DeviceDefinitionLoader.Parse(Definition
+            .Replace("\"productIds\": []", "\"productIds\": [\"0x5030\"]", StringComparison.Ordinal)
+            .Replace("\"usage\": \"0x0002\"", "\"usage\": \"0x0002\", \"receiverProductIds\": [\"0x4011\"]", StringComparison.Ordinal));
+        var service = new KeyboardDiscoveryService(new FakeTransport(Hid("receiver", pid: 0x4011)), [definition]);
+
+        Assert.Empty(service.Discover());
+        Assert.Same(definition, service.FindReceiver());
+    }
+
+    [Fact]
     public void DiagnosticReport_DoesNotContainDevicePath()
     {
         const string path = @"\\?\hid#vid_3151&pid_5030&mi_02#secret-instance";

@@ -30,6 +30,8 @@ public partial class App : Application
             if (desktop.Args?.Contains(Autostart.MinimizedArgument) == true)
                 window.WindowState = Avalonia.Controls.WindowState.Minimized;
             window.Opened += async (_, _) => await viewModel.StartAsync();
+            HidSharp.DeviceList.Local.Changed += (_, _) =>
+                Avalonia.Threading.Dispatcher.UIThread.Post(async () => await viewModel.CheckDevicesAsync());
             desktop.MainWindow = window;
             KeepRunningInTray(window, viewModel.AutoSwitch);
         }

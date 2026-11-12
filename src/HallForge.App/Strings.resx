@@ -891,4 +891,13 @@
   <data name="TrayToolTip" xml:space="preserve">
     <value>HallForge: switching per program</value>
   </data>
+  <data name="Disconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
+  <data name="DisconnectedHelp" xml:space="preserve">
+    <value>The keyboard is no longer connected. Plug the USB cable back in; your pending changes are kept.</value>
+  </data>
+  <data name="ReceiverOnly" xml:space="preserve">
+    <value>The 2.4 GHz receiver of the {0} is plugged in. HallForge configures the keyboard only over the USB cable, so connect the cable.</value>
+  </data>
 </root>

@@ -134,7 +134,9 @@ public sealed partial class KeyboardEditorViewModel : ObservableObject
     public double CanvasHeight { get; }
     public string DeviceName => _definition.Name;
     public bool IsExperimental => !_definition.Verified;
-    public string UsbId => $"{_target.Interface.VendorId:X4}:{_target.Interface.ProductId:X4}";
+    public string InterfacePath => _target.Interface.Path;
+
+    public string UsbId =>$"{_target.Interface.VendorId:X4}:{_target.Interface.ProductId:X4}";
     public string ModelIds => string.Join(", ", _definition.FirmwareModelIds);
     public string LayoutSummary => Text.Format(Strings.LayoutSummary, Keys.Count);
 
